@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Card, CardColor, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
-import { Events } from '@thc-u-know/shared';
+import { Events, manifestEntry } from '@thc-u-know/shared';
 import { socket } from '../realtime/socket';
 import { ChatBox } from './ChatBox';
 import { PlayerRail } from './PlayerRail';
@@ -13,8 +13,14 @@ type Props = {
 };
 
 const wildColors: CardColor[] = ['purple', 'green', 'gold', 'blue'];
-const colorChangingWilds = new Set(['strain-switch', 'hotbox-plus-four']);
-const targetCards = new Set(['bogart', 'greener-side']);
+
+function cardNeedsChosenColor(card: Card): boolean {
+  return card.kind !== 'number' && manifestEntry(card.kind).needsChosenColor;
+}
+
+function cardNeedsTarget(card: Card): boolean {
+  return card.kind !== 'number' && manifestEntry(card.kind).needsTarget;
+}
 
 export function GameTable({ playerId, publicState, privateState }: Props) {
   const isMyTurn = publicState.currentPlayerId === playerId && !publicState.winnerId;
@@ -32,11 +38,11 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   function play(card: Card) {
-    if (colorChangingWilds.has(card.kind)) {
+    if (cardNeedsChosenColor(card)) {
       setPendingWild(card);
       return;
     }
-    if (targetCards.has(card.kind)) {
+    if (cardNeedsTarget(card)) {
       setPendingTarget(card);
       return;
     }
