@@ -1,0 +1,17 @@
+{
+  "name": "thc-u-know-card-game",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Online multiplayer UNNO-style parody card game for browser and Discord play.",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm --parallel --filter @thc-u-know/server --filter @thc-u-know/web dev",
+    "test": "pnpm --filter @thc-u-know/shared test",
+    "lint": "pnpm -r lint"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.4"
+}
