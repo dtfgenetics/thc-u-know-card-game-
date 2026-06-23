@@ -49,8 +49,9 @@ export class RedisSessionStore implements SessionStore {
   constructor(private readonly redis: Redis, private readonly ttlSeconds = env.SESSION_TTL_SECONDS) {}
 
   static fromEnv(): RedisSessionStore {
-    if (!env.REDIS_URL) throw new Error('REDIS_URL is required for RedisSessionStore');
-    return new RedisSessionStore(new Redis(env.REDIS_URL), env.SESSION_TTL_SECONDS);
+    const redisUrl = env.REDIS_URL;
+    if (!redisUrl) throw new Error('REDIS_URL is required for RedisSessionStore');
+    return new RedisSessionStore(new Redis(redisUrl), env.SESSION_TTL_SECONDS);
   }
 
   async createSession(playerName: string, settings?: Partial<GameSettings>): Promise<Session> {
