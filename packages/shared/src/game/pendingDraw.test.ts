@@ -17,7 +17,11 @@ function packTwo(id: string): Card {
   return { id, color: 'purple', kind: 'pack-two', label: 'Pack Two', points: 20 };
 }
 
-function createPendingState(stacking: boolean): GameState {
+function toleranceBreak(id: string): Card {
+  return { id, color: 'black', kind: 'tolerance-break', label: 'Tolerance Break', points: 50 };
+}
+
+function createPendingState(stacking: boolean, p2Cards: Card[] = [numberCard('p2-number'), packTwo('p2-pack-two')]): GameState {
   const state = createGameState({ sessionCode: 'DRAW01', players, random: () => 0.5 });
   return {
     ...state,
@@ -28,7 +32,7 @@ function createPendingState(stacking: boolean): GameState {
     discardPile: [packTwo('discard-pack-two')],
     hands: [
       { playerId: 'p1', cards: [numberCard('p1-number')] },
-      { playerId: 'p2', cards: [numberCard('p2-number'), packTwo('p2-pack-two')] }
+      { playerId: 'p2', cards: p2Cards }
     ]
   };
 }
@@ -51,5 +55,15 @@ describe('pending draw rules', () => {
     const result = playCard(state, { playerId: 'p2', cardId: card.id });
     expect(result.ok).toBe(true);
     expect(result.state.pendingDraw).toBe(4);
+  });
+
+  it('allows Tolerance Break to clear draw pressure even when stacking is disabled', () => {
+    const state = createPendingState(false, [toleranceBreak('p2-tolerance-break')]);
+    const card = state.hands[1]!.cards[0]!;
+    const validation = canPlayCard(state, 'p2', card);
+    expect(validation.ok).toBe(true);
+    const result = playCard(state, { playerId: 'p2', cardId: card.id });
+    expect(result.ok).toBe(true);
+    expect(result.state.pendingDraw).toBe(0);
   });
 });
