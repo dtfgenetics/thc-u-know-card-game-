@@ -4,8 +4,10 @@ export function toPublicState(state: GameState): PublicGameState {
   const topDiscard = state.discardPile[state.discardPile.length - 1];
   if (!topDiscard) throw new Error('Discard pile is empty');
 
+  const { hands: _hands, drawPile: _drawPile, ...safeState } = state;
+
   return {
-    ...state,
+    ...safeState,
     players: state.players.map(player => ({
       ...player,
       cardCount: state.hands.find(hand => hand.playerId === player.id)?.cards.length ?? 0
