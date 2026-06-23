@@ -1,5 +1,5 @@
 import type { Server, Socket } from 'socket.io';
-import { Events, createGameState, drawCards, playCard } from '@thc-u-know/shared';
+import { Events, createGameState, createNextRoundState, drawCards, playCard } from '@thc-u-know/shared';
 import type { CardColor, GameSettings } from '@thc-u-know/shared';
 import { publicSession } from '../state/store.js';
 import type { SessionStore } from '../state/store.js';
@@ -121,6 +121,7 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const updated = await store.setGame(code, game);
       if (!updated) return;
       io.to(code).emit(Events.GAME_STARTED, publicSession(updated));
+      broadcastSession(io, updated);
       broadcastGame(io, updated);
     });
 
@@ -129,13 +130,14 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
-      if (!session.game.winnerId) return socket.emit(Events.ERROR, { message: 'Round is not over yet' });
+      if (!session.game.winnerId && !session.game.drawRound) return socket.emit(Events.ERROR, { message: 'Round is not over yet' });
       if (!session.players.some(player => player.id === playerId)) return socket.emit(Events.ERROR, { message: 'Player not found' });
       if (session.players.length < 2) return socket.emit(Events.ERROR, { message: 'At least 2 players are required' });
 
-      const resetPlayers = session.players.map(player => ({ ...player, calledThcUKnow: false }));
-      const game = createGameState({ sessionCode: session.code, players: resetPlayers, settings: session.settings });
-      const updated = await store.saveSession({ ...session, players: resetPlayers, game });
+      const game = session.game.matchWinnerId
+        ? createGameState({ sessionCode: session.code, players: session.players.map(player => ({ ...player, calledThcUKnow: false })), settings: session.settings })
+        : createNextRoundState(session.game);
+      const updated = await store.saveSession({ ...session, players: game.players, game });
       io.to(code).emit(Events.GAME_STARTED, publicSession(updated));
       broadcastSession(io, updated);
       broadcastGame(io, updated);
@@ -155,9 +157,17 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       });
 
       if (!result.ok) return socket.emit(Events.ERROR, { message: result.reason ?? 'Invalid move' });
-      const updated = await store.saveSession({ ...session, game: result.state });
+      const updated = await store.saveSession({ ...session, players: result.state.players, game: result.state });
+      broadcastSession(io, updated);
       broadcastGame(io, updated);
-      if (result.state.winnerId) io.to(code).emit(Events.GAME_OVER, { winnerId: result.state.winnerId });
+      if (result.state.winnerId) {
+        io.to(code).emit(Events.GAME_OVER, {
+          winnerId: result.state.winnerId,
+          matchWinnerId: result.state.matchWinnerId,
+          lastRoundScore: result.state.lastRoundScore,
+          scores: result.state.scores
+        });
+      }
     });
 
     safeOn(socket, Events.GAME_DRAW_CARD, async payload => {
@@ -169,7 +179,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const drawCount = session.game.pendingDraw > 0 ? session.game.pendingDraw : 1;
       const result = drawCards(session.game, playerId, drawCount, true);
       if (!result.ok) return socket.emit(Events.ERROR, { message: result.reason ?? 'Unable to draw' });
-      const updated = await store.saveSession({ ...session, game: result.state });
+      const updated = await store.saveSession({ ...session, players: result.state.players, game: result.state });
+      broadcastSession(io, updated);
       broadcastGame(io, updated);
     });
 
