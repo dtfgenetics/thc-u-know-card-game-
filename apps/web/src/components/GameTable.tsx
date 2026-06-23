@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Card, CardColor, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events } from '@thc-u-know/shared';
 import { socket } from '../realtime/socket';
@@ -14,20 +15,29 @@ const wildColors: CardColor[] = ['purple', 'green', 'gold', 'blue'];
 
 export function GameTable({ playerId, publicState, privateState }: Props) {
   const isMyTurn = publicState.currentPlayerId === playerId;
+  const [pendingWild, setPendingWild] = useState<Card | null>(null);
 
-  function play(card: Card) {
-    let chosenColor: CardColor | undefined;
-    if (card.color === 'black') {
-      const choice = window.prompt('Choose strain color: purple, green, gold, or blue', 'purple') as CardColor | null;
-      chosenColor = wildColors.includes(choice as CardColor) ? (choice as CardColor) : 'purple';
-    }
-
+  function emitPlay(card: Card, chosenColor?: CardColor) {
     socket.emit(Events.GAME_PLAY_CARD, {
       code: publicState.sessionCode,
       playerId,
       cardId: card.id,
       chosenColor
     });
+  }
+
+  function play(card: Card) {
+    if (card.color === 'black') {
+      setPendingWild(card);
+      return;
+    }
+    emitPlay(card);
+  }
+
+  function chooseWildColor(color: CardColor) {
+    if (!pendingWild) return;
+    emitPlay(pendingWild, color);
+    setPendingWild(null);
   }
 
   function draw() {
@@ -37,6 +47,8 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   function callThcUKnow() {
     socket.emit(Events.GAME_CALL_THC_U_KNOW, { code: publicState.sessionCode, playerId });
   }
+
+  const latestLog = publicState.actionLog.slice(-5).reverse();
 
   return (
     <main className="game-table">
@@ -57,12 +69,29 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
             <ThcCard card={publicState.topDiscard} />
           </div>
         </div>
+        <section className="action-log">
+          <h3>Table Talk</h3>
+          {latestLog.map(item => <p key={item.id}>{item.message}</p>)}
+        </section>
       </section>
       <section className="hand-zone">
         <div className="hand-header">
           <h2>Your Hand</h2>
           <button type="button" onClick={callThcUKnow}>THC U Know!</button>
         </div>
+        {pendingWild && (
+          <div className="wild-picker">
+            <strong>Choose strain color for {pendingWild.label}</strong>
+            <div>
+              {wildColors.map(color => (
+                <button key={color} className={`color-choice card-${color}`} type="button" onClick={() => chooseWildColor(color)}>
+                  {color}
+                </button>
+              ))}
+              <button className="ghost-button" type="button" onClick={() => setPendingWild(null)}>Cancel</button>
+            </div>
+          </div>
+        )}
         <div className="hand-scroll">
           {privateState.hand.map(card => (
             <ThcCard key={card.id} card={card} disabled={!isMyTurn} onClick={play} />
