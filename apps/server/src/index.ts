@@ -4,6 +4,7 @@ import express from 'express';
 import { Server } from 'socket.io';
 import { env } from './config/env.js';
 import { attachRedisAdapter } from './realtime/socketRedisAdapter.js';
+import { createSessionStore } from './state/createSessionStore.js';
 import { registerSocketHandlers } from './socket/handlers.js';
 
 async function main() {
@@ -24,8 +25,9 @@ async function main() {
     }
   });
 
+  const sessionStore = createSessionStore();
   await attachRedisAdapter(io);
-  registerSocketHandlers(io);
+  registerSocketHandlers(io, sessionStore);
 
   server.listen(env.PORT, () => {
     console.log(`THC U Know server listening on http://localhost:${env.PORT}`);
