@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { Events } from '@thc-u-know/shared';
 import { socket } from '../realtime/socket';
 
@@ -36,6 +36,14 @@ export function ChatBox({ code, playerId }: Props) {
     setDraft('');
   }
 
+  function onDraftChange(event: ChangeEvent<HTMLInputElement>) {
+    setDraft(event.target.value);
+  }
+
+  function onDraftKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') send();
+  }
+
   return (
     <section className="chat-box">
       <h3>Smoke Talk</h3>
@@ -48,7 +56,7 @@ export function ChatBox({ code, playerId }: Props) {
         ))}
       </div>
       <div className="chat-input-row">
-        <input value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => event.key === 'Enter' && send()} placeholder="Say something..." />
+        <input value={draft} onChange={onDraftChange} onKeyDown={onDraftKeyDown} placeholder="Say something..." />
         <button type="button" onClick={send}>Send</button>
       </div>
     </section>
