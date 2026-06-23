@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Player, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events } from '@thc-u-know/shared';
-import { GameTable } from './components/GameTable.js';
-import { InvitePanel } from './components/InvitePanel.js';
-import { socket } from './realtime/socket.js';
+import { GameTable } from './components/GameTable';
+import { InvitePanel } from './components/InvitePanel';
+import { socket } from './realtime/socket';
 
 type PublicSession = {
   code: string;
