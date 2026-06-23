@@ -1,5 +1,6 @@
 export * from './events.js';
 export * from './types.js';
+export * from './game/cardManifest.js';
 export * from './game/cardNames.js';
 export * from './game/createDeck.js';
 export * from './game/createGame.js';
