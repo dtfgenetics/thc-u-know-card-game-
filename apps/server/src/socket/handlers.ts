@@ -5,11 +5,34 @@ import { publicSession } from '../state/store.js';
 import type { SessionStore } from '../state/store.js';
 import { broadcastGame, broadcastSession } from './broadcast.js';
 
+type SocketPayload = Record<string, unknown> | undefined;
+
 function joinSocketRooms(socket: Socket, code: string, playerId: string): void {
   socket.join(code);
   socket.join(`player:${playerId}`);
   socket.data.sessionCode = code;
   socket.data.playerId = playerId;
+}
+
+function emitSocketError(socket: Socket, message = 'Server error while handling game action'): void {
+  socket.emit(Events.ERROR, { message });
+}
+
+function safeOn(
+  socket: Socket,
+  event: string,
+  handler: (payload: SocketPayload) => Promise<void> | void
+): void {
+  socket.on(event, payload => {
+    void Promise.resolve(handler(payload as SocketPayload)).catch(error => {
+      console.error(`Socket handler failed for ${event}`, error);
+      emitSocketError(socket);
+    });
+  });
+}
+
+function payloadString(payload: SocketPayload, key: string, fallback = ''): string {
+  return String(payload?.[key] ?? fallback);
 }
 
 async function emitFullState(io: Server, store: SessionStore, sessionCode: string): Promise<void> {
@@ -21,14 +44,15 @@ async function emitFullState(io: Server, store: SessionStore, sessionCode: strin
 
 export function registerSocketHandlers(io: Server, store: SessionStore): void {
   io.on('connection', socket => {
-    socket.on(Events.SESSION_CREATE, async payload => {
-      const name = String(payload?.playerName ?? '').trim();
+    safeOn(socket, Events.SESSION_CREATE, async payload => {
+      const name = payloadString(payload, 'playerName').trim();
       if (!name) {
         socket.emit(Events.ERROR, { message: 'Player name is required' });
         return;
       }
 
-      const session = await store.createSession(name, payload?.settings);
+      const settings = payload?.settings && typeof payload.settings === 'object' ? payload.settings : undefined;
+      const session = await store.createSession(name, settings);
       const player = session.players[0];
       if (!player) return;
       joinSocketRooms(socket, session.code, player.id);
@@ -36,10 +60,11 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       broadcastSession(io, session);
     });
 
-    socket.on(Events.SESSION_JOIN, async payload => {
-      const code = String(payload?.code ?? '').trim().toUpperCase();
-      const name = String(payload?.playerName ?? '').trim();
-      const result = await store.joinSession(code, name, payload?.playerId);
+    safeOn(socket, Events.SESSION_JOIN, async payload => {
+      const code = payloadString(payload, 'code').trim().toUpperCase();
+      const name = payloadString(payload, 'playerName').trim();
+      const playerId = payloadString(payload, 'playerId') || undefined;
+      const result = await store.joinSession(code, name, playerId);
       if (result.error || !result.session || !result.player) {
         socket.emit(Events.ERROR, { message: result.error ?? 'Unable to join Smoke Circle' });
         return;
@@ -51,9 +76,9 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       if (result.session.game) broadcastGame(io, result.session);
     });
 
-    socket.on(Events.SESSION_REJOIN, async payload => {
-      const code = String(payload?.code ?? '').trim().toUpperCase();
-      const playerId = String(payload?.playerId ?? '');
+    safeOn(socket, Events.SESSION_REJOIN, async payload => {
+      const code = payloadString(payload, 'code').trim().toUpperCase();
+      const playerId = payloadString(payload, 'playerId');
       const result = await store.rejoinSession(code, playerId);
       if (result.error || !result.session || !result.player) {
         socket.emit(Events.ERROR, { message: result.error ?? 'Unable to reconnect' });
@@ -65,10 +90,10 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       await emitFullState(io, store, result.session.code);
     });
 
-    socket.on(Events.SESSION_KICK_PLAYER, async payload => {
-      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
-      const hostId = String(payload?.hostId ?? socket.data.playerId ?? '');
-      const targetPlayerId = String(payload?.targetPlayerId ?? '');
+    safeOn(socket, Events.SESSION_KICK_PLAYER, async payload => {
+      const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
+      const hostId = payloadString(payload, 'hostId', socket.data.playerId);
+      const targetPlayerId = payloadString(payload, 'targetPlayerId');
       const result = await store.kickPlayer(code, hostId, targetPlayerId);
       if (result.error || !result.session) {
         socket.emit(Events.ERROR, { message: result.error ?? 'Unable to kick player' });
@@ -79,9 +104,9 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       broadcastGame(io, result.session);
     });
 
-    socket.on(Events.GAME_START, async payload => {
-      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
-      const playerId = String(payload?.playerId ?? socket.data.playerId ?? '');
+    safeOn(socket, Events.GAME_START, async payload => {
+      const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
+      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       if (!session) return socket.emit(Events.ERROR, { message: 'Smoke Circle not found' });
       if (session.hostId !== playerId) return socket.emit(Events.ERROR, { message: 'Only the host can start the game' });
@@ -94,9 +119,9 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       broadcastGame(io, updated);
     });
 
-    socket.on(Events.GAME_REMATCH, async payload => {
-      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
-      const playerId = String(payload?.playerId ?? socket.data.playerId ?? '');
+    safeOn(socket, Events.GAME_REMATCH, async payload => {
+      const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
+      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
       if (!session.game.winnerId) return socket.emit(Events.ERROR, { message: 'Round is not over yet' });
@@ -111,17 +136,17 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       broadcastGame(io, updated);
     });
 
-    socket.on(Events.GAME_PLAY_CARD, async payload => {
-      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
-      const playerId = String(payload?.playerId ?? socket.data.playerId ?? '');
+    safeOn(socket, Events.GAME_PLAY_CARD, async payload => {
+      const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
+      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
 
       const result = playCard(session.game, {
         playerId,
-        cardId: String(payload?.cardId ?? ''),
+        cardId: payloadString(payload, 'cardId'),
         chosenColor: payload?.chosenColor as CardColor | undefined,
-        targetPlayerId: payload?.targetPlayerId
+        targetPlayerId: payloadString(payload, 'targetPlayerId') || undefined
       });
 
       if (!result.ok) return socket.emit(Events.ERROR, { message: result.reason ?? 'Invalid move' });
@@ -130,9 +155,9 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       if (result.state.winnerId) io.to(code).emit(Events.GAME_OVER, { winnerId: result.state.winnerId });
     });
 
-    socket.on(Events.GAME_DRAW_CARD, async payload => {
-      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
-      const playerId = String(payload?.playerId ?? socket.data.playerId ?? '');
+    safeOn(socket, Events.GAME_DRAW_CARD, async payload => {
+      const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
+      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
 
@@ -143,9 +168,9 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       broadcastGame(io, updated);
     });
 
-    socket.on(Events.GAME_CALL_THC_U_KNOW, async payload => {
-      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
-      const playerId = String(payload?.playerId ?? socket.data.playerId ?? '');
+    safeOn(socket, Events.GAME_CALL_THC_U_KNOW, async payload => {
+      const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
+      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       if (!session?.game) return;
       const players = session.players.map(player =>
@@ -160,28 +185,32 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       broadcastGame(io, updated);
     });
 
-    socket.on(Events.CHAT_SEND, async payload => {
-      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
-      const playerId = String(payload?.playerId ?? socket.data.playerId ?? '');
+    safeOn(socket, Events.CHAT_SEND, async payload => {
+      const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
+      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       const player = session?.players.find(item => item.id === playerId);
       if (!session || !player) return;
       io.to(code).emit(Events.CHAT_RECEIVE, {
         playerId,
         playerName: player.name,
-        message: String(payload?.message ?? '').slice(0, 240),
+        message: payloadString(payload, 'message').slice(0, 240),
         createdAt: Date.now()
       });
     });
 
-    socket.on('disconnect', async () => {
-      const playerId = socket.data.playerId;
-      if (!playerId) return;
-      const session = await store.markDisconnected(playerId);
-      if (session) {
-        broadcastSession(io, session);
-        broadcastGame(io, session);
-      }
+    socket.on('disconnect', () => {
+      void (async () => {
+        const playerId = socket.data.playerId;
+        if (!playerId) return;
+        const session = await store.markDisconnected(playerId);
+        if (session) {
+          broadcastSession(io, session);
+          broadcastGame(io, session);
+        }
+      })().catch(error => {
+        console.error('Socket disconnect handler failed', error);
+      });
     });
   });
 }
