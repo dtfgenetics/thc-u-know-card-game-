@@ -10,7 +10,8 @@ export function toPublicState(state: GameState): PublicGameState {
     ...safeState,
     players: state.players.map(player => ({
       ...player,
-      cardCount: state.hands.find(hand => hand.playerId === player.id)?.cards.length ?? 0
+      cardCount: state.hands.find(hand => hand.playerId === player.id)?.cards.length ?? 0,
+      score: state.scores[player.id] ?? 0
     })),
     drawPileCount: state.drawPile.length,
     topDiscard
