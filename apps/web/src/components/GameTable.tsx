@@ -1,8 +1,8 @@
 import type { Card, CardColor, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events } from '@thc-u-know/shared';
-import { socket } from '../realtime/socket.js';
-import { PlayerRail } from './PlayerRail.js';
-import { ThcCard } from './ThcCard.js';
+import { socket } from '../realtime/socket';
+import { PlayerRail } from './PlayerRail';
+import { ThcCard } from './ThcCard';
 
 type Props = {
   playerId: string;
