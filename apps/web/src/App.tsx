@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { Player, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
+import type { GameMode, Player, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events } from '@thc-u-know/shared';
 import { GameTable } from './components/GameTable';
 import { InvitePanel } from './components/InvitePanel';
@@ -10,12 +10,42 @@ type PublicSession = {
   hostId: string;
   players: Player[];
   started: boolean;
+  settings?: {
+    mode: GameMode;
+    maxPlayers: number;
+    startingHandSize: number;
+    stacking: boolean;
+    jumpIn: boolean;
+  };
 };
+
+const savedSessionKey = 'thc-u-know-session';
+
+type SavedSession = {
+  code: string;
+  playerId: string;
+  name: string;
+};
+
+function readSavedSession(): SavedSession | null {
+  try {
+    const raw = window.localStorage.getItem(savedSessionKey);
+    return raw ? (JSON.parse(raw) as SavedSession) : null;
+  } catch {
+    return null;
+  }
+}
+
+function savePlayerSession(code: string, player: Player) {
+  window.localStorage.setItem(savedSessionKey, JSON.stringify({ code, playerId: player.id, name: player.name }));
+}
 
 export function App() {
   const joinCode = useMemo(() => new URLSearchParams(window.location.search).get('join') ?? '', []);
-  const [name, setName] = useState('');
-  const [code, setCode] = useState(joinCode);
+  const savedSession = useMemo(readSavedSession, []);
+  const [name, setName] = useState(savedSession?.name ?? '');
+  const [code, setCode] = useState(joinCode || savedSession?.code || '');
+  const [mode, setMode] = useState<GameMode>('classic');
   const [player, setPlayer] = useState<Player | null>(null);
   const [session, setSession] = useState<PublicSession | null>(null);
   const [publicState, setPublicState] = useState<PublicGameState | null>(null);
@@ -23,16 +53,22 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    socket.on(Events.SESSION_CREATED, payload => {
+    const saved = readSavedSession();
+    if (saved?.code && saved.playerId && !joinCode) {
+      socket.emit(Events.SESSION_REJOIN, { code: saved.code, playerId: saved.playerId });
+    }
+  }, [joinCode]);
+
+  useEffect(() => {
+    function onJoined(payload: { session: PublicSession; player: Player }) {
       setPlayer(payload.player);
       setSession(payload.session);
+      savePlayerSession(payload.session.code, payload.player);
       setError(null);
-    });
-    socket.on(Events.SESSION_JOINED, payload => {
-      setPlayer(payload.player);
-      setSession(payload.session);
-      setError(null);
-    });
+    }
+
+    socket.on(Events.SESSION_CREATED, onJoined);
+    socket.on(Events.SESSION_JOINED, onJoined);
     socket.on(Events.SESSION_UPDATE, setSession);
     socket.on(Events.GAME_STARTED, setSession);
     socket.on(Events.GAME_PUBLIC_STATE, setPublicState);
@@ -41,8 +77,8 @@ export function App() {
     socket.on(Events.GAME_OVER, payload => setError(`Winner: ${payload.winnerId}`));
 
     return () => {
-      socket.off(Events.SESSION_CREATED);
-      socket.off(Events.SESSION_JOINED);
+      socket.off(Events.SESSION_CREATED, onJoined);
+      socket.off(Events.SESSION_JOINED, onJoined);
       socket.off(Events.SESSION_UPDATE);
       socket.off(Events.GAME_STARTED);
       socket.off(Events.GAME_PUBLIC_STATE);
@@ -53,11 +89,19 @@ export function App() {
   }, []);
 
   function hostGame() {
-    socket.emit(Events.SESSION_CREATE, { playerName: name });
+    socket.emit(Events.SESSION_CREATE, {
+      playerName: name,
+      settings: {
+        mode,
+        startingHandSize: mode === 'fast-sesh' ? 5 : 7,
+        stacking: mode === 'no-mercy'
+      }
+    });
   }
 
   function joinGame() {
-    socket.emit(Events.SESSION_JOIN, { code, playerName: name });
+    const saved = readSavedSession();
+    socket.emit(Events.SESSION_JOIN, { code, playerName: name, playerId: saved?.code === code ? saved.playerId : undefined });
   }
 
   function startGame() {
@@ -65,9 +109,21 @@ export function App() {
     socket.emit(Events.GAME_START, { code: session.code, playerId: player.id });
   }
 
+  function kick(targetPlayerId: string) {
+    if (!session || !player) return;
+    socket.emit(Events.SESSION_KICK_PLAYER, { code: session.code, hostId: player.id, targetPlayerId });
+  }
+
+  function clearSavedSession() {
+    window.localStorage.removeItem(savedSessionKey);
+    window.location.reload();
+  }
+
   if (player && session && publicState && privateState) {
     return <GameTable playerId={player.id} publicState={publicState} privateState={privateState} />;
   }
+
+  const isHost = Boolean(player && session?.hostId === player.id);
 
   return (
     <div className="app-shell">
@@ -85,6 +141,15 @@ export function App() {
             Player name
             <input value={name} onChange={event => setName(event.target.value)} placeholder="Enter your name" />
           </label>
+          <label>
+            Game mode
+            <select value={mode} onChange={event => setMode(event.target.value as GameMode)}>
+              <option value="classic">Classic Mode</option>
+              <option value="party">Party Mode</option>
+              <option value="fast-sesh">Fast Sesh</option>
+              <option value="no-mercy">No Mercy</option>
+            </select>
+          </label>
           <div className="button-row">
             <button type="button" disabled={!name.trim()} onClick={hostGame}>Host Smoke Circle</button>
           </div>
@@ -93,6 +158,7 @@ export function App() {
             <input value={code} onChange={event => setCode(event.target.value.toUpperCase())} placeholder="ABC123" />
           </label>
           <button type="button" disabled={!name.trim() || !code.trim()} onClick={joinGame}>Join Smoke Circle</button>
+          {savedSession && <button className="ghost-button" type="button" onClick={clearSavedSession}>Forget Saved Session</button>}
         </section>
       )}
 
@@ -101,12 +167,18 @@ export function App() {
           <InvitePanel code={session.code} />
           <section className="panel">
             <h2>Smoke Circle</h2>
+            {session.settings && <p>Mode: <strong>{session.settings.mode}</strong> · Hand: <strong>{session.settings.startingHandSize}</strong></p>}
             <ul className="player-list">
               {session.players.map(item => (
-                <li key={item.id}>{item.host ? '👑 ' : ''}{item.name}{item.connected ? '' : ' · disconnected'}</li>
+                <li key={item.id}>
+                  <span>{item.host ? '👑 ' : ''}{item.name}{item.connected ? '' : ' · disconnected'}</span>
+                  {isHost && item.id !== player.id && !session.started && (
+                    <button type="button" onClick={() => kick(item.id)}>Kick</button>
+                  )}
+                </li>
               ))}
             </ul>
-            <button type="button" disabled={session.players.length < 2 || session.hostId !== player.id} onClick={startGame}>
+            <button type="button" disabled={session.players.length < 2 || !isHost} onClick={startGame}>
               Start Game
             </button>
             {session.players.length < 2 && <p>Waiting for at least one more player.</p>}
