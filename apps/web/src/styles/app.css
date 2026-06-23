@@ -56,6 +56,8 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .player-pill strong { font-size: 1.8rem; }
 .player-pill em { color: #9fea4d; font-style: normal; font-weight: 900; }
 .table-center { display: grid; align-content: center; gap: 1rem; }
+.winner-panel { width: min(720px, 100%); margin: 0 auto; padding: 1.25rem; text-align: center; border-radius: 28px; background: linear-gradient(145deg, rgba(159,234,77,0.25), rgba(0,0,0,0.34)); border: 1px solid rgba(159,234,77,0.4); }
+.winner-panel h2 { margin: 0.25rem 0 1rem; font-size: clamp(2rem, 6vw, 4rem); }
 .status-row { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
 .danger { color: #ffbd59; font-weight: 900; }
 .piles { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
