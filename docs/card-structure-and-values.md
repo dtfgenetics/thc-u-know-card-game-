@@ -64,7 +64,7 @@ Party cards are Wild Smoke cards. They do not require choosing a new color unles
 | Munchies | 1 | 2 | 50 | No | Next player draws 2. |
 | Paranoia | 1 | 2 | 50 | No | Skip the next player. |
 | Rotation | 1 | 2 | 50 | No | Reverse turn direction. |
-| Tolerance Break | 1 | 2 | 50 | No | Clear pending draw pressure, then end turn. |
+| Tolerance Break | 1 | 2 | 50 | No | May be played against pending draw pressure. Clears pending draw pressure, then ends turn. |
 | Bogart | 1 | 2 | 50 | Yes | Target player draws 1. Defaults to next player. |
 | Pass the Tray | 1 | 2 | 50 | No | Every player passes one card in turn direction. |
 | Smoke Sesh | 1 | 2 | 50 | No | Every other player draws 1. |
@@ -94,8 +94,9 @@ A card may be played when it matches one of these:
 
 If pending draw pressure exists:
 
-- Stacking disabled: the player must draw the full pending amount.
-- Stacking enabled: only draw cards may be stacked.
+- Tolerance Break may always be played to clear pending draw pressure.
+- Stacking disabled: otherwise, the player must draw the full pending amount.
+- Stacking enabled: draw cards may be stacked.
 - Stackable draw cards: Pack Two, Munchies, Hotbox +4.
 
 ## Current intentionally disabled / future feature
