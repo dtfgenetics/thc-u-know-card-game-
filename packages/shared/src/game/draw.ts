@@ -49,15 +49,19 @@ export function drawCards(state: GameState, playerId: string, count = 1, endTurn
   const drawn: Card[] = [];
   for (let index = 0; index < count; index += 1) {
     nextState = recycleDiscardPile(nextState);
-    const card = nextState.drawPile.pop();
+    const drawPile = [...nextState.drawPile];
+    const card = drawPile.pop();
+    nextState = { ...nextState, drawPile };
     if (!card) break;
     drawn.push(card);
   }
 
-  hand.cards.push(...drawn);
+  if (drawn.length === 0) return { ok: false, reason: 'No cards are available in the Stash', state };
+
+  const updatedHand = { ...hand, cards: [...hand.cards, ...drawn] };
   nextState = {
     ...nextState,
-    hands: nextState.hands.map(entry => (entry.playerId === playerId ? hand : entry)),
+    hands: nextState.hands.map(entry => (entry.playerId === playerId ? updatedHand : entry)),
     pendingDraw: 0,
     updatedAt: Date.now()
   };
