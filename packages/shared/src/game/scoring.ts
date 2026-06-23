@@ -1,5 +1,4 @@
 import type { GameState, LastRoundScore, Player, ScoreLedger } from '../types.js';
-import { createGameState } from './createGame.js';
 
 export function emptyScores(players: Player[]): ScoreLedger {
   return Object.fromEntries(players.map(player => [player.id, 0]));
@@ -44,21 +43,5 @@ export function applyRoundScore(state: GameState, winnerId: string): GameState {
     winnerId,
     matchWinnerId,
     updatedAt: Date.now()
-  };
-}
-
-export function createNextRoundState(previousState: GameState, random?: () => number): GameState {
-  const resetPlayers = previousState.players.map(player => ({ ...player, calledThcUKnow: false }));
-  const nextRound = createGameState({
-    sessionCode: previousState.sessionCode,
-    players: resetPlayers,
-    settings: previousState.settings,
-    random
-  });
-
-  return {
-    ...nextRound,
-    scores: normalizeScores(resetPlayers, previousState.scores),
-    roundNumber: previousState.roundNumber + 1
   };
 }
