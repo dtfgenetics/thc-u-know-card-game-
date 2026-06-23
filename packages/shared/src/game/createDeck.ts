@@ -1,4 +1,5 @@
-import type { Card, CardColor, CardKind, GameMode } from '../types.js';
+import type { Card, CardColor, GameMode } from '../types.js';
+import { cardManifest, copiesForMode, numberCardRules } from './cardManifest.js';
 import { actionLabels, classicColors, colorLabels } from './cardNames.js';
 import { shuffle } from './shuffle.js';
 
@@ -17,8 +18,7 @@ function numberCard(color: CardColor, value: number, copy: number): Card {
   };
 }
 
-function actionCard(color: CardColor, kind: Exclude<CardKind, 'number'>, copy: number): Card {
-  const points = color === 'black' ? 50 : 20;
+function actionCard(color: CardColor, kind: Exclude<Card['kind'], 'number'>, copy: number, points: number): Card {
   return {
     id: cardId(['card', color, kind, copy]),
     color,
@@ -35,36 +35,23 @@ export function createDeck(mode: GameMode = 'classic', random: () => number = Ma
     cards.push(numberCard(color, 0, 1));
 
     for (let value = 1; value <= 9; value += 1) {
-      cards.push(numberCard(color, value, 1));
-      cards.push(numberCard(color, value, 2));
+      for (let copy = 1; copy <= numberCardRules.nonZeroCopiesPerColor; copy += 1) {
+        cards.push(numberCard(color, value, copy));
+      }
     }
 
-    for (let copy = 1; copy <= 2; copy += 1) {
-      cards.push(actionCard(color, 'couch-lock', copy));
-      cards.push(actionCard(color, 'puff-puff-pass-back', copy));
-      cards.push(actionCard(color, 'pack-two', copy));
+    for (const entry of cardManifest.filter(item => item.deckGroup === 'classic-color-action')) {
+      const copies = copiesForMode(entry, mode);
+      for (let copy = 1; copy <= copies; copy += 1) {
+        cards.push(actionCard(color, entry.kind, copy, entry.points));
+      }
     }
   }
 
-  for (let copy = 1; copy <= 4; copy += 1) {
-    cards.push(actionCard('black', 'strain-switch', copy));
-    cards.push(actionCard('black', 'hotbox-plus-four', copy));
-  }
-
-  if (mode === 'party' || mode === 'no-mercy') {
-    const partyCards: Exclude<CardKind, 'number'>[] = [
-      'munchies',
-      'paranoia',
-      'rotation',
-      'tolerance-break',
-      'bogart',
-      'pass-the-tray',
-      'smoke-sesh',
-      'greener-side'
-    ];
-    for (const kind of partyCards) {
-      cards.push(actionCard('black', kind, 1));
-      if (mode === 'no-mercy') cards.push(actionCard('black', kind, 2));
+  for (const entry of cardManifest.filter(item => item.deckGroup !== 'classic-color-action')) {
+    const copies = copiesForMode(entry, mode);
+    for (let copy = 1; copy <= copies; copy += 1) {
+      cards.push(actionCard('black', entry.kind, copy, entry.points));
     }
   }
 
