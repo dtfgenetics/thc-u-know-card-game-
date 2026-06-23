@@ -21,7 +21,7 @@ function joinSocketRooms(socket: Socket, code: string, playerId: string): void {
   socket.data.playerId = playerId;
 }
 
-function emitFullState(io: Server, socket: Socket, sessionCode: string): void {
+function emitFullState(io: Server, sessionCode: string): void {
   const session = getSession(sessionCode);
   if (!session) return;
   broadcastSession(io, session);
@@ -71,7 +71,7 @@ export function registerSocketHandlers(io: Server): void {
 
       joinSocketRooms(socket, result.session.code, result.player.id);
       socket.emit(Events.SESSION_JOINED, { session: publicSession(result.session), player: result.player });
-      emitFullState(io, socket, result.session.code);
+      emitFullState(io, result.session.code);
     });
 
     socket.on(Events.SESSION_KICK_PLAYER, payload => {
@@ -100,6 +100,23 @@ export function registerSocketHandlers(io: Server): void {
       const updated = setGame(code, game);
       if (!updated) return;
       io.to(code).emit(Events.GAME_STARTED, publicSession(updated));
+      broadcastGame(io, updated);
+    });
+
+    socket.on(Events.GAME_REMATCH, payload => {
+      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
+      const playerId = String(payload?.playerId ?? socket.data.playerId ?? '');
+      const session = getSession(code);
+      if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
+      if (!session.game.winnerId) return socket.emit(Events.ERROR, { message: 'Round is not over yet' });
+      if (!session.players.some(player => player.id === playerId)) return socket.emit(Events.ERROR, { message: 'Player not found' });
+      if (session.players.length < 2) return socket.emit(Events.ERROR, { message: 'At least 2 players are required' });
+
+      const resetPlayers = session.players.map(player => ({ ...player, calledThcUKnow: false }));
+      const game = createGameState({ sessionCode: session.code, players: resetPlayers, settings: session.settings });
+      const updated = saveSession({ ...session, players: resetPlayers, game });
+      io.to(code).emit(Events.GAME_STARTED, publicSession(updated));
+      broadcastSession(io, updated);
       broadcastGame(io, updated);
     });
 
