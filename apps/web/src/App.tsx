@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import type { GameMode, Player, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events } from '@thc-u-know/shared';
 import { GameTable } from './components/GameTable';
@@ -17,6 +17,14 @@ type PublicSession = {
     stacking: boolean;
     jumpIn: boolean;
   };
+};
+
+type SocketErrorPayload = {
+  message?: string;
+};
+
+type GameOverPayload = {
+  winnerId: string;
 };
 
 const savedSessionKey = 'thc-u-know-session';
@@ -53,13 +61,6 @@ export function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = readSavedSession();
-    if (saved?.code && saved.playerId && !joinCode) {
-      socket.emit(Events.SESSION_REJOIN, { code: saved.code, playerId: saved.playerId });
-    }
-  }, [joinCode]);
-
-  useEffect(() => {
     function onJoined(payload: { session: PublicSession; player: Player }) {
       setPlayer(payload.player);
       setSession(payload.session);
@@ -73,8 +74,8 @@ export function App() {
     socket.on(Events.GAME_STARTED, setSession);
     socket.on(Events.GAME_PUBLIC_STATE, setPublicState);
     socket.on(Events.GAME_PRIVATE_STATE, setPrivateState);
-    socket.on(Events.ERROR, payload => setError(payload.message ?? 'Something went wrong'));
-    socket.on(Events.GAME_OVER, payload => setError(`Winner: ${payload.winnerId}`));
+    socket.on(Events.ERROR, (payload: SocketErrorPayload) => setError(payload.message ?? 'Something went wrong'));
+    socket.on(Events.GAME_OVER, (payload: GameOverPayload) => setError(`Winner: ${payload.winnerId}`));
 
     return () => {
       socket.off(Events.SESSION_CREATED, onJoined);
@@ -87,6 +88,13 @@ export function App() {
       socket.off(Events.GAME_OVER);
     };
   }, []);
+
+  useEffect(() => {
+    const saved = readSavedSession();
+    if (saved?.code && saved.playerId && !joinCode) {
+      socket.emit(Events.SESSION_REJOIN, { code: saved.code, playerId: saved.playerId });
+    }
+  }, [joinCode]);
 
   function hostGame() {
     socket.emit(Events.SESSION_CREATE, {
@@ -119,6 +127,18 @@ export function App() {
     window.location.reload();
   }
 
+  function onNameChange(event: ChangeEvent<HTMLInputElement>) {
+    setName(event.target.value);
+  }
+
+  function onModeChange(event: ChangeEvent<HTMLSelectElement>) {
+    setMode(event.target.value as GameMode);
+  }
+
+  function onCodeChange(event: ChangeEvent<HTMLInputElement>) {
+    setCode(event.target.value.toUpperCase());
+  }
+
   if (player && session && publicState && privateState) {
     return <GameTable playerId={player.id} publicState={publicState} privateState={privateState} />;
   }
@@ -139,11 +159,11 @@ export function App() {
         <section className="panel start-panel">
           <label>
             Player name
-            <input value={name} onChange={event => setName(event.target.value)} placeholder="Enter your name" />
+            <input value={name} onChange={onNameChange} placeholder="Enter your name" />
           </label>
           <label>
             Game mode
-            <select value={mode} onChange={event => setMode(event.target.value as GameMode)}>
+            <select value={mode} onChange={onModeChange}>
               <option value="classic">Classic Mode</option>
               <option value="party">Party Mode</option>
               <option value="fast-sesh">Fast Sesh</option>
@@ -155,7 +175,7 @@ export function App() {
           </div>
           <label>
             Session code
-            <input value={code} onChange={event => setCode(event.target.value.toUpperCase())} placeholder="ABC123" />
+            <input value={code} onChange={onCodeChange} placeholder="ABC123" />
           </label>
           <button type="button" disabled={!name.trim() || !code.trim()} onClick={joinGame}>Join Smoke Circle</button>
           {savedSession && <button className="ghost-button" type="button" onClick={clearSavedSession}>Forget Saved Session</button>}
