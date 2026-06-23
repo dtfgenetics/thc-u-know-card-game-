@@ -55,6 +55,14 @@ export function createGameState(input: {
     direction: 1,
     activeColor: classicColors.includes(topDiscard.color) ? topDiscard.color : 'purple',
     pendingDraw: 0,
+    actionLog: [
+      {
+        id: `log-${now}`,
+        playerId: 'system',
+        message: `Smoke Circle started. First Ashtray card is ${topDiscard.label}.`,
+        createdAt: now
+      }
+    ],
     started: true,
     createdAt: now,
     updatedAt: now
