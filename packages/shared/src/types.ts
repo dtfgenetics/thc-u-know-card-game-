@@ -49,6 +49,8 @@ export type GameSettings = {
   startingHandSize: number;
   stacking: boolean;
   jumpIn: boolean;
+  targetScore: number;
+  thcUKnowPenaltyCards: number;
 };
 
 export type GameActionLog = {
@@ -56,6 +58,14 @@ export type GameActionLog = {
   playerId: string;
   message: string;
   createdAt: number;
+};
+
+export type ScoreLedger = Record<string, number>;
+
+export type LastRoundScore = {
+  winnerId: string;
+  pointsAwarded: number;
+  remainingCardPoints: Record<string, number>;
 };
 
 export type GameState = {
@@ -70,7 +80,12 @@ export type GameState = {
   activeColor: CardColor;
   pendingDraw: number;
   actionLog: GameActionLog[];
+  scores: ScoreLedger;
+  roundNumber: number;
+  lastRoundScore?: LastRoundScore;
   winnerId?: string;
+  matchWinnerId?: string;
+  drawRound?: boolean;
   started: boolean;
   createdAt: number;
   updatedAt: number;
@@ -78,6 +93,7 @@ export type GameState = {
 
 export type PublicPlayerState = Player & {
   cardCount: number;
+  score: number;
 };
 
 export type PublicGameState = Omit<GameState, 'hands' | 'drawPile' | 'players'> & {
