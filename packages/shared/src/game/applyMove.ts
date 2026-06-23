@@ -1,6 +1,7 @@
 import type { Card, GameState, MoveResult, PlayCardInput } from '../types.js';
 import { manifestEntry } from './cardManifest.js';
 import { drawCards } from './draw.js';
+import { applyRoundScore } from './scoring.js';
 import { advanceTurn, nextPlayerId, reverseDirection } from './turn.js';
 import { canPlayCard, findPlayerHand, normalizeChosenColor } from './validateMove.js';
 
@@ -172,9 +173,12 @@ export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   };
 
   if (cards.length === 0) {
+    const scoredState = applyRoundScore(nextState, input.playerId);
+    const points = scoredState.lastRoundScore?.pointsAwarded ?? 0;
+    const matchText = scoredState.matchWinnerId ? ` Match target reached at ${scoredState.scores[input.playerId]} points.` : '';
     return {
       ok: true,
-      state: logAction({ ...nextState, winnerId: input.playerId, updatedAt: Date.now() }, input.playerId, `${playerName(nextState, input.playerId)} went out and won the round.`)
+      state: logAction(scoredState, input.playerId, `${playerName(scoredState, input.playerId)} went out, scored ${points} points, and won the round.${matchText}`)
     };
   }
 
