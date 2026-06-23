@@ -1,13 +1,16 @@
-import type { Card, GameMode, GameSettings, GameState, Player, PlayerHand } from '../types.js';
+import type { Card, GameMode, GameSettings, GameState, Player, PlayerHand, ScoreLedger } from '../types.js';
 import { classicColors } from './cardNames.js';
 import { createDeck } from './createDeck.js';
+import { normalizeScores } from './scoring.js';
 
 export const defaultSettings: GameSettings = {
   mode: 'classic',
   maxPlayers: 8,
   startingHandSize: 7,
   stacking: false,
-  jumpIn: false
+  jumpIn: false,
+  targetScore: 500,
+  thcUKnowPenaltyCards: 2
 };
 
 function drawOpeningDiscard(drawPile: Card[]): Card {
@@ -24,6 +27,8 @@ export function createGameState(input: {
   sessionCode: string;
   players: Player[];
   settings?: Partial<GameSettings>;
+  scores?: ScoreLedger;
+  roundNumber?: number;
   random?: () => number;
 }): GameState {
   const settings: GameSettings = { ...defaultSettings, ...input.settings };
@@ -59,10 +64,12 @@ export function createGameState(input: {
       {
         id: `log-${now}`,
         playerId: 'system',
-        message: `Smoke Circle started. First Ashtray card is ${topDiscard.label}.`,
+        message: `Round ${input.roundNumber ?? 1} started. First Ashtray card is ${topDiscard.label}.`,
         createdAt: now
       }
     ],
+    scores: normalizeScores(input.players, input.scores),
+    roundNumber: input.roundNumber ?? 1,
     started: true,
     createdAt: now,
     updatedAt: now
