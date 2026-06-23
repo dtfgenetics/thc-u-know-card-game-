@@ -1,4 +1,5 @@
 import type { Card, GameState, MoveResult, PlayCardInput } from '../types.js';
+import { manifestEntry } from './cardManifest.js';
 import { drawCards } from './draw.js';
 import { advanceTurn, nextPlayerId, reverseDirection } from './turn.js';
 import { canPlayCard, findPlayerHand, normalizeChosenColor } from './validateMove.js';
@@ -25,7 +26,7 @@ function playerName(state: GameState, playerId: string): string {
 }
 
 function requiresChosenColor(card: Card): boolean {
-  return card.kind === 'strain-switch' || card.kind === 'hotbox-plus-four';
+  return card.kind !== 'number' && manifestEntry(card.kind).needsChosenColor;
 }
 
 function removeCardFromHand(hand: Card[], cardId: string): { card?: Card; cards: Card[] } {
@@ -47,7 +48,7 @@ function drawForPlayer(state: GameState, playerId: string, count: number): GameS
   const originalCurrent = nextState.currentPlayerId;
   nextState = { ...nextState, currentPlayerId: playerId };
   const result = drawCards(nextState, playerId, count, false);
-  return { ...result.state, currentPlayerId: originalCurrent, pendingDraw: state.pendingDraw };
+  return result.ok ? { ...result.state, currentPlayerId: originalCurrent, pendingDraw: state.pendingDraw } : state;
 }
 
 function swapHands(state: GameState, playerA: string, playerB: string): GameState {
