@@ -4,6 +4,7 @@ export * from './game/cardManifest.js';
 export * from './game/cardNames.js';
 export * from './game/createDeck.js';
 export * from './game/createGame.js';
+export * from './game/scoring.js';
 export * from './game/shuffle.js';
 export * from './game/turn.js';
 export * from './game/validateMove.js';
