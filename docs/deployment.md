@@ -39,12 +39,15 @@ Server:
 ```txt
 PORT=5174
 WEB_ORIGIN=http://localhost:5173
-ENABLE_REDIS_ADAPTER=false
-REDIS_URL=redis://localhost:6379
+SESSION_STORE=memory
 SESSION_TTL_SECONDS=86400
+REDIS_URL=redis://localhost:6379
+ENABLE_REDIS_ADAPTER=false
 ```
 
-Set `ENABLE_REDIS_ADAPTER=true` only when Redis is available. The Redis adapter lets Socket.IO broadcasts work across multiple Node server processes. Redis should be private, authenticated, firewall-protected, and never exposed to public/untrusted networks.
+Use `SESSION_STORE=memory` for local dev. Use `SESSION_STORE=redis` before public launch so Smoke Circles survive server restarts and can be shared across processes.
+
+Set `ENABLE_REDIS_ADAPTER=true` only when Redis is available and you are running more than one Node server process. The Redis adapter lets Socket.IO broadcasts work across multiple server processes. Redis should be private, authenticated, firewall-protected, and never exposed to public/untrusted networks.
 
 Web:
 
@@ -70,10 +73,12 @@ Recommended first production stack:
 
 ## Pre-launch checklist
 
-- Wire socket handlers to the `SessionStore` interface and swap memory store for Redis store.
+- Run full install/build/test with real dependencies.
+- Test `SESSION_STORE=memory` locally.
+- Test `SESSION_STORE=redis` with `docker compose up -d redis`.
+- Test `ENABLE_REDIS_ADAPTER=true` when running multiple server processes.
 - Add CORS production origins.
-- Confirm session expiration cleanup.
 - Run multiplayer E2E tests with two or more browser contexts.
 - Add structured logging.
 - Add monitoring.
-- Run `pnpm install`, commit `pnpm-lock.yaml`, then run full CI build and tests.
+- Commit `pnpm-lock.yaml` after first real `pnpm install`.
