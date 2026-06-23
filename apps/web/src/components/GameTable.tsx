@@ -17,7 +17,7 @@ const colorChangingWilds = new Set(['strain-switch', 'hotbox-plus-four']);
 const targetCards = new Set(['bogart', 'greener-side']);
 
 export function GameTable({ playerId, publicState, privateState }: Props) {
-  const isMyTurn = publicState.currentPlayerId === playerId;
+  const isMyTurn = publicState.currentPlayerId === playerId && !publicState.winnerId;
   const [pendingWild, setPendingWild] = useState<Card | null>(null);
   const [pendingTarget, setPendingTarget] = useState<Card | null>(null);
 
@@ -63,13 +63,25 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
     socket.emit(Events.GAME_CALL_THC_U_KNOW, { code: publicState.sessionCode, playerId });
   }
 
+  function rematch() {
+    socket.emit(Events.GAME_REMATCH, { code: publicState.sessionCode, playerId });
+  }
+
   const latestLog = publicState.actionLog.slice(-5).reverse();
   const targetOptions = publicState.players.filter(player => player.id !== playerId);
+  const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
 
   return (
     <main className="game-table">
       <PlayerRail players={publicState.players} currentPlayerId={publicState.currentPlayerId} />
       <section className="table-center">
+        {winner && (
+          <section className="winner-panel">
+            <p className="eyebrow">Round Over</p>
+            <h2>{winner.name} wins!</h2>
+            <button type="button" onClick={rematch}>Start Rematch</button>
+          </section>
+        )}
         <div className="status-row">
           <strong>Active strain: {publicState.activeColor}</strong>
           <span>Direction: {publicState.direction === 1 ? 'Clockwise' : 'Counter-clockwise'}</span>
@@ -94,7 +106,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
       <section className="hand-zone">
         <div className="hand-header">
           <h2>Your Hand</h2>
-          <button type="button" onClick={callThcUKnow}>THC U Know!</button>
+          <button type="button" disabled={Boolean(publicState.winnerId)} onClick={callThcUKnow}>THC U Know!</button>
         </div>
         {pendingWild && (
           <div className="wild-picker">
