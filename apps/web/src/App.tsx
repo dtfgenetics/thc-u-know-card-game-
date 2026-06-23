@@ -16,6 +16,8 @@ type PublicSession = {
     startingHandSize: number;
     stacking: boolean;
     jumpIn: boolean;
+    targetScore: number;
+    thcUKnowPenaltyCards: number;
   };
 };
 
@@ -25,6 +27,7 @@ type SocketErrorPayload = {
 
 type GameOverPayload = {
   winnerId: string;
+  matchWinnerId?: string;
 };
 
 const savedSessionKey = 'thc-u-know-session';
@@ -75,7 +78,9 @@ export function App() {
     socket.on(Events.GAME_PUBLIC_STATE, setPublicState);
     socket.on(Events.GAME_PRIVATE_STATE, setPrivateState);
     socket.on(Events.ERROR, (payload: SocketErrorPayload) => setError(payload.message ?? 'Something went wrong'));
-    socket.on(Events.GAME_OVER, (payload: GameOverPayload) => setError(`Winner: ${payload.winnerId}`));
+    socket.on(Events.GAME_OVER, (payload: GameOverPayload) => {
+      setError(payload.matchWinnerId ? `Match winner: ${payload.matchWinnerId}` : `Round winner: ${payload.winnerId}`);
+    });
 
     return () => {
       socket.off(Events.SESSION_CREATED, onJoined);
@@ -102,7 +107,10 @@ export function App() {
       settings: {
         mode,
         startingHandSize: mode === 'fast-sesh' ? 5 : 7,
-        stacking: mode === 'no-mercy'
+        stacking: mode === 'no-mercy',
+        jumpIn: false,
+        targetScore: 500,
+        thcUKnowPenaltyCards: 2
       }
     });
   }
@@ -187,7 +195,7 @@ export function App() {
           <InvitePanel code={session.code} />
           <section className="panel">
             <h2>Smoke Circle</h2>
-            {session.settings && <p>Mode: <strong>{session.settings.mode}</strong> · Hand: <strong>{session.settings.startingHandSize}</strong></p>}
+            {session.settings && <p>Mode: <strong>{session.settings.mode}</strong> · Hand: <strong>{session.settings.startingHandSize}</strong> · Target: <strong>{session.settings.targetScore}</strong></p>}
             <ul className="player-list">
               {session.players.map(item => (
                 <li key={item.id}>
