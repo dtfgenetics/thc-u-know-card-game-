@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Card, CardColor, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events } from '@thc-u-know/shared';
 import { socket } from '../realtime/socket';
+import { ChatBox } from './ChatBox';
 import { PlayerRail } from './PlayerRail';
 import { ThcCard } from './ThcCard';
 
@@ -88,6 +89,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
           <h3>Table Talk</h3>
           {latestLog.map(item => <p key={item.id}>{item.message}</p>)}
         </section>
+        <ChatBox code={publicState.sessionCode} playerId={playerId} />
       </section>
       <section className="hand-zone">
         <div className="hand-header">
