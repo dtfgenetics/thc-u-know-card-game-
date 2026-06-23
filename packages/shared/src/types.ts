@@ -51,6 +51,13 @@ export type GameSettings = {
   jumpIn: boolean;
 };
 
+export type GameActionLog = {
+  id: string;
+  playerId: string;
+  message: string;
+  createdAt: number;
+};
+
 export type GameState = {
   sessionCode: string;
   settings: GameSettings;
@@ -62,6 +69,7 @@ export type GameState = {
   direction: TurnDirection;
   activeColor: CardColor;
   pendingDraw: number;
+  actionLog: GameActionLog[];
   winnerId?: string;
   started: boolean;
   createdAt: number;
@@ -72,7 +80,7 @@ export type PublicPlayerState = Player & {
   cardCount: number;
 };
 
-export type PublicGameState = Omit<GameState, 'hands' | 'drawPile'> & {
+export type PublicGameState = Omit<GameState, 'hands' | 'drawPile' | 'players'> & {
   players: PublicPlayerState[];
   drawPileCount: number;
   topDiscard: Card;
