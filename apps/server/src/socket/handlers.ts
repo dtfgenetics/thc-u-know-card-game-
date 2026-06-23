@@ -31,8 +31,8 @@ function safeOn(
   });
 }
 
-function payloadString(payload: SocketPayload, key: string, fallback = ''): string {
-  return String(payload?.[key] ?? fallback);
+function payloadString(payload: SocketPayload, key: string, fallback: unknown = ''): string {
+  return String(payload?.[key] ?? fallback ?? '');
 }
 
 function payloadSettings(payload: SocketPayload): Partial<GameSettings> | undefined {
