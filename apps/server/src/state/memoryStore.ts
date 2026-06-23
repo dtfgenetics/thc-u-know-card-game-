@@ -1,13 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { defaultSettings } from '@thc-u-know/shared';
 import type { GameSettings, GameState, Player } from '@thc-u-know/shared';
+import { createSessionCode, normalizeSessionCode } from './sessionCode.js';
 import type { Session } from './types.js';
 
 const sessions = new Map<string, Session>();
-
-function sessionCode(): string {
-  return Math.random().toString(36).slice(2, 8).toUpperCase();
-}
 
 function syncGamePlayers(session: Session, players: Player[]): Session {
   if (!session.game) return { ...session, players };
@@ -41,8 +38,8 @@ export function createPlayer(name: string, host = false, playerId = randomUUID()
 }
 
 export function createSession(playerName: string, settings?: Partial<GameSettings>): Session {
-  let code = sessionCode();
-  while (sessions.has(code)) code = sessionCode();
+  let code = createSessionCode();
+  while (sessions.has(code)) code = createSessionCode();
 
   const host = createPlayer(playerName, true);
   const now = Date.now();
@@ -62,7 +59,7 @@ export function createSession(playerName: string, settings?: Partial<GameSetting
 }
 
 export function getSession(code: string): Session | undefined {
-  return sessions.get(code.toUpperCase());
+  return sessions.get(normalizeSessionCode(code));
 }
 
 export function saveSession(session: Session): Session {
