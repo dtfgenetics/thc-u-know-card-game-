@@ -1,6 +1,7 @@
 import type { Card, CardColor, GameState } from '../types.js';
 
 const drawStackCards = new Set(['pack-two', 'munchies', 'hotbox-plus-four']);
+const drawPressureEscapeCards = new Set(['tolerance-break']);
 
 export function getTopDiscard(state: GameState): Card {
   const top = state.discardPile[state.discardPile.length - 1];
@@ -17,8 +18,9 @@ export function canPlayCard(state: GameState, playerId: string, card: Card): { o
   if (state.currentPlayerId !== playerId) return { ok: false, reason: 'It is not your turn' };
 
   if (state.pendingDraw > 0) {
+    if (drawPressureEscapeCards.has(card.kind)) return { ok: true };
     if (!state.settings.stacking) return { ok: false, reason: `You must draw ${state.pendingDraw} before your turn can continue` };
-    if (!drawStackCards.has(card.kind)) return { ok: false, reason: 'Only draw cards can be stacked while draw pressure is pending' };
+    if (!drawStackCards.has(card.kind)) return { ok: false, reason: 'Only draw cards or Tolerance Break can answer pending draw pressure' };
   }
 
   const top = getTopDiscard(state);
