@@ -62,9 +62,12 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .pile { min-width: 150px; min-height: 210px; border-radius: 24px; display: grid; place-items: center; background: rgba(255,255,255,0.08); color: #f4ffe8; }
 .pile strong { font-size: 3rem; }
 .ashtray { padding: 1rem; }
-.action-log { width: min(720px, 100%); margin: 0 auto; padding: 1rem; border-radius: 20px; background: rgba(0,0,0,0.22); }
-.action-log h3 { margin: 0 0 0.5rem; color: #9fea4d; }
-.action-log p { margin: 0.35rem 0; color: #e8ffd8; }
+.action-log, .chat-box { width: min(720px, 100%); margin: 0 auto; padding: 1rem; border-radius: 20px; background: rgba(0,0,0,0.22); }
+.action-log h3, .chat-box h3 { margin: 0 0 0.5rem; color: #9fea4d; }
+.action-log p, .chat-messages p { margin: 0.35rem 0; color: #e8ffd8; }
+.chat-messages { max-height: 150px; overflow-y: auto; padding-right: 0.5rem; }
+.chat-input-row { display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; margin-top: 0.75rem; }
+.muted { opacity: 0.7; }
 .hand-zone { background: rgba(0,0,0,0.22); border-radius: 28px; padding: 1rem; }
 .hand-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .hand-scroll { display: flex; gap: 0.7rem; overflow-x: auto; padding: 1rem 0; }
