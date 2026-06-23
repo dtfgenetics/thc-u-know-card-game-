@@ -107,7 +107,7 @@ export const cardManifest: CardManifestEntry[] = [
     copies: { party: 1, 'no-mercy': 2 },
     needsChosenColor: false,
     needsTarget: false,
-    effect: 'Clear pending draw pressure, then end turn.'
+    effect: 'May be played against pending draw pressure. Clears pending draw pressure, then ends turn.'
   },
   {
     kind: 'bogart',
