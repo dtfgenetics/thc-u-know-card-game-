@@ -2,29 +2,37 @@ import http from 'node:http';
 import cors from 'cors';
 import express from 'express';
 import { Server } from 'socket.io';
+import { env } from './config/env.js';
+import { attachRedisAdapter } from './realtime/socketRedisAdapter.js';
 import { registerSocketHandlers } from './socket/handlers.js';
 
-const app = express();
-const port = Number(process.env.PORT ?? 5174);
-const webOrigin = process.env.WEB_ORIGIN ?? 'http://localhost:5173';
+async function main() {
+  const app = express();
 
-app.use(cors({ origin: webOrigin, credentials: true }));
-app.use(express.json());
+  app.use(cors({ origin: env.WEB_ORIGIN, credentials: true }));
+  app.use(express.json());
 
-app.get('/healthz', (_request, response) => {
-  response.status(200).json({ ok: true, service: 'thc-u-know-server' });
-});
+  app.get('/healthz', (_request, response) => {
+    response.status(200).json({ ok: true, service: 'thc-u-know-server' });
+  });
 
-const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: webOrigin,
-    credentials: true
-  }
-});
+  const server = http.createServer(app);
+  const io = new Server(server, {
+    cors: {
+      origin: env.WEB_ORIGIN,
+      credentials: true
+    }
+  });
 
-registerSocketHandlers(io);
+  await attachRedisAdapter(io);
+  registerSocketHandlers(io);
 
-server.listen(port, () => {
-  console.log(`THC U Know server listening on http://localhost:${port}`);
+  server.listen(env.PORT, () => {
+    console.log(`THC U Know server listening on http://localhost:${env.PORT}`);
+  });
+}
+
+main().catch(error => {
+  console.error('Failed to start THC U Know server', error);
+  process.exit(1);
 });
