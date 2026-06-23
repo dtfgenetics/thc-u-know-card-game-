@@ -5,8 +5,10 @@ import {
   createSession,
   getSession,
   joinSession,
+  kickPlayer,
   markDisconnected,
   publicSession,
+  rejoinSession,
   saveSession,
   setGame
 } from '../state/memoryStore.js';
@@ -17,6 +19,13 @@ function joinSocketRooms(socket: Socket, code: string, playerId: string): void {
   socket.join(`player:${playerId}`);
   socket.data.sessionCode = code;
   socket.data.playerId = playerId;
+}
+
+function emitFullState(io: Server, socket: Socket, sessionCode: string): void {
+  const session = getSession(sessionCode);
+  if (!session) return;
+  broadcastSession(io, session);
+  if (session.game) broadcastGame(io, session);
 }
 
 export function registerSocketHandlers(io: Server): void {
@@ -48,6 +57,35 @@ export function registerSocketHandlers(io: Server): void {
       joinSocketRooms(socket, result.session.code, result.player.id);
       socket.emit(Events.SESSION_JOINED, { session: publicSession(result.session), player: result.player });
       broadcastSession(io, result.session);
+      if (result.session.game) broadcastGame(io, result.session);
+    });
+
+    socket.on(Events.SESSION_REJOIN, payload => {
+      const code = String(payload?.code ?? '').trim().toUpperCase();
+      const playerId = String(payload?.playerId ?? '');
+      const result = rejoinSession(code, playerId);
+      if (result.error || !result.session || !result.player) {
+        socket.emit(Events.ERROR, { message: result.error ?? 'Unable to reconnect' });
+        return;
+      }
+
+      joinSocketRooms(socket, result.session.code, result.player.id);
+      socket.emit(Events.SESSION_JOINED, { session: publicSession(result.session), player: result.player });
+      emitFullState(io, socket, result.session.code);
+    });
+
+    socket.on(Events.SESSION_KICK_PLAYER, payload => {
+      const code = String(payload?.code ?? socket.data.sessionCode ?? '').trim().toUpperCase();
+      const hostId = String(payload?.hostId ?? socket.data.playerId ?? '');
+      const targetPlayerId = String(payload?.targetPlayerId ?? '');
+      const result = kickPlayer(code, hostId, targetPlayerId);
+      if (result.error || !result.session) {
+        socket.emit(Events.ERROR, { message: result.error ?? 'Unable to kick player' });
+        return;
+      }
+      io.to(`player:${targetPlayerId}`).emit(Events.ERROR, { message: 'You were removed from the Smoke Circle by the host.' });
+      broadcastSession(io, result.session);
+      broadcastGame(io, result.session);
     });
 
     socket.on(Events.GAME_START, payload => {
@@ -130,7 +168,10 @@ export function registerSocketHandlers(io: Server): void {
       const playerId = socket.data.playerId;
       if (!playerId) return;
       const session = markDisconnected(playerId);
-      if (session) broadcastSession(io, session);
+      if (session) {
+        broadcastSession(io, session);
+        broadcastGame(io, session);
+      }
     });
   });
 }
