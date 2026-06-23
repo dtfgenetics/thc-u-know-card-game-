@@ -24,6 +24,10 @@ function playerName(state: GameState, playerId: string): string {
   return state.players.find(player => player.id === playerId)?.name ?? 'A player';
 }
 
+function requiresChosenColor(card: Card): boolean {
+  return card.kind === 'strain-switch' || card.kind === 'hotbox-plus-four';
+}
+
 function removeCardFromHand(hand: Card[], cardId: string): { card?: Card; cards: Card[] } {
   const index = hand.findIndex(card => card.id === cardId);
   if (index < 0) return { cards: hand };
@@ -93,7 +97,7 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
   const actor = playerName(nextState, input.playerId);
 
   if (card.color === 'black') {
-    nextState = { ...nextState, activeColor: chosenColor ?? 'purple' };
+    nextState = { ...nextState, activeColor: requiresChosenColor(card) ? chosenColor ?? 'purple' : nextState.activeColor };
   } else {
     nextState = { ...nextState, activeColor: card.color };
   }
@@ -152,8 +156,8 @@ export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   const valid = canPlayCard(state, input.playerId, card);
   if (!valid.ok) return { ok: false, reason: valid.reason, state };
 
-  if (card.color === 'black' && !normalizeChosenColor(input.chosenColor)) {
-    return { ok: false, reason: 'Wild cards require a chosen strain color', state };
+  if (requiresChosenColor(card) && !normalizeChosenColor(input.chosenColor)) {
+    return { ok: false, reason: 'Color-changing wild cards require a chosen strain color', state };
   }
 
   let nextState = updateHand(state, input.playerId, cards);
