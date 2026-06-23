@@ -51,8 +51,9 @@ A player may play a card if it matches:
 
 If pending draw pressure exists:
 
-- Stacking disabled: the player must draw the full pending amount.
-- Stacking enabled: only draw cards may be stacked.
+- Tolerance Break may always be played to clear pending draw pressure.
+- Stacking disabled: otherwise, the player must draw the full pending amount.
+- Stacking enabled: draw cards may be stacked.
 - Stackable draw cards: Pack Two, Munchies, Hotbox +4.
 
 ## Number cards
@@ -96,7 +97,7 @@ Party wild cards are Wild Smoke cards. Party mode adds 1 copy of each. No Mercy 
 | Munchies | 1 | 2 | 50 | Next player draws 2. |
 | Paranoia | 1 | 2 | 50 | Skip the next player. |
 | Rotation | 1 | 2 | 50 | Reverse turn direction. |
-| Tolerance Break | 1 | 2 | 50 | Clear pending draw pressure, then end turn. |
+| Tolerance Break | 1 | 2 | 50 | May be played against pending draw pressure. Clears pending draw pressure, then ends turn. |
 | Bogart | 1 | 2 | 50 | Target player draws 1. Defaults to next player. |
 | Pass the Tray | 1 | 2 | 50 | Every player passes one card in turn direction. |
 | Smoke Sesh | 1 | 2 | 50 | Every other player draws 1. |
