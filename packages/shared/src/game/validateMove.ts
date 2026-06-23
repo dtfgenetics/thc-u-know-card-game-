@@ -1,5 +1,7 @@
 import type { Card, CardColor, GameState } from '../types.js';
 
+const drawStackCards = new Set(['pack-two', 'munchies', 'hotbox-plus-four']);
+
 export function getTopDiscard(state: GameState): Card {
   const top = state.discardPile[state.discardPile.length - 1];
   if (!top) throw new Error('Discard pile is empty');
@@ -13,6 +15,11 @@ export function findPlayerHand(state: GameState, playerId: string) {
 export function canPlayCard(state: GameState, playerId: string, card: Card): { ok: true } | { ok: false; reason: string } {
   if (state.winnerId) return { ok: false, reason: 'The game is already over' };
   if (state.currentPlayerId !== playerId) return { ok: false, reason: 'It is not your turn' };
+
+  if (state.pendingDraw > 0) {
+    if (!state.settings.stacking) return { ok: false, reason: `You must draw ${state.pendingDraw} before your turn can continue` };
+    if (!drawStackCards.has(card.kind)) return { ok: false, reason: 'Only draw cards can be stacked while draw pressure is pending' };
+  }
 
   const top = getTopDiscard(state);
   if (card.color === 'black') return { ok: true };
