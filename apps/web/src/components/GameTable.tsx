@@ -12,23 +12,31 @@ type Props = {
 };
 
 const wildColors: CardColor[] = ['purple', 'green', 'gold', 'blue'];
+const colorChangingWilds = new Set(['strain-switch', 'hotbox-plus-four']);
+const targetCards = new Set(['bogart', 'greener-side']);
 
 export function GameTable({ playerId, publicState, privateState }: Props) {
   const isMyTurn = publicState.currentPlayerId === playerId;
   const [pendingWild, setPendingWild] = useState<Card | null>(null);
+  const [pendingTarget, setPendingTarget] = useState<Card | null>(null);
 
-  function emitPlay(card: Card, chosenColor?: CardColor) {
+  function emitPlay(card: Card, options?: { chosenColor?: CardColor; targetPlayerId?: string }) {
     socket.emit(Events.GAME_PLAY_CARD, {
       code: publicState.sessionCode,
       playerId,
       cardId: card.id,
-      chosenColor
+      chosenColor: options?.chosenColor,
+      targetPlayerId: options?.targetPlayerId
     });
   }
 
   function play(card: Card) {
-    if (card.color === 'black') {
+    if (colorChangingWilds.has(card.kind)) {
       setPendingWild(card);
+      return;
+    }
+    if (targetCards.has(card.kind)) {
+      setPendingTarget(card);
       return;
     }
     emitPlay(card);
@@ -36,8 +44,14 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
 
   function chooseWildColor(color: CardColor) {
     if (!pendingWild) return;
-    emitPlay(pendingWild, color);
+    emitPlay(pendingWild, { chosenColor: color });
     setPendingWild(null);
+  }
+
+  function chooseTarget(targetPlayerId: string) {
+    if (!pendingTarget) return;
+    emitPlay(pendingTarget, { targetPlayerId });
+    setPendingTarget(null);
   }
 
   function draw() {
@@ -49,6 +63,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   const latestLog = publicState.actionLog.slice(-5).reverse();
+  const targetOptions = publicState.players.filter(player => player.id !== playerId);
 
   return (
     <main className="game-table">
@@ -89,6 +104,19 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
                 </button>
               ))}
               <button className="ghost-button" type="button" onClick={() => setPendingWild(null)}>Cancel</button>
+            </div>
+          </div>
+        )}
+        {pendingTarget && (
+          <div className="wild-picker">
+            <strong>Choose target for {pendingTarget.label}</strong>
+            <div>
+              {targetOptions.map(target => (
+                <button key={target.id} className="ghost-button" type="button" onClick={() => chooseTarget(target.id)}>
+                  {target.name}
+                </button>
+              ))}
+              <button className="ghost-button" type="button" onClick={() => setPendingTarget(null)}>Cancel</button>
             </div>
           </div>
         )}
