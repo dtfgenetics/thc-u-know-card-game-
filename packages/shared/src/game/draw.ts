@@ -16,7 +16,28 @@ function recycleDiscardPile(state: GameState): GameState {
   };
 }
 
+function playerName(state: GameState, playerId: string): string {
+  return state.players.find(player => player.id === playerId)?.name ?? 'A player';
+}
+
+function logDraw(state: GameState, playerId: string, count: number): GameState {
+  const now = Date.now();
+  return {
+    ...state,
+    actionLog: [
+      ...state.actionLog.slice(-24),
+      {
+        id: `log-${now}-${Math.random().toString(36).slice(2, 7)}`,
+        playerId,
+        message: `${playerName(state, playerId)} drew ${count} card${count === 1 ? '' : 's'} from the Stash.`,
+        createdAt: now
+      }
+    ]
+  };
+}
+
 export function drawCards(state: GameState, playerId: string, count = 1, endTurn = true): MoveResult {
+  if (state.winnerId) return { ok: false, reason: 'The game is already over', state };
   if (state.currentPlayerId !== playerId) {
     return { ok: false, reason: 'It is not your turn', state };
   }
@@ -41,6 +62,7 @@ export function drawCards(state: GameState, playerId: string, count = 1, endTurn
     updatedAt: Date.now()
   };
 
+  nextState = logDraw(nextState, playerId, drawn.length);
   if (endTurn) nextState = advanceTurn(nextState);
   return { ok: true, state: nextState };
 }
