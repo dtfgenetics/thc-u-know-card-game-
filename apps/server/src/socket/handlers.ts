@@ -1,6 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import { Events, createGameState, drawCards, playCard } from '@thc-u-know/shared';
-import type { CardColor } from '@thc-u-know/shared';
+import type { CardColor, GameSettings } from '@thc-u-know/shared';
 import { publicSession } from '../state/store.js';
 import type { SessionStore } from '../state/store.js';
 import { broadcastGame, broadcastSession } from './broadcast.js';
@@ -35,6 +35,12 @@ function payloadString(payload: SocketPayload, key: string, fallback = ''): stri
   return String(payload?.[key] ?? fallback);
 }
 
+function payloadSettings(payload: SocketPayload): Partial<GameSettings> | undefined {
+  return payload?.settings && typeof payload.settings === 'object'
+    ? (payload.settings as Partial<GameSettings>)
+    : undefined;
+}
+
 async function emitFullState(io: Server, store: SessionStore, sessionCode: string): Promise<void> {
   const session = await store.getSession(sessionCode);
   if (!session) return;
@@ -51,8 +57,7 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
         return;
       }
 
-      const settings = payload?.settings && typeof payload.settings === 'object' ? payload.settings : undefined;
-      const session = await store.createSession(name, settings);
+      const session = await store.createSession(name, payloadSettings(payload));
       const player = session.players[0];
       if (!player) return;
       joinSocketRooms(socket, session.code, player.id);
