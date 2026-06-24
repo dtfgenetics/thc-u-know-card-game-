@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#2b102f"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <circle cx="118" cy="186" r="42" fill="#ffdf75"/>
+  <circle cx="214" cy="222" r="52" fill="#9fea4d"/>
+  <circle cx="162" cy="292" r="44" fill="#4dd8ff"/>
+  <path d="M88 340c38-28 78-28 118 0 18-18 38-25 60-22-26 42-58 64-98 66-38-2-72-16-102-44Z" fill="#f4ffe8" opacity="0.9"/>
+  <text x="168" y="104" text-anchor="middle" font-family="Arial" font-size="34" font-weight="900" fill="#f4ffe8">PARTY</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="22" font-weight="900" fill="#9fea4d">CHAOS CARD</text>
+</svg>
