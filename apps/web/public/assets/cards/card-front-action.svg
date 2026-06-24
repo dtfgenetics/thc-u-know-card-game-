@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#33205e"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <path d="M84 268h104l-34 72 98-116H148l34-72Z" fill="#ffdf75" stroke="#111" stroke-width="6"/>
+  <text x="168" y="104" text-anchor="middle" font-family="Arial" font-size="34" font-weight="900" fill="#f4ffe8">ACTION</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="22" font-weight="900" fill="#9fea4d">SKIP · REVERSE · DRAW</text>
+</svg>
