@@ -49,11 +49,21 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .player-list li { padding: 0.75rem 1rem; border-radius: 16px; background: rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
 .player-list button { padding: 0.5rem 0.75rem; background: #ffbd59; }
 
-.game-table { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; gap: 1rem; padding: 1rem; }
+.game-table {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
+  background-image: linear-gradient(rgba(6, 15, 6, 0.82), rgba(6, 15, 6, 0.92)), url('/assets/ui/table-bg.svg');
+  background-size: cover;
+  background-position: center;
+}
 .player-rail { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem; }
 .player-pill { min-width: 150px; padding: 0.75rem; border-radius: 18px; background: rgba(255,255,255,0.08); display: grid; gap: 0.35rem; }
 .player-pill.active { outline: 3px solid #9fea4d; }
 .player-pill strong { font-size: 1.8rem; }
+.player-pill small { color: #ffdf75; font-weight: 900; }
 .player-pill em { color: #9fea4d; font-style: normal; font-weight: 900; }
 .table-center { display: grid; align-content: center; gap: 1rem; }
 .winner-panel { width: min(720px, 100%); margin: 0 auto; padding: 1.25rem; text-align: center; border-radius: 28px; background: linear-gradient(145deg, rgba(159,234,77,0.25), rgba(0,0,0,0.34)); border: 1px solid rgba(159,234,77,0.4); }
@@ -61,9 +71,10 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .status-row { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
 .danger { color: #ffbd59; font-weight: 900; }
 .piles { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.pile { min-width: 150px; min-height: 210px; border-radius: 24px; display: grid; place-items: center; background: rgba(255,255,255,0.08); color: #f4ffe8; }
+.pile { min-width: 150px; min-height: 210px; border-radius: 24px; display: grid; place-items: center; background: rgba(255,255,255,0.08); color: #f4ffe8; background-size: cover; background-position: center; }
+.pile:first-child { background-image: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), url('/assets/ui/stash-bg.svg'); }
 .pile strong { font-size: 3rem; }
-.ashtray { padding: 1rem; }
+.ashtray { padding: 1rem; background-image: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), url('/assets/ui/ashtray-bg.svg'); }
 .action-log, .chat-box { width: min(720px, 100%); margin: 0 auto; padding: 1rem; border-radius: 20px; background: rgba(0,0,0,0.22); }
 .action-log h3, .chat-box h3 { margin: 0 0 0.5rem; color: #9fea4d; }
 .action-log p, .chat-messages p { margin: 0.35rem 0; color: #e8ffd8; }
@@ -77,6 +88,7 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .wild-picker div { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .color-choice { color: white; min-width: 96px; text-transform: capitalize; border: 2px solid rgba(255,255,255,0.5); }
 .card {
+  position: relative;
   width: 112px;
   height: 168px;
   border-radius: 18px;
@@ -88,9 +100,27 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   box-shadow: 0 10px 30px rgba(0,0,0,0.28);
   flex: 0 0 auto;
   color: white;
+  overflow: hidden;
+  isolation: isolate;
 }
-.card-label, .card-footer { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; }
-.card-value { font-size: 1.35rem; line-height: 1; }
+.card-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.42));
+}
+.card-label, .card-footer { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; text-shadow: 0 2px 5px rgba(0,0,0,0.55); }
+.card-value { font-size: 1.35rem; line-height: 1; text-shadow: 0 3px 8px rgba(0,0,0,0.7); }
+.card-back-title { align-self: center; justify-self: center; font-size: 1.4rem; font-weight: 1000; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.8); }
 .card-purple { background: linear-gradient(145deg, #5c2bd8, #26105e); }
 .card-green { background: linear-gradient(145deg, #2d9a43, #0e3e1c); }
 .card-gold { background: linear-gradient(145deg, #d79b22, #714909); }
