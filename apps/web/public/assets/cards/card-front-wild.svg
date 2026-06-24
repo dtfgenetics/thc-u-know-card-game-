@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#080808"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <circle cx="168" cy="244" r="92" fill="#9fea4d" opacity="0.22"/>
+  <path d="M168 126c24 34 52 55 82 62-22 15-45 19-68 13 18 27 27 57 26 91-16-23-30-36-40-38-10 2-24 15-40 38-1-34 8-64 26-91-23 6-46 2-68-13 30-7 58-28 82-62Z" fill="#9fea4d"/>
+  <text x="168" y="374" text-anchor="middle" font-family="Arial" font-size="42" font-weight="900" fill="#f4ffe8">WILD</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="22" font-weight="900" fill="#9fea4d">CHOOSE STRAIN</text>
+</svg>
