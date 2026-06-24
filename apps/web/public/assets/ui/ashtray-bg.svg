@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" rx="42" fill="#111"/>
+  <ellipse cx="200" cy="230" rx="130" ry="72" fill="#303030" stroke="#f4ffe8" stroke-opacity="0.35" stroke-width="10"/>
+  <ellipse cx="200" cy="216" rx="92" ry="38" fill="#070707"/>
+  <path d="M144 134c28-30 86-30 112 0-34-9-70-9-112 0Z" fill="#9fea4d" opacity="0.5"/>
+  <text x="200" y="336" text-anchor="middle" font-family="Arial" font-size="38" font-weight="900" fill="#f4ffe8">ASHTRAY</text>
+</svg>
