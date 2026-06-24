@@ -50,44 +50,48 @@ apps/web/public/assets/
 Browser paths should be referenced like this:
 
 ```txt
-/assets/cards/card-back.png
-/assets/logos/thc-u-know-logo.png
+/assets/cards/card-back.svg
+/assets/logos/thc-u-know-logo.svg
 /assets/music/table-loop.mp3
 /assets/sounds/card-play.mp3
-/assets/ui/table-texture.png
+/assets/ui/table-bg.svg
 ```
 
-## Required digital assets
+## Working placeholder digital assets
+
+The repo now includes SVG placeholders so the game has visible digital art immediately in VS Code/Vite.
 
 ### Card visuals
 
 ```txt
-apps/web/public/assets/cards/card-back.png
-apps/web/public/assets/cards/card-front-number.png
-apps/web/public/assets/cards/card-front-action.png
-apps/web/public/assets/cards/card-front-wild.png
-apps/web/public/assets/cards/card-front-party.png
+apps/web/public/assets/cards/card-back.svg
+apps/web/public/assets/cards/card-front-number.svg
+apps/web/public/assets/cards/card-front-action.svg
+apps/web/public/assets/cards/card-front-wild.svg
+apps/web/public/assets/cards/card-front-party.svg
 ```
 
 ### Logo / branding
 
 ```txt
-apps/web/public/assets/logos/thc-u-know-logo.png
-apps/web/public/assets/logos/dtf-genetics-logo.png
-apps/web/public/assets/logos/favicon.png
+apps/web/public/assets/logos/thc-u-know-logo.svg
+apps/web/public/assets/logos/dtf-genetics-logo.svg
+apps/web/public/assets/logos/favicon.svg
 ```
 
 ### UI/table assets
 
 ```txt
-apps/web/public/assets/ui/table-bg.png
-apps/web/public/assets/ui/ashtray-bg.png
-apps/web/public/assets/ui/stash-bg.png
-apps/web/public/assets/ui/winner-badge.png
-apps/web/public/assets/ui/player-token.png
+apps/web/public/assets/ui/table-bg.svg
+apps/web/public/assets/ui/ashtray-bg.svg
+apps/web/public/assets/ui/stash-bg.svg
+apps/web/public/assets/ui/winner-badge.svg
+apps/web/public/assets/ui/player-token.svg
 ```
 
-### Sound effects
+## Sound effects still needed
+
+Audio is mapped in code but real audio files still need to be created/exported:
 
 ```txt
 apps/web/public/assets/sounds/card-play.mp3
@@ -98,7 +102,7 @@ apps/web/public/assets/sounds/win-round.mp3
 apps/web/public/assets/sounds/error.mp3
 ```
 
-### Background music
+## Background music still needed
 
 ```txt
 apps/web/public/assets/music/table-loop.mp3
@@ -126,8 +130,9 @@ import { assetPaths } from '../assets/assetRegistry';
 
 - Use lowercase filenames.
 - Use hyphens, not spaces.
-- Use `.png` for transparent UI/card art.
-- Use `.webp` for large non-transparent backgrounds.
+- Use `.svg` for editable placeholder/vector assets.
+- Use `.png` for final transparent UI/card art.
+- Use `.webp` for large non-transparent final backgrounds.
 - Use `.mp3` or `.ogg` for browser audio.
 - Do not commit huge design-source files unless needed.
 - Keep browser-ready assets optimized.
@@ -135,11 +140,16 @@ import { assetPaths } from '../assets/assetRegistry';
 ## Current status
 
 ```txt
-✅ Asset locations are now defined.
+✅ Asset locations are defined.
 ✅ Source/master asset folder is defined.
 ✅ Browser-ready public asset folder is defined.
 ✅ Code asset registry is defined.
-⚠️ Final artwork/audio files still need to be placed in the folders.
+✅ Placeholder SVG card art exists.
+✅ Placeholder SVG logo art exists.
+✅ Placeholder SVG table/UI art exists.
+✅ ThcCard renders visual assets.
+✅ App hero renders the logo asset.
+⚠️ Final custom artwork/audio still needs to replace placeholders.
 ```
 
 ## VS Code workflow
