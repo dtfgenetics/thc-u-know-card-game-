@@ -30,6 +30,7 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 
 .app-shell { width: min(1080px, 94vw); margin: 0 auto; padding: 2rem 0; }
 .hero { padding: 3rem 0 1.5rem; text-align: center; }
+.hero-logo { width: min(420px, 86vw); height: auto; margin: 0 auto 1rem; display: block; filter: drop-shadow(0 22px 42px rgba(0,0,0,0.42)); }
 .hero h1 { margin: 0; font-size: clamp(3rem, 10vw, 7rem); letter-spacing: -0.08em; text-transform: uppercase; }
 .eyebrow { color: #9fea4d; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 900; }
 .panel {
