@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" rx="42" fill="#0c2110"/>
+  <rect x="122" y="82" width="156" height="220" rx="22" fill="#111" stroke="#f4ffe8" stroke-width="8" transform="rotate(-7 200 192)"/>
+  <rect x="142" y="62" width="156" height="220" rx="22" fill="#1d3f20" stroke="#9fea4d" stroke-width="8" transform="rotate(7 220 172)"/>
+  <text x="200" y="340" text-anchor="middle" font-family="Arial" font-size="42" font-weight="900" fill="#f4ffe8">STASH</text>
+</svg>
