@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504" role="img" aria-label="THC U Know card back">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#111"/>
+      <stop offset="0.58" stop-color="#09230f"/>
+      <stop offset="1" stop-color="#050505"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="42%" r="58%">
+      <stop offset="0" stop-color="#9fea4d" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#9fea4d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="336" height="504" rx="38" fill="url(#bg)"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <rect x="34" y="34" width="268" height="436" rx="20" fill="url(#glow)" stroke="#9fea4d" stroke-opacity="0.55" stroke-width="4"/>
+  <path d="M168 126c26 35 54 56 86 63-24 16-48 21-72 14 19 28 28 60 27 96-17-25-31-38-41-40-10 2-24 15-41 40-1-36 8-68 27-96-24 7-48 2-72-14 32-7 60-28 86-63Z" fill="#9fea4d" opacity="0.9"/>
+  <text x="168" y="344" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="46" fill="#f4ffe8">THC</text>
+  <text x="168" y="394" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="34" fill="#9fea4d">U KNOW</text>
+</svg>
