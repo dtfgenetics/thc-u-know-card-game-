@@ -5,6 +5,7 @@ type Props = {
   card?: Card;
   hidden?: boolean;
   disabled?: boolean;
+  zone?: 'hand' | 'discard';
   onClick?: (card: Card) => void;
 };
 
@@ -17,7 +18,7 @@ function cardArt(card: Card): string {
   return assetPaths.cards.frontAction;
 }
 
-export function ThcCard({ card, hidden = false, disabled = false, onClick }: Props) {
+export function ThcCard({ card, hidden = false, disabled = false, zone, onClick }: Props) {
   if (hidden || !card) {
     return (
       <div className="card card-back" aria-label="Hidden THC U Know card">
@@ -31,7 +32,12 @@ export function ThcCard({ card, hidden = false, disabled = false, onClick }: Pro
     <button
       className={`card card-${card.color}`}
       type="button"
-      disabled={disabled}
+      disabled={disabled || !onClick}
+      data-card-id={card.id}
+      data-card-kind={card.kind}
+      data-card-color={card.color}
+      data-card-value={card.value}
+      data-card-zone={zone}
       onClick={() => onClick?.(card)}
       title={card.label}
     >

@@ -78,7 +78,15 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
 
   return (
-    <main className="game-table">
+    <main
+      className="game-table"
+      data-current-player-id={publicState.currentPlayerId}
+      data-player-id={playerId}
+      data-pending-draw={publicState.pendingDraw}
+      data-round-number={publicState.roundNumber}
+      data-winner-id={publicState.winnerId}
+      data-updated-at={publicState.updatedAt}
+    >
       <PlayerRail players={publicState.players} currentPlayerId={publicState.currentPlayerId} />
       <section className="table-center">
         {winner && (
@@ -100,7 +108,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
           </button>
           <div className="pile ashtray">
             <span>Ashtray</span>
-            <ThcCard card={publicState.topDiscard} />
+            <ThcCard card={publicState.topDiscard} zone="discard" />
           </div>
         </div>
         <section className="action-log">
@@ -142,7 +150,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
         )}
         <div className="hand-scroll">
           {privateState.hand.map(card => (
-            <ThcCard key={card.id} card={card} disabled={!isMyTurn} onClick={play} />
+            <ThcCard key={card.id} card={card} zone="hand" disabled={!isMyTurn} onClick={play} />
           ))}
         </div>
       </section>

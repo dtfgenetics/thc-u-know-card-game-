@@ -63,8 +63,24 @@ export function App() {
   const [publicState, setPublicState] = useState<PublicGameState | null>(null);
   const [privateState, setPrivateState] = useState<PrivatePlayerState | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [socketConnected, setSocketConnected] = useState(socket.connected);
+  const [connectionFailed, setConnectionFailed] = useState(false);
 
   useEffect(() => {
+    function onConnect() {
+      setSocketConnected(true);
+      setConnectionFailed(false);
+    }
+
+    function onDisconnect() {
+      setSocketConnected(false);
+    }
+
+    function onConnectError() {
+      setSocketConnected(false);
+      setConnectionFailed(true);
+    }
+
     function onJoined(payload: { session: PublicSession; player: Player }) {
       setPlayer(payload.player);
       setSession(payload.session);
@@ -82,6 +98,9 @@ export function App() {
     socket.on(Events.GAME_OVER, (payload: GameOverPayload) => {
       setError(payload.matchWinnerId ? `Match winner: ${payload.matchWinnerId}` : `Round winner: ${payload.winnerId}`);
     });
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('connect_error', onConnectError);
 
     return () => {
       socket.off(Events.SESSION_CREATED, onJoined);
@@ -92,6 +111,9 @@ export function App() {
       socket.off(Events.GAME_PRIVATE_STATE);
       socket.off(Events.ERROR);
       socket.off(Events.GAME_OVER);
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('connect_error', onConnectError);
     };
   }, []);
 
@@ -164,6 +186,11 @@ export function App() {
       </header>
 
       {error && <div className="error-box">{error}</div>}
+      {connectionFailed && (
+        <div className="error-box" role="status">
+          Multiplayer server unavailable. The web client loaded, but a persistent Node/WebSocket backend is not connected.
+        </div>
+      )}
 
       {!session && (
         <section className="panel start-panel">
@@ -181,13 +208,13 @@ export function App() {
             </select>
           </label>
           <div className="button-row">
-            <button type="button" disabled={!name.trim()} onClick={hostGame}>Host Smoke Circle</button>
+            <button type="button" disabled={!name.trim() || !socketConnected} onClick={hostGame}>Host Smoke Circle</button>
           </div>
           <label>
             Session code
             <input value={code} onChange={onCodeChange} placeholder="ABC123" />
           </label>
-          <button type="button" disabled={!name.trim() || !code.trim()} onClick={joinGame}>Join Smoke Circle</button>
+          <button type="button" disabled={!name.trim() || !code.trim() || !socketConnected} onClick={joinGame}>Join Smoke Circle</button>
           {savedSession && <button className="ghost-button" type="button" onClick={clearSavedSession}>Forget Saved Session</button>}
         </section>
       )}
@@ -197,11 +224,11 @@ export function App() {
           <InvitePanel code={session.code} />
           <section className="panel">
             <h2>Smoke Circle</h2>
-            {session.settings && <p>Mode: <strong>{session.settings.mode}</strong> · Hand: <strong>{session.settings.startingHandSize}</strong> · Target: <strong>{session.settings.targetScore}</strong></p>}
+            {session.settings && <p>Mode: <strong>{session.settings.mode}</strong> | Hand: <strong>{session.settings.startingHandSize}</strong> | Target: <strong>{session.settings.targetScore}</strong></p>}
             <ul className="player-list">
               {session.players.map(item => (
                 <li key={item.id}>
-                  <span>{item.host ? '👑 ' : ''}{item.name}{item.connected ? '' : ' · disconnected'}</span>
+                  <span>{item.host ? 'Host: ' : ''}{item.name}{item.connected ? '' : ' | disconnected'}</span>
                   {isHost && item.id !== player.id && !session.started && (
                     <button type="button" onClick={() => kick(item.id)}>Kick</button>
                   )}

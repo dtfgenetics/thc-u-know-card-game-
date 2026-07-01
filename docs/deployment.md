@@ -53,6 +53,7 @@ Web:
 
 ```txt
 VITE_SERVER_URL=http://localhost:5174
+VITE_SOCKET_PATH=/socket.io
 ```
 
 Discord bot:
@@ -70,6 +71,17 @@ Recommended first production stack:
 - Server: Node process with Socket.IO and HTTPS reverse proxy.
 - State: Redis before public launch.
 - Realtime scaling: Socket.IO Redis adapter when running more than one Node process.
+
+The Vite app is built with `base: '/games/thc-u-know/'`. Browser assets are resolved relative to that base.
+
+For a separate backend origin, set:
+
+```txt
+VITE_SERVER_URL=https://api.dtfseeds.com
+VITE_SOCKET_PATH=/socket.io
+```
+
+For a same-origin reverse proxy, leave `VITE_SERVER_URL` unset and route `/socket.io/` to the Node service. Traditional Hostinger shared hosting cannot accept incoming WebSocket connections; use Hostinger managed Node hosting, a VPS, or another persistent Node host for multiplayer.
 
 ## Pre-launch checklist
 
