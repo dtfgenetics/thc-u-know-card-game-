@@ -31,8 +31,8 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .app-shell { width: min(1080px, 94vw); margin: 0 auto; padding: 2rem 0; }
 .hero { padding: 3rem 0 1.5rem; text-align: center; }
 .hero-logo { width: min(420px, 86vw); height: auto; margin: 0 auto 1rem; display: block; filter: drop-shadow(0 22px 42px rgba(0,0,0,0.42)); }
-.hero h1 { margin: 0; font-size: clamp(3rem, 10vw, 7rem); letter-spacing: -0.08em; text-transform: uppercase; }
-.eyebrow { color: #9fea4d; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 900; }
+.hero h1 { max-width: 100%; margin: 0; font-size: 7rem; line-height: 1; letter-spacing: 0; text-transform: uppercase; overflow-wrap: anywhere; }
+.eyebrow { max-width: 100%; color: #9fea4d; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 900; line-height: 1.4; overflow-wrap: anywhere; }
 .panel {
   background: rgba(8, 18, 8, 0.82);
   border: 1px solid rgba(159, 234, 77, 0.24);
@@ -131,4 +131,13 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 @media (min-width: 900px) {
   .game-table { grid-template-columns: 260px 1fr; grid-template-rows: 1fr auto; }
   .player-rail { grid-row: 1 / span 2; flex-direction: column; overflow: visible; }
+}
+
+@media (max-width: 760px) {
+  .app-shell { width: 100%; padding: 1rem 0.75rem; }
+  .hero { overflow: hidden; padding: 1.5rem 0 1rem; }
+  .hero h1 { font-size: 2.75rem; }
+  .eyebrow { font-size: 0.8rem; letter-spacing: 0.12em; }
+  .panel { border-radius: 20px; padding: 1rem; }
+  .session-code { font-size: 2rem; }
 }
