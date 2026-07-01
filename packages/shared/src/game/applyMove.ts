@@ -148,6 +148,40 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
   }
 }
 
+function applyFinalCardEffects(state: GameState, card: Card, input: PlayCardInput): GameState {
+  let nextState = state;
+  const chosenColor = normalizeChosenColor(input.chosenColor);
+
+  if (card.color === 'black' && requiresChosenColor(card) && chosenColor) {
+    nextState = { ...nextState, activeColor: chosenColor };
+  } else if (card.color !== 'black') {
+    nextState = { ...nextState, activeColor: card.color };
+  }
+
+  switch (card.kind) {
+    case 'tolerance-break':
+      return { ...nextState, pendingDraw: 0 };
+    case 'pack-two':
+    case 'munchies':
+      return drawForPlayer(nextState, nextPlayerId(nextState), 2);
+    case 'hotbox-plus-four':
+      return drawForPlayer(nextState, nextPlayerId(nextState), 4);
+    case 'bogart': {
+      const targetId = input.targetPlayerId && nextState.players.some(player => player.id === input.targetPlayerId)
+        ? input.targetPlayerId
+        : nextPlayerId(nextState);
+      return drawForPlayer(nextState, targetId, 1);
+    }
+    case 'smoke-sesh':
+      for (const player of nextState.players) {
+        if (player.id !== input.playerId) nextState = drawForPlayer(nextState, player.id, 1);
+      }
+      return nextState;
+    default:
+      return nextState;
+  }
+}
+
 export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   const hand = findPlayerHand(state, input.playerId);
   if (!hand) return { ok: false, reason: 'Player hand not found', state };
@@ -173,7 +207,7 @@ export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   };
 
   if (cards.length === 0) {
-    const scoredState = applyRoundScore(nextState, input.playerId);
+    const scoredState = applyRoundScore(applyFinalCardEffects(nextState, card, input), input.playerId);
     const points = scoredState.lastRoundScore?.pointsAwarded ?? 0;
     const matchText = scoredState.matchWinnerId ? ` Match target reached at ${scoredState.scores[input.playerId]} points.` : '';
     return {

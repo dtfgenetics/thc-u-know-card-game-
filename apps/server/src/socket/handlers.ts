@@ -113,9 +113,9 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
       const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
-      if (!session) return socket.emit(Events.ERROR, { message: 'Smoke Circle not found' });
-      if (session.hostId !== playerId) return socket.emit(Events.ERROR, { message: 'Only the host can start the game' });
-      if (session.players.length < 2) return socket.emit(Events.ERROR, { message: 'At least 2 players are required' });
+      if (!session) return emitSocketError(socket, 'Smoke Circle not found');
+      if (session.hostId !== playerId) return emitSocketError(socket, 'Only the host can start the game');
+      if (session.players.length < 2) return emitSocketError(socket, 'At least 2 players are required');
 
       const game = createGameState({ sessionCode: session.code, players: session.players, settings: session.settings });
       const updated = await store.setGame(code, game);
@@ -129,10 +129,10 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
       const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
-      if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
-      if (!session.game.winnerId && !session.game.drawRound) return socket.emit(Events.ERROR, { message: 'Round is not over yet' });
-      if (!session.players.some(player => player.id === playerId)) return socket.emit(Events.ERROR, { message: 'Player not found' });
-      if (session.players.length < 2) return socket.emit(Events.ERROR, { message: 'At least 2 players are required' });
+      if (!session?.game) return emitSocketError(socket, 'Game not found');
+      if (!session.game.winnerId && !session.game.drawRound) return emitSocketError(socket, 'Round is not over yet');
+      if (!session.players.some(player => player.id === playerId)) return emitSocketError(socket, 'Player not found');
+      if (session.players.length < 2) return emitSocketError(socket, 'At least 2 players are required');
 
       const game = session.game.matchWinnerId
         ? createGameState({ sessionCode: session.code, players: session.players.map(player => ({ ...player, calledThcUKnow: false })), settings: session.settings })
@@ -147,7 +147,7 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
       const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
-      if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
+      if (!session?.game) return emitSocketError(socket, 'Game not found');
 
       const result = playCard(session.game, {
         playerId,
@@ -156,7 +156,7 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
         targetPlayerId: payloadString(payload, 'targetPlayerId') || undefined
       });
 
-      if (!result.ok) return socket.emit(Events.ERROR, { message: result.reason ?? 'Invalid move' });
+      if (!result.ok) return emitSocketError(socket, result.reason ?? 'Invalid move');
       const updated = await store.saveSession({ ...session, players: result.state.players, game: result.state });
       broadcastSession(io, updated);
       broadcastGame(io, updated);
@@ -174,11 +174,11 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
       const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
-      if (!session?.game) return socket.emit(Events.ERROR, { message: 'Game not found' });
+      if (!session?.game) return emitSocketError(socket, 'Game not found');
 
       const drawCount = session.game.pendingDraw > 0 ? session.game.pendingDraw : 1;
       const result = drawCards(session.game, playerId, drawCount, true);
-      if (!result.ok) return socket.emit(Events.ERROR, { message: result.reason ?? 'Unable to draw' });
+      if (!result.ok) return emitSocketError(socket, result.reason ?? 'Unable to draw');
       const updated = await store.saveSession({ ...session, players: result.state.players, game: result.state });
       broadcastSession(io, updated);
       broadcastGame(io, updated);
