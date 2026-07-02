@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#6b4208"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <rect x="100" y="178" width="96" height="142" rx="16" fill="#111" stroke="#f4ffe8" stroke-width="7" transform="rotate(-9 148 249)"/>
+  <rect x="140" y="168" width="96" height="142" rx="16" fill="#d79b22" stroke="#f4ffe8" stroke-width="7" transform="rotate(9 188 239)"/>
+  <text x="168" y="110" text-anchor="middle" font-family="Arial" font-size="38" font-weight="900" fill="#f4ffe8">PACK</text>
+  <text x="168" y="154" text-anchor="middle" font-family="Arial" font-size="38" font-weight="900" fill="#ffdf75">TWO</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="28" font-weight="900" fill="#f4ffe8">DRAW 2</text>
+</svg>
