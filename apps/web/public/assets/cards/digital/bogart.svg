@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#30190b"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <circle cx="168" cy="250" r="78" fill="#111" stroke="#ffdf75" stroke-width="10"/>
+  <path d="M118 250h100" stroke="#9fea4d" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="230" cy="250" r="22" fill="#f4ffe8"/>
+  <text x="168" y="112" text-anchor="middle" font-family="Arial" font-size="40" font-weight="900" fill="#f4ffe8">BOGART</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="24" font-weight="900" fill="#9fea4d">TARGET DRAW 1</text>
+</svg>
