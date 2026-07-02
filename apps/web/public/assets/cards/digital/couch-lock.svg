@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#143f1d"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <rect x="82" y="210" width="172" height="70" rx="22" fill="#9fea4d"/>
+  <rect x="62" y="254" width="212" height="64" rx="22" fill="#f4ffe8"/>
+  <text x="168" y="110" text-anchor="middle" font-family="Arial" font-size="36" font-weight="900" fill="#f4ffe8">COUCH</text>
+  <text x="168" y="154" text-anchor="middle" font-family="Arial" font-size="36" font-weight="900" fill="#9fea4d">LOCK</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="26" font-weight="900" fill="#f4ffe8">SKIP</text>
+</svg>
