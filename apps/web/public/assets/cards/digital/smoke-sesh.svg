@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#1a1a1a"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <circle cx="168" cy="250" r="88" fill="#9fea4d" opacity="0.24"/>
+  <circle cx="122" cy="250" r="34" fill="#f4ffe8"/>
+  <circle cx="168" cy="220" r="34" fill="#f4ffe8"/>
+  <circle cx="214" cy="250" r="34" fill="#f4ffe8"/>
+  <text x="168" y="102" text-anchor="middle" font-family="Arial" font-size="36" font-weight="900" fill="#f4ffe8">SMOKE</text>
+  <text x="168" y="142" text-anchor="middle" font-family="Arial" font-size="36" font-weight="900" fill="#9fea4d">SESH</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="22" font-weight="900" fill="#f4ffe8">OTHERS DRAW 1</text>
+</svg>
