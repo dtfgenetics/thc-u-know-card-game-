@@ -63,7 +63,7 @@ apps/web/public/assets/cards/digital/smoke-sesh.svg
 apps/web/public/assets/cards/digital/greener-side.svg
 ```
 
-## Code files that must use these assets
+## Code files that use these assets
 
 ```txt
 apps/web/src/assets/assetRegistry.ts
@@ -71,14 +71,17 @@ apps/web/src/assets/cardVisualAssets.ts
 apps/web/src/components/ThcCard.tsx
 ```
 
-## Current implementation plan
+## Implementation completed
 
 ```txt
-1. Keep existing broad placeholder assets as fallback.
-2. Add specific digital card assets under /assets/cards/digital/.
-3. Add a TypeScript card visual resolver.
-4. Update ThcCard to use specific art first and fallback safely.
-5. Replace SVG placeholders with final approved PNG/SVG art later without changing game logic.
+✅ Existing broad placeholder assets remain as fallbacks.
+✅ Specific digital card assets now live under /assets/cards/digital/.
+✅ A TypeScript card visual resolver exists.
+✅ ThcCard now uses the specific card visual resolver.
+✅ Number cards use color-family templates.
+✅ Classic action cards use individual action visuals.
+✅ Wild cards use individual wild visuals.
+✅ Party / No Mercy cards use individual party visuals.
 ```
 
 ## Current status
@@ -86,6 +89,8 @@ apps/web/src/components/ThcCard.tsx
 ```txt
 ✅ Asset inventory defined.
 ✅ Required digital card files listed.
-⚠️ Specific digital SVG placeholders are being added in small batches.
-⚠️ Final approved card art still needs to replace placeholders once exported.
+✅ Specific digital SVG placeholders created.
+✅ Digital card resolver created.
+✅ Card component wired to digital visuals.
+⚠️ Final approved print-matched card art still needs to replace SVG placeholders once exported.
 ```
