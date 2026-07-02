@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#32106b"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <path d="M232 160a92 92 0 1 0 20 104" fill="none" stroke="#9fea4d" stroke-width="28" stroke-linecap="round"/>
+  <path d="M252 264l-52-4 34 40Z" fill="#9fea4d"/>
+  <text x="168" y="94" text-anchor="middle" font-family="Arial" font-size="28" font-weight="900" fill="#f4ffe8">PUFF PUFF</text>
+  <text x="168" y="128" text-anchor="middle" font-family="Arial" font-size="28" font-weight="900" fill="#9fea4d">PASS BACK</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="26" font-weight="900" fill="#f4ffe8">REVERSE</text>
+</svg>
