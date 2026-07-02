@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#0d3d1a"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <rect x="88" y="194" width="78" height="120" rx="16" fill="#111" stroke="#f4ffe8" stroke-width="7"/>
+  <rect x="170" y="194" width="78" height="120" rx="16" fill="#9fea4d" stroke="#f4ffe8" stroke-width="7"/>
+  <path d="M126 338h84" stroke="#f4ffe8" stroke-width="18" stroke-linecap="round"/>
+  <path d="M210 338l-30-26v52Z" fill="#f4ffe8"/>
+  <text x="168" y="100" text-anchor="middle" font-family="Arial" font-size="32" font-weight="900" fill="#f4ffe8">GREENER</text>
+  <text x="168" y="138" text-anchor="middle" font-family="Arial" font-size="32" font-weight="900" fill="#9fea4d">SIDE</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="22" font-weight="900" fill="#f4ffe8">SWAP HANDS</text>
+</svg>
