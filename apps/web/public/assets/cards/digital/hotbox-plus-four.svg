@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#111"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <circle cx="168" cy="246" r="88" fill="#9fea4d" opacity="0.26"/>
+  <text x="168" y="110" text-anchor="middle" font-family="Arial" font-size="36" font-weight="900" fill="#f4ffe8">HOTBOX</text>
+  <text x="168" y="286" text-anchor="middle" font-family="Arial" font-size="112" font-weight="900" fill="#9fea4d">+4</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="23" font-weight="900" fill="#f4ffe8">CHOOSE + DRAW</text>
+</svg>
