@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 504">
+  <rect width="336" height="504" rx="38" fill="#180b24"/>
+  <rect x="18" y="18" width="300" height="468" rx="28" fill="none" stroke="#f4ffe8" stroke-width="10"/>
+  <ellipse cx="168" cy="252" rx="92" ry="56" fill="#f4ffe8"/>
+  <circle cx="168" cy="252" r="28" fill="#111"/>
+  <circle cx="168" cy="252" r="12" fill="#9fea4d"/>
+  <text x="168" y="112" text-anchor="middle" font-family="Arial" font-size="36" font-weight="900" fill="#f4ffe8">PARANOIA</text>
+  <text x="168" y="424" text-anchor="middle" font-family="Arial" font-size="28" font-weight="900" fill="#9fea4d">SKIP</text>
+</svg>
