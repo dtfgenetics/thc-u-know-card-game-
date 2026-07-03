@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import type { GameMode, Player, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events } from '@thc-u-know/shared';
-import { assetPaths } from './assets/assetRegistry';
 import { GameTable } from './components/GameTable';
 import { InvitePanel } from './components/InvitePanel';
 import { socket } from './realtime/socket';
@@ -32,6 +31,7 @@ type GameOverPayload = {
 };
 
 const savedSessionKey = 'thc-u-know-session';
+const logoPath = 'assets/logos/thc-u-know-logo.svg';
 
 type SavedSession = {
   code: string;
@@ -157,7 +157,7 @@ export function App() {
   return (
     <div className="app-shell">
       <header className="hero">
-        <img className="hero-logo" src={assetPaths.logos.thcUKnow} alt="THC U Know" />
+        <img className="hero-logo" src={logoPath} alt="THC U Know" />
         <p className="eyebrow">Online multiplayer parody card game</p>
         <h1>THC U Know</h1>
         <p>Host a Smoke Circle, invite friends, and play original UNNO-style cannabis parody rules.</p>
