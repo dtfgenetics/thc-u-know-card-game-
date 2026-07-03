@@ -118,6 +118,8 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
     case 'hotbox-plus-four':
       return logAction({ ...advanceTurn(nextState), pendingDraw: nextState.pendingDraw + 4 }, input.playerId, `${actor} played ${card.label} and chose ${nextState.activeColor}. Next player must draw 4.`);
     case 'strain-switch':
+    case 'dealer-choice':
+    case 'mystery-nug':
       return logAction(advanceTurn(nextState), input.playerId, `${actor} played ${card.label} and switched the active strain to ${nextState.activeColor}.`);
     case 'tolerance-break':
       return logAction(advanceTurn({ ...nextState, pendingDraw: 0 }), input.playerId, `${actor} took a Tolerance Break and cleared pending draw pressure.`);
