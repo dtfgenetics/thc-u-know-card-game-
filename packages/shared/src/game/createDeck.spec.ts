@@ -31,7 +31,9 @@ describe('classic deck manifest', () => {
     expect(countKind(deck, 'couch-lock')).toBe(8);
     expect(countKind(deck, 'puff-puff-pass-back')).toBe(8);
     expect(countKind(deck, 'pack-two')).toBe(8);
-    expect(countKind(deck, 'strain-switch')).toBe(6);
-    expect(countKind(deck, 'hotbox-plus-four')).toBe(6);
+    expect(countKind(deck, 'strain-switch')).toBe(4);
+    expect(countKind(deck, 'hotbox-plus-four')).toBe(4);
+    expect(countKind(deck, 'dealer-choice')).toBe(2);
+    expect(countKind(deck, 'mystery-nug')).toBe(2);
   });
 });
