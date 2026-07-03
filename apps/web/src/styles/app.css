@@ -56,7 +56,7 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   grid-template-rows: auto 1fr auto;
   gap: 1rem;
   padding: 1rem;
-  background-image: linear-gradient(rgba(6, 15, 6, 0.82), rgba(6, 15, 6, 0.92)), url('../assets/ui/table-bg.svg');
+  background: linear-gradient(rgba(6, 15, 6, 0.82), rgba(6, 15, 6, 0.92)), radial-gradient(circle at top, #26451d, #090d08 65%);
   background-size: cover;
   background-position: center;
 }
@@ -73,9 +73,9 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .danger { color: #ffbd59; font-weight: 900; }
 .piles { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .pile { min-width: 174px; min-height: 154px; border-radius: 24px; display: grid; place-items: center; background: rgba(255,255,255,0.08); color: #f4ffe8; background-size: cover; background-position: center; }
-.pile:first-child { background-image: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), url('../assets/ui/stash-bg.svg'); }
+.pile:first-child { background: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), rgba(20, 44, 20, 0.9); }
 .pile strong { font-size: 3rem; }
-.ashtray { padding: 1rem; background-image: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), url('../assets/ui/ashtray-bg.svg'); }
+.ashtray { padding: 1rem; background: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), rgba(42, 24, 16, 0.9); }
 .action-log, .chat-box { width: min(720px, 100%); margin: 0 auto; padding: 1rem; border-radius: 20px; background: rgba(0,0,0,0.22); }
 .action-log h3, .chat-box h3 { margin: 0 0 0.5rem; color: #9fea4d; }
 .action-log p, .chat-messages p { margin: 0.35rem 0; color: #e8ffd8; }
