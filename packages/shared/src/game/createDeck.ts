@@ -1,6 +1,6 @@
 import type { Card, CardColor, GameMode } from '../types.js';
 import { cardManifest, copiesForMode, numberCardRules } from './cardManifest.js';
-import { actionLabels, classicColors, colorLabels } from './cardNames.js';
+import { actionLabels, classicColors, colorLabels, valueLabels } from './cardNames.js';
 import { shuffle } from './shuffle.js';
 
 function cardId(parts: Array<string | number>): string {
@@ -8,11 +8,13 @@ function cardId(parts: Array<string | number>): string {
 }
 
 function numberCard(color: CardColor, value: number, copy: number): Card {
+  const valueLabel = valueLabels[value] ?? `${colorLabels[color]} ${value}`;
+
   return {
     id: cardId(['card', color, value, copy]),
     color,
     kind: 'number',
-    label: `${colorLabels[color]} ${value}`,
+    label: valueLabel,
     value,
     points: value
   };
@@ -32,7 +34,9 @@ export function createDeck(mode: GameMode = 'classic', random: () => number = Ma
   const cards: Card[] = [];
 
   for (const color of classicColors) {
-    cards.push(numberCard(color, 0, 1));
+    for (let copy = 1; copy <= numberCardRules.zeroCopiesPerColor; copy += 1) {
+      cards.push(numberCard(color, 0, copy));
+    }
 
     for (let value = 1; value <= 9; value += 1) {
       for (let copy = 1; copy <= numberCardRules.nonZeroCopiesPerColor; copy += 1) {
