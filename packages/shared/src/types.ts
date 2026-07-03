@@ -7,6 +7,8 @@ export type CardKind =
   | 'pack-two'
   | 'strain-switch'
   | 'hotbox-plus-four'
+  | 'dealer-choice'
+  | 'mystery-nug'
   | 'munchies'
   | 'paranoia'
   | 'rotation'
