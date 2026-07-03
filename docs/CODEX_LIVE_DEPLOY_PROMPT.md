@@ -25,6 +25,8 @@ Web app:
 VITE_BASE_PATH=/games/thc-u-know/
 ```
 
+The Vite config now defaults to `/games/thc-u-know/`, but setting `VITE_BASE_PATH` explicitly is safer.
+
 If the Socket.IO server runs on the same origin as the web app, `VITE_SERVER_URL` can be omitted. If it runs on a separate origin, set it to that server origin.
 
 Server:
@@ -32,12 +34,14 @@ Server:
 ```bash
 NODE_ENV=production
 PORT=<production port>
-WEB_ORIGIN=https://dtfseeds.com
+WEB_ORIGIN=https://dtfseeds.com,https://www.dtfseeds.com
 WEB_BASE_PATH=/games/thc-u-know
 WEB_DIST_DIR=<absolute path to apps/web/dist>
 SESSION_STORE=memory
 ENABLE_REDIS_ADAPTER=false
 ```
+
+The Node server can serve the built React app from `WEB_DIST_DIR`, so one Node process can host both the game route and Socket.IO multiplayer server.
 
 Use Redis only after the first live version is stable.
 
