@@ -7,7 +7,8 @@
     "build": "pnpm -r build",
     "dev": "pnpm --parallel --filter @thc-u-know/server --filter @thc-u-know/web dev",
     "test": "pnpm --filter @thc-u-know/shared test",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "start": "pnpm --filter @thc-u-know/server start"
   },
   "engines": {
     "node": ">=20.0.0",
