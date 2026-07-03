@@ -54,7 +54,7 @@ export const cardManifest: CardManifestEntry[] = [
     label: 'Strain Swap',
     deckGroup: 'classic-wild',
     points: 50,
-    copies: { classic: 6, party: 6, 'fast-sesh': 6, 'no-mercy': 6 },
+    copies: { classic: 4, party: 4, 'fast-sesh': 4, 'no-mercy': 4 },
     needsChosenColor: true,
     needsTarget: false,
     effect: 'Choose the active strain color.'
@@ -64,10 +64,30 @@ export const cardManifest: CardManifestEntry[] = [
     label: 'Greenout',
     deckGroup: 'classic-wild',
     points: 50,
-    copies: { classic: 6, party: 6, 'fast-sesh': 6, 'no-mercy': 6 },
+    copies: { classic: 4, party: 4, 'fast-sesh': 4, 'no-mercy': 4 },
     needsChosenColor: true,
     needsTarget: false,
     effect: 'Choose the active strain color. Next player must draw 4 cards from the Stash.'
+  },
+  {
+    kind: 'dealer-choice',
+    label: "Dealer's Choice",
+    deckGroup: 'classic-wild',
+    points: 50,
+    copies: { classic: 2, party: 2, 'fast-sesh': 2, 'no-mercy': 2 },
+    needsChosenColor: true,
+    needsTarget: false,
+    effect: 'Choose the active strain color.'
+  },
+  {
+    kind: 'mystery-nug',
+    label: 'Mystery Nug',
+    deckGroup: 'classic-wild',
+    points: 50,
+    copies: { classic: 2, party: 2, 'fast-sesh': 2, 'no-mercy': 2 },
+    needsChosenColor: true,
+    needsTarget: false,
+    effect: 'Choose the active strain color.'
   },
   {
     kind: 'munchies',
