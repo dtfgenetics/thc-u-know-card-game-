@@ -22,6 +22,8 @@ const envSchema = z.object({
   WEB_ORIGIN: z.string().default('http://localhost:5173').refine(validateOriginList, {
     message: 'WEB_ORIGIN must be one or more comma-separated URL origins'
   }),
+  WEB_BASE_PATH: z.string().default('/games/thc-u-know'),
+  WEB_DIST_DIR: z.string().default('../web/dist'),
   REDIS_URL: z.string().url().optional(),
   SESSION_TTL_SECONDS: z.coerce.number().int().positive().default(60 * 60 * 24),
   ENABLE_REDIS_ADAPTER: booleanFromEnv.default(false),
