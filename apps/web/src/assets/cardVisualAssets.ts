@@ -17,6 +17,8 @@ export const actionCardArtByKind: Record<ActionKind, string> = {
   'pack-two': '/assets/cards/digital/pack-two.svg',
   'strain-switch': '/assets/cards/digital/strain-switch.svg',
   'hotbox-plus-four': '/assets/cards/digital/hotbox-plus-four.svg',
+  'dealer-choice': '/assets/cards/digital/dealer-choice.svg',
+  'mystery-nug': '/assets/cards/digital/mystery-nug.svg',
   munchies: '/assets/cards/digital/munchies.svg',
   paranoia: '/assets/cards/digital/paranoia.svg',
   rotation: '/assets/cards/digital/rotation.svg',
