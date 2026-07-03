@@ -12,8 +12,8 @@ export type CardManifestEntry = {
 };
 
 export const numberCardRules = {
-  values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-  zeroCopiesPerColor: 1,
+  values: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  zeroCopiesPerColor: 0,
   nonZeroCopiesPerColor: 2,
   points: 'face value'
 } as const;
@@ -31,7 +31,7 @@ export const cardManifest: CardManifestEntry[] = [
   },
   {
     kind: 'puff-puff-pass-back',
-    label: 'Puff Puff Pass Back',
+    label: 'Pass It Back',
     deckGroup: 'classic-color-action',
     points: 20,
     copies: { classic: 2, party: 2, 'fast-sesh': 2, 'no-mercy': 2 },
@@ -41,7 +41,7 @@ export const cardManifest: CardManifestEntry[] = [
   },
   {
     kind: 'pack-two',
-    label: 'Pack Two',
+    label: 'Cottonmouth',
     deckGroup: 'classic-color-action',
     points: 20,
     copies: { classic: 2, party: 2, 'fast-sesh': 2, 'no-mercy': 2 },
@@ -51,20 +51,20 @@ export const cardManifest: CardManifestEntry[] = [
   },
   {
     kind: 'strain-switch',
-    label: 'Strain Switch',
+    label: 'Strain Swap',
     deckGroup: 'classic-wild',
     points: 50,
-    copies: { classic: 4, party: 4, 'fast-sesh': 4, 'no-mercy': 4 },
+    copies: { classic: 6, party: 6, 'fast-sesh': 6, 'no-mercy': 6 },
     needsChosenColor: true,
     needsTarget: false,
     effect: 'Choose the active strain color.'
   },
   {
     kind: 'hotbox-plus-four',
-    label: 'Hotbox +4',
+    label: 'Greenout',
     deckGroup: 'classic-wild',
     points: 50,
-    copies: { classic: 4, party: 4, 'fast-sesh': 4, 'no-mercy': 4 },
+    copies: { classic: 6, party: 6, 'fast-sesh': 6, 'no-mercy': 6 },
     needsChosenColor: true,
     needsTarget: false,
     effect: 'Choose the active strain color. Next player must draw 4 cards from the Stash.'
