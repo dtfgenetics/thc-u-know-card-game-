@@ -72,7 +72,7 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .status-row { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
 .danger { color: #ffbd59; font-weight: 900; }
 .piles { display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap; }
-.pile { min-width: 150px; min-height: 210px; border-radius: 24px; display: grid; place-items: center; background: rgba(255,255,255,0.08); color: #f4ffe8; background-size: cover; background-position: center; }
+.pile { min-width: 174px; min-height: 154px; border-radius: 24px; display: grid; place-items: center; background: rgba(255,255,255,0.08); color: #f4ffe8; background-size: cover; background-position: center; }
 .pile:first-child { background-image: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), url('/assets/ui/stash-bg.svg'); }
 .pile strong { font-size: 3rem; }
 .ashtray { padding: 1rem; background-image: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), url('/assets/ui/ashtray-bg.svg'); }
@@ -90,8 +90,8 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .color-choice { color: white; min-width: 96px; text-transform: capitalize; border: 2px solid rgba(255,255,255,0.5); }
 .card {
   position: relative;
-  width: 112px;
-  height: 168px;
+  width: 162px;
+  height: 144px;
   border-radius: 18px;
   padding: 0.7rem;
   display: grid;
@@ -120,7 +120,7 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.42));
 }
 .card-label, .card-footer { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; text-shadow: 0 2px 5px rgba(0,0,0,0.55); }
-.card-value { font-size: 1.35rem; line-height: 1; text-shadow: 0 3px 8px rgba(0,0,0,0.7); }
+.card-value { font-size: 1.7rem; line-height: 1; text-shadow: 0 3px 8px rgba(0,0,0,0.7); }
 .card-back-title { align-self: center; justify-self: center; font-size: 1.4rem; font-weight: 1000; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.8); }
 .card-purple { background: linear-gradient(145deg, #5c2bd8, #26105e); }
 .card-green { background: linear-gradient(145deg, #2d9a43, #0e3e1c); }
