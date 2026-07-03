@@ -1,6 +1,6 @@
 # THC U Know Card Game
 
-**THC U Know** is a standalone online multiplayer UNNO-style parody card game for browser play, with a Discord version scaffolded for later.
+**THC U Know** is a standalone online multiplayer parody card game for browser play, with a Discord version scaffolded for invite sharing.
 
 This repository is intentionally separate from the High Land game project.
 
@@ -14,28 +14,22 @@ This repository is intentionally separate from the High Land game project.
 - Discord bot scaffold for future session creation and invite sharing.
 - Original parody-safe names, artwork, and wording.
 
-## Parody-safe naming
+## Approved classic deck
 
-This project should not use official UNO logos, official card art, official names, or protected branding. The game uses original naming:
+The classic deck is locked to 108 cards:
 
-| Function | THC U Know name |
-| --- | --- |
-| Lobby | Smoke Circle |
-| Draw pile | Stash |
-| Discard pile | Ashtray |
-| Skip | Couch Lock |
-| Reverse | Puff Puff Pass Back |
-| Draw Two | Pack Two |
-| Wild | Strain Switch |
-| Wild Draw Four | Hotbox +4 |
-| One-card call | THC U Know! |
+- 72 number cards: values 1-9, four colors, two copies each.
+- 24 color action cards: Couch Lock, Pass It Back, Cottonmouth, four colors, two copies each.
+- 12 wild cards: Strain Swap, Greenout, Dealer's Choice, and Mystery Nug.
+
+A regression test verifies this distribution before deployment.
 
 ## Repository structure
 
 ```txt
 apps/
   web/          React/Vite browser game
-  server/       Socket.IO realtime game server
+  server/       Express + Socket.IO realtime game server
   discord-bot/  Discord command scaffold
 packages/
   shared/       Game engine, card definitions, shared types, tests
@@ -63,16 +57,14 @@ Run the web app:
 pnpm --filter @thc-u-know/web dev
 ```
 
-## Current status
+## Production notes
 
-Starter scaffold created with:
+- Target route: `/games/thc-u-know/`.
+- The server exposes `/healthz`.
+- The server can serve the built React app when `WEB_DIST_DIR` points to `apps/web/dist`.
+- In production, the web app uses the same origin Socket.IO server unless `VITE_SERVER_URL` is set.
 
-- Shared TypeScript game engine.
-- Deck generation and basic move validation.
-- Socket.IO server room flow.
-- React web starter.
-- Discord bot placeholder.
-- Docs for rules, invites, deployment, and branding.
+See `docs/CODEX_LIVE_DEPLOY_PROMPT.md` and `docs/LIVE_READINESS_CHECKLIST.md` for deployment steps.
 
 ## License
 
