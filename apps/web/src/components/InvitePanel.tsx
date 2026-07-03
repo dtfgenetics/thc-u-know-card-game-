@@ -6,7 +6,7 @@ type Props = {
 
 export function InvitePanel({ code }: Props) {
   const inviteUrl = `${window.location.origin}${window.location.pathname}?join=${code}`;
-  const discordText = `/thc-u-know join code:${code}`;
+  const discordText = `/thc-u-know-join code:${code}`;
 
   async function copy(value: string) {
     await navigator.clipboard.writeText(value);
