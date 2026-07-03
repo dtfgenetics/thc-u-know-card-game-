@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import cors from 'cors';
 import express from 'express';
 import { Server } from 'socket.io';
@@ -9,6 +10,8 @@ import { attachRedisAdapter } from './realtime/socketRedisAdapter.js';
 import { createSessionStore } from './state/createSessionStore.js';
 import { registerSocketHandlers } from './socket/handlers.js';
 
+const serverDistDir = path.dirname(fileURLToPath(import.meta.url));
+
 function basePath(value: string): string {
   const trimmed = value.trim();
   if (!trimmed || trimmed === '/') return '';
@@ -16,15 +19,27 @@ function basePath(value: string): string {
   return withSlash.endsWith('/') ? withSlash.slice(0, -1) : withSlash;
 }
 
-function addWebBuild(app: express.Express): void {
-  const distDir = path.resolve(env.WEB_DIST_DIR);
-  const indexFile = path.join(distDir, 'index.html');
+function findWebDistDir(): string | undefined {
+  const candidates = [
+    path.resolve(env.WEB_DIST_DIR),
+    path.resolve(process.cwd(), env.WEB_DIST_DIR),
+    path.resolve(process.cwd(), 'apps/web/dist'),
+    path.resolve(process.cwd(), '../web/dist'),
+    path.resolve(serverDistDir, '../../web/dist')
+  ];
 
-  if (!fs.existsSync(indexFile)) {
-    console.warn(`Web build not found at ${distDir}.`);
+  return candidates.find(candidate => fs.existsSync(path.join(candidate, 'index.html')));
+}
+
+function addWebBuild(app: express.Express): void {
+  const distDir = findWebDistDir();
+
+  if (!distDir) {
+    console.warn(`Web build not found. Checked WEB_DIST_DIR=${env.WEB_DIST_DIR}.`);
     return;
   }
 
+  const indexFile = path.join(distDir, 'index.html');
   const routeBase = basePath(env.WEB_BASE_PATH);
   const staticMount = routeBase ? `${routeBase}/` : '/';
 
