@@ -111,14 +111,14 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
     case 'puff-puff-pass-back':
     case 'rotation':
       nextState = reverseDirection(nextState);
-      return logAction(advanceTurn(nextState, nextState.players.length === 2 ? 2 : 1), input.playerId, `${actor} reversed the rotation.`);
+      return logAction(advanceTurn(nextState, nextState.players.length === 2 ? 2 : 1), input.playerId, `${actor} played ${card.label}. The rotation reversed.`);
     case 'pack-two':
     case 'munchies':
       return logAction({ ...advanceTurn(nextState), pendingDraw: nextState.pendingDraw + 2 }, input.playerId, `${actor} played ${card.label}. Next player must draw 2.`);
     case 'hotbox-plus-four':
-      return logAction({ ...advanceTurn(nextState), pendingDraw: nextState.pendingDraw + 4 }, input.playerId, `${actor} called Hotbox +4 and chose ${nextState.activeColor}.`);
+      return logAction({ ...advanceTurn(nextState), pendingDraw: nextState.pendingDraw + 4 }, input.playerId, `${actor} played ${card.label} and chose ${nextState.activeColor}. Next player must draw 4.`);
     case 'strain-switch':
-      return logAction(advanceTurn(nextState), input.playerId, `${actor} switched the active strain to ${nextState.activeColor}.`);
+      return logAction(advanceTurn(nextState), input.playerId, `${actor} played ${card.label} and switched the active strain to ${nextState.activeColor}.`);
     case 'tolerance-break':
       return logAction(advanceTurn({ ...nextState, pendingDraw: 0 }), input.playerId, `${actor} took a Tolerance Break and cleared pending draw pressure.`);
     case 'bogart': {
