@@ -31,6 +31,10 @@ function findWebDistDir(): string | undefined {
   return candidates.find(candidate => fs.existsSync(path.join(candidate, 'index.html')));
 }
 
+function sendHealth(response: express.Response): void {
+  response.status(200).json({ ok: true, service: 'thc-u-know-server' });
+}
+
 function addWebBuild(app: express.Express): void {
   const distDir = findWebDistDir();
 
@@ -54,13 +58,13 @@ async function main() {
   const allowedOrigins = webOrigins();
   const corsOrigin = allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins;
   const socketPath = socketIoPath();
+  const routeBase = basePath(env.WEB_BASE_PATH);
 
   app.use(cors({ origin: corsOrigin, credentials: true }));
   app.use(express.json());
 
-  app.get('/healthz', (_request, response) => {
-    response.status(200).json({ ok: true, service: 'thc-u-know-server' });
-  });
+  app.get('/healthz', (_request, response) => sendHealth(response));
+  if (routeBase) app.get(`${routeBase}/healthz`, (_request, response) => sendHealth(response));
 
   addWebBuild(app);
 
