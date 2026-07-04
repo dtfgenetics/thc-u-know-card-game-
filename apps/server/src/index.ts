@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import cors from 'cors';
 import express from 'express';
 import { Server } from 'socket.io';
-import { env, webOrigins } from './config/env.js';
+import { env, socketIoPath, webOrigins } from './config/env.js';
 import { attachRedisAdapter } from './realtime/socketRedisAdapter.js';
 import { createSessionStore } from './state/createSessionStore.js';
 import { registerSocketHandlers } from './socket/handlers.js';
@@ -53,6 +53,7 @@ async function main() {
   const app = express();
   const allowedOrigins = webOrigins();
   const corsOrigin = allowedOrigins.length === 1 ? allowedOrigins[0] : allowedOrigins;
+  const socketPath = socketIoPath();
 
   app.use(cors({ origin: corsOrigin, credentials: true }));
   app.use(express.json());
@@ -65,6 +66,7 @@ async function main() {
 
   const server = http.createServer(app);
   const io = new Server(server, {
+    path: socketPath,
     cors: {
       origin: corsOrigin,
       credentials: true
@@ -76,7 +78,7 @@ async function main() {
   registerSocketHandlers(io, sessionStore);
 
   server.listen(env.PORT, () => {
-    console.log(`THC U Know server started on port ${env.PORT}`);
+    console.log(`THC U Know server started on port ${env.PORT} with Socket.IO path ${socketPath}`);
   });
 }
 
