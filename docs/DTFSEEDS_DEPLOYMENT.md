@@ -45,15 +45,17 @@ The Node app should serve:
 - React app: `/games/thc-u-know/`
 - Socket.IO: `/games/thc-u-know/socket.io`
 - Health check: `/healthz`
+- Alternate health check: `/games/thc-u-know/healthz`
 
 If the main domain is handled by another app, route those paths to this Node process and allow WebSocket upgrades.
 
 ## Post-deploy checks
 
 1. Open `https://dtfseeds.com/healthz` and confirm JSON ok response.
-2. Open `https://dtfseeds.com/games/thc-u-know/`.
-3. Create a room with player one.
-4. Join through the invite link in a second browser.
-5. Start game, draw, play a number card, play action cards, play a wild, refresh/rejoin, and rematch.
+2. Open `https://dtfseeds.com/games/thc-u-know/healthz` and confirm JSON ok response.
+3. Open `https://dtfseeds.com/games/thc-u-know/`.
+4. Create a room with player one.
+5. Join through the invite link in a second browser.
+6. Start game, draw, play a number card, play action cards, play a wild, refresh/rejoin, and rematch.
 
 Rollback branch: `backup-main-before-direct-push`.
