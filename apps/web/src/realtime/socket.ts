@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 function defaultSocketPath(): string {
   const baseUrl = import.meta.env.BASE_URL || '/';
   const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-  return `${normalizedBase}socket.io`;
+  return import.meta.env.PROD ? `${normalizedBase}socket.io` : '/socket.io';
 }
 
 const serverUrl = import.meta.env.VITE_SERVER_URL ?? (import.meta.env.PROD ? window.location.origin : 'http://localhost:5174');
