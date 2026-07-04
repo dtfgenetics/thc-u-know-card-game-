@@ -16,6 +16,16 @@ function validateOriginList(value: string): boolean {
     .every(origin => z.string().url().safeParse(origin).success);
 }
 
+function normalizePath(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === '/') return '/';
+  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+}
+
+function trimTrailingSlash(value: string): string {
+  return value.endsWith('/') && value.length > 1 ? value.slice(0, -1) : value;
+}
+
 const envSchema = z.object({
   NODE_ENV: z.string().default('development'),
   PORT: z.coerce.number().int().positive().default(5174),
@@ -24,7 +34,7 @@ const envSchema = z.object({
   }),
   WEB_BASE_PATH: z.string().default('/games/thc-u-know'),
   WEB_DIST_DIR: z.string().default('../web/dist'),
-  SOCKET_IO_PATH: z.string().default('/games/thc-u-know/socket.io'),
+  SOCKET_IO_PATH: z.string().optional(),
   REDIS_URL: z.string().url().optional(),
   SESSION_TTL_SECONDS: z.coerce.number().int().positive().default(60 * 60 * 24),
   ENABLE_REDIS_ADAPTER: booleanFromEnv.default(false),
@@ -40,8 +50,9 @@ export function webOrigins(): string[] {
 }
 
 export function socketIoPath(): string {
-  const trimmed = env.SOCKET_IO_PATH.trim();
-  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  if (env.SOCKET_IO_PATH) return normalizePath(env.SOCKET_IO_PATH);
+  if (env.NODE_ENV === 'production') return `${trimTrailingSlash(normalizePath(env.WEB_BASE_PATH))}/socket.io`;
+  return '/socket.io';
 }
 
 export function shouldUseRedisAdapter(): boolean {
