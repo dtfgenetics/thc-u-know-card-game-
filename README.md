@@ -59,12 +59,13 @@ pnpm --filter @thc-u-know/web dev
 
 ## Production notes
 
-- Target route: `/games/thc-u-know/`.
+- Target route: `/games/thc-u-know/` on dtfseeds.com.
 - The server exposes `/healthz`.
 - The server can serve the built React app when `WEB_DIST_DIR` points to `apps/web/dist`.
 - In production, the web app uses the same origin Socket.IO server unless `VITE_SERVER_URL` is set.
+- For subdirectory deployment, Socket.IO should use `/games/thc-u-know/socket.io`.
 
-See `docs/CODEX_LIVE_DEPLOY_PROMPT.md` and `docs/LIVE_READINESS_CHECKLIST.md` for deployment steps.
+See `docs/DTFSEEDS_DEPLOYMENT.md`, `docs/CODEX_LIVE_DEPLOY_PROMPT.md`, and `docs/LIVE_READINESS_CHECKLIST.md` for deployment steps.
 
 ## License
 
