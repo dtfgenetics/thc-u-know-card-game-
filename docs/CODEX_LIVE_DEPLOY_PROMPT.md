@@ -23,9 +23,8 @@ Web app:
 
 ```bash
 VITE_BASE_PATH=/games/thc-u-know/
+VITE_SOCKET_PATH=/games/thc-u-know/socket.io
 ```
-
-The Vite config now defaults to `/games/thc-u-know/`, but setting `VITE_BASE_PATH` explicitly is safer.
 
 If the Socket.IO server runs on the same origin as the web app, `VITE_SERVER_URL` can be omitted. If it runs on a separate origin, set it to that server origin.
 
@@ -37,6 +36,7 @@ PORT=<production port>
 WEB_ORIGIN=https://dtfseeds.com,https://www.dtfseeds.com
 WEB_BASE_PATH=/games/thc-u-know
 WEB_DIST_DIR=<absolute path to apps/web/dist>
+SOCKET_IO_PATH=/games/thc-u-know/socket.io
 SESSION_STORE=memory
 ENABLE_REDIS_ADAPTER=false
 ```
@@ -74,6 +74,7 @@ Use Redis only after the first live version is stable.
 - Digital card display changed to landscape ratio closer to the approved print cards.
 - Server can serve the built web app from the Node process when `WEB_DIST_DIR` is set.
 - Production socket connection defaults to same origin if `VITE_SERVER_URL` is not set.
+- Socket.IO can run under `/games/thc-u-know/socket.io` for subdirectory deployment.
 
 ## Do not change
 
