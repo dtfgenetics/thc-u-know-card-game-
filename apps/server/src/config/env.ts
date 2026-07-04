@@ -24,6 +24,7 @@ const envSchema = z.object({
   }),
   WEB_BASE_PATH: z.string().default('/games/thc-u-know'),
   WEB_DIST_DIR: z.string().default('../web/dist'),
+  SOCKET_IO_PATH: z.string().default('/games/thc-u-know/socket.io'),
   REDIS_URL: z.string().url().optional(),
   SESSION_TTL_SECONDS: z.coerce.number().int().positive().default(60 * 60 * 24),
   ENABLE_REDIS_ADAPTER: booleanFromEnv.default(false),
@@ -36,6 +37,11 @@ export const env: ServerEnv = envSchema.parse(process.env);
 
 export function webOrigins(): string[] {
   return env.WEB_ORIGIN.split(',').map(origin => origin.trim()).filter(Boolean);
+}
+
+export function socketIoPath(): string {
+  const trimmed = env.SOCKET_IO_PATH.trim();
+  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
 }
 
 export function shouldUseRedisAdapter(): boolean {
