@@ -54,18 +54,17 @@ If pending draw pressure exists:
 - Tolerance Break may always be played to clear pending draw pressure.
 - Stacking disabled: otherwise, the player must draw the full pending amount.
 - Stacking enabled: draw cards may be stacked.
-- Stackable draw cards: Pack Two, Munchies, Hotbox +4.
+- Stackable draw cards: Cottonmouth, Munchies, Greenout.
 
 ## Number cards
 
-There are 4 standard colors. Each color has one 0 and two copies each of 1-9.
+There are 4 standard colors. Each color has two copies each of 1-9. There are no zero cards.
 
 | Card | Total copies | Point value |
 | --- | ---: | ---: |
-| 0 | 4 | 0 |
 | 1-9 | 72 | Face value |
 
-Total number cards: 76.
+Total number cards: 72.
 
 ## Classic colored action cards
 
@@ -74,8 +73,8 @@ Each classic colored action exists in all 4 standard colors with 2 copies per co
 | Card | Total copies | Points | Effect |
 | --- | ---: | ---: | --- |
 | Couch Lock | 8 | 20 | Skip the next player. |
-| Puff Puff Pass Back | 8 | 20 | Reverse turn direction. Acts as skip in 2-player games. |
-| Pack Two | 8 | 20 | Next player draws 2. |
+| Pass It Back | 8 | 20 | Reverse turn direction. Acts as skip in 2-player games. |
+| Cottonmouth | 8 | 20 | Next player draws 2. |
 
 Total classic colored action cards: 24.
 
@@ -83,10 +82,12 @@ Total classic colored action cards: 24.
 
 | Card | Total copies | Points | Effect |
 | --- | ---: | ---: | --- |
-| Strain Switch | 4 | 50 | Choose active strain color. |
-| Hotbox +4 | 4 | 50 | Choose active strain color; next player draws 4. |
+| Strain Swap | 4 | 50 | Choose active strain color. |
+| Greenout | 4 | 50 | Choose active strain color; next player draws 4. |
+| Dealer's Choice | 2 | 50 | The player chooses the active strain color. |
+| Mystery Nug | 2 | 50 | Reveal and play the next card from the Stash. |
 
-Total classic wild cards: 8.
+Total classic wild cards: 12.
 
 ## Party Mode / No Mercy cards
 
@@ -107,10 +108,10 @@ Party wild cards are Wild Smoke cards. Party mode adds 1 copy of each. No Mercy 
 
 | Mode | Number cards | Colored actions | Classic wilds | Party wilds | Total |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Classic | 76 | 24 | 8 | 0 | 108 |
-| Fast Sesh | 76 | 24 | 8 | 0 | 108 |
-| Party | 76 | 24 | 8 | 8 | 116 |
-| No Mercy | 76 | 24 | 8 | 16 | 124 |
+| Classic | 72 | 24 | 12 | 0 | 108 |
+| Fast Sesh | 72 | 24 | 12 | 0 | 108 |
+| Party | 72 | 24 | 12 | 8 | 116 |
+| No Mercy | 72 | 24 | 12 | 16 | 124 |
 
 ## THC U Know call
 

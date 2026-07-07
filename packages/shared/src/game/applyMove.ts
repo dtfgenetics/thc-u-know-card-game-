@@ -1,6 +1,6 @@
 import type { Card, GameState, MoveResult, PlayCardInput } from '../types.js';
 import { manifestEntry } from './cardManifest.js';
-import { drawCards } from './draw.js';
+import { drawCards, recycleDrawPile } from './draw.js';
 import { applyRoundScore } from './scoring.js';
 import { advanceTurn, nextPlayerId, reverseDirection } from './turn.js';
 import { canPlayCard, findPlayerHand, normalizeChosenColor } from './validateMove.js';
@@ -93,6 +93,43 @@ function passTheTray(state: GameState): GameState {
   };
 }
 
+function revealMysteryNug(state: GameState, input: PlayCardInput, terminal = false): GameState {
+  let nextState = recycleDrawPile(state);
+  const drawPile = [...nextState.drawPile];
+  const revealedCard = drawPile.pop();
+  const actor = playerName(nextState, input.playerId);
+
+  if (!revealedCard) {
+    return logAction(
+      terminal ? nextState : advanceTurn(nextState),
+      input.playerId,
+      `${actor} played Mystery Nug, but the Stash was empty.`
+    );
+  }
+
+  nextState = logAction({
+    ...nextState,
+    drawPile,
+    discardPile: [...nextState.discardPile, revealedCard]
+  }, input.playerId, `${actor} revealed ${revealedCard.label} with Mystery Nug.`);
+
+  if (revealedCard.kind === 'number') {
+    const revealedState = { ...nextState, activeColor: revealedCard.color };
+    return terminal ? revealedState : advanceTurn(revealedState);
+  }
+
+  const revealedInput: PlayCardInput = {
+    ...input,
+    cardId: revealedCard.id,
+    chosenColor: nextState.activeColor,
+    targetPlayerId: undefined
+  };
+
+  return terminal
+    ? applyFinalCardEffects(nextState, revealedCard, revealedInput)
+    : applyAction(nextState, revealedCard, revealedInput);
+}
+
 function applyAction(state: GameState, card: Card, input: PlayCardInput): GameState {
   let nextState = state;
   const chosenColor = normalizeChosenColor(input.chosenColor);
@@ -119,8 +156,9 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
       return logAction({ ...advanceTurn(nextState), pendingDraw: nextState.pendingDraw + 4 }, input.playerId, `${actor} played ${card.label} and chose ${nextState.activeColor}. Next player must draw 4.`);
     case 'strain-switch':
     case 'dealer-choice':
-    case 'mystery-nug':
       return logAction(advanceTurn(nextState), input.playerId, `${actor} played ${card.label} and switched the active strain to ${nextState.activeColor}.`);
+    case 'mystery-nug':
+      return revealMysteryNug(nextState, input);
     case 'tolerance-break':
       return logAction(advanceTurn({ ...nextState, pendingDraw: 0 }), input.playerId, `${actor} took a Tolerance Break and cleared pending draw pressure.`);
     case 'bogart': {
@@ -150,6 +188,42 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
   }
 }
 
+function applyFinalCardEffects(state: GameState, card: Card, input: PlayCardInput): GameState {
+  let nextState = state;
+  const chosenColor = normalizeChosenColor(input.chosenColor);
+
+  if (card.color === 'black' && requiresChosenColor(card) && chosenColor) {
+    nextState = { ...nextState, activeColor: chosenColor };
+  } else if (card.color !== 'black') {
+    nextState = { ...nextState, activeColor: card.color };
+  }
+
+  switch (card.kind) {
+    case 'tolerance-break':
+      return { ...nextState, pendingDraw: 0 };
+    case 'pack-two':
+    case 'munchies':
+      return drawForPlayer(nextState, nextPlayerId(nextState), 2);
+    case 'hotbox-plus-four':
+      return drawForPlayer(nextState, nextPlayerId(nextState), 4);
+    case 'bogart': {
+      const targetId = input.targetPlayerId && nextState.players.some(player => player.id === input.targetPlayerId)
+        ? input.targetPlayerId
+        : nextPlayerId(nextState);
+      return drawForPlayer(nextState, targetId, 1);
+    }
+    case 'smoke-sesh':
+      for (const player of nextState.players) {
+        if (player.id !== input.playerId) nextState = drawForPlayer(nextState, player.id, 1);
+      }
+      return nextState;
+    case 'mystery-nug':
+      return revealMysteryNug(nextState, input, true);
+    default:
+      return nextState;
+  }
+}
+
 export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   const hand = findPlayerHand(state, input.playerId);
   if (!hand) return { ok: false, reason: 'Player hand not found', state };
@@ -175,7 +249,7 @@ export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   };
 
   if (cards.length === 0) {
-    const scoredState = applyRoundScore(nextState, input.playerId);
+    const scoredState = applyRoundScore(applyFinalCardEffects(nextState, card, input), input.playerId);
     const points = scoredState.lastRoundScore?.pointsAwarded ?? 0;
     const matchText = scoredState.matchWinnerId ? ` Match target reached at ${scoredState.scores[input.playerId]} points.` : '';
     return {

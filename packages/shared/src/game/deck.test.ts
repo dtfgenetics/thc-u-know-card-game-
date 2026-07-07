@@ -5,12 +5,15 @@ describe('createDeck', () => {
   it('creates a classic deck with 108 cards', () => {
     const deck = createDeck('classic', () => 0.5);
     expect(deck).toHaveLength(108);
-    expect(deck.filter(card => card.kind === 'number')).toHaveLength(76);
+    expect(deck.filter(card => card.kind === 'number')).toHaveLength(72);
+    expect(deck.some(card => card.kind === 'number' && card.value === 0)).toBe(false);
     expect(deck.filter(card => card.kind === 'couch-lock')).toHaveLength(8);
     expect(deck.filter(card => card.kind === 'puff-puff-pass-back')).toHaveLength(8);
     expect(deck.filter(card => card.kind === 'pack-two')).toHaveLength(8);
     expect(deck.filter(card => card.kind === 'strain-switch')).toHaveLength(4);
     expect(deck.filter(card => card.kind === 'hotbox-plus-four')).toHaveLength(4);
+    expect(deck.filter(card => card.kind === 'dealer-choice')).toHaveLength(2);
+    expect(deck.filter(card => card.kind === 'mystery-nug')).toHaveLength(2);
   });
 
   it('creates a party deck with one copy of each party wild', () => {

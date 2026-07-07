@@ -27,7 +27,7 @@ function transferHostIfNeeded(session: Session): Session {
   return syncGamePlayers({ ...session, hostId: nextHost.id }, players);
 }
 
-export function createPlayer(name: string, host = false, playerId = randomUUID()): Player {
+export function createPlayer(name: string, host = false, playerId: string = randomUUID()): Player {
   return {
     id: playerId,
     name: name.trim(),

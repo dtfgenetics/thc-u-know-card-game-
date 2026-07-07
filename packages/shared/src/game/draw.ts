@@ -2,7 +2,7 @@ import type { Card, GameState, MoveResult } from '../types.js';
 import { shuffle } from './shuffle.js';
 import { advanceTurn } from './turn.js';
 
-function recycleDiscardPile(state: GameState): GameState {
+export function recycleDrawPile(state: GameState): GameState {
   if (state.drawPile.length > 0) return state;
   if (state.discardPile.length <= 1) return state;
 
@@ -42,13 +42,13 @@ export function drawCards(state: GameState, playerId: string, count = 1, endTurn
     return { ok: false, reason: 'It is not your turn', state };
   }
 
-  let nextState = recycleDiscardPile(state);
+  let nextState = recycleDrawPile(state);
   const hand = nextState.hands.find(entry => entry.playerId === playerId);
   if (!hand) return { ok: false, reason: 'Player hand not found', state };
 
   const drawn: Card[] = [];
   for (let index = 0; index < count; index += 1) {
-    nextState = recycleDiscardPile(nextState);
+    nextState = recycleDrawPile(nextState);
     const drawPile = [...nextState.drawPile];
     const card = drawPile.pop();
     nextState = { ...nextState, drawPile };

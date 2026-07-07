@@ -47,9 +47,11 @@ function addWebBuild(app: express.Express): void {
   const routeBase = basePath(env.WEB_BASE_PATH);
   const staticMount = routeBase ? `${routeBase}/` : '/';
 
-  if (routeBase) app.get(routeBase, (_request, response) => response.redirect(301, `${routeBase}/`));
+  if (routeBase) {
+    app.get([routeBase, `${routeBase}/`], (_request, response) => response.sendFile(indexFile));
+  }
 
-  app.use(staticMount, express.static(distDir, { index: false }));
+  app.use(staticMount, express.static(distDir, { index: false, redirect: false }));
   app.get(routeBase ? `${routeBase}/*` : '*', (_request, response) => response.sendFile(indexFile));
 }
 

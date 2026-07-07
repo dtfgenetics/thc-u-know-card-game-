@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Card, CardColor, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
 import { Events, manifestEntry } from '@thc-u-know/shared';
 import { socket } from '../realtime/socket';
+import { playGameSound } from '../audio/gameSounds';
 import { ChatBox } from './ChatBox';
 import { PlayerRail } from './PlayerRail';
 import { ThcCard } from './ThcCard';
@@ -26,6 +27,18 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const isMyTurn = publicState.currentPlayerId === playerId && !publicState.winnerId;
   const [pendingWild, setPendingWild] = useState<Card | null>(null);
   const [pendingTarget, setPendingTarget] = useState<Card | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(() => window.localStorage.getItem('thc-u-know-sound') !== 'off');
+  const previousActionId = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    const latestAction = publicState.actionLog.at(-1);
+    if (!latestAction || latestAction.id === previousActionId.current) return;
+    previousActionId.current = latestAction.id;
+
+    if (publicState.winnerId) playGameSound('win', soundEnabled);
+    else if (/drew|stash/i.test(latestAction.message)) playGameSound('draw', soundEnabled);
+    else playGameSound('card', soundEnabled);
+  }, [publicState.actionLog, publicState.winnerId, soundEnabled]);
 
   function emitPlay(card: Card, options?: { chosenColor?: CardColor; targetPlayerId?: string }) {
     socket.emit(Events.GAME_PLAY_CARD, {
@@ -62,6 +75,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   function draw() {
+    playGameSound('draw', soundEnabled);
     socket.emit(Events.GAME_DRAW_CARD, { code: publicState.sessionCode, playerId });
   }
 
@@ -70,7 +84,20 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   function rematch() {
+    playGameSound('turn', soundEnabled);
     socket.emit(Events.GAME_REMATCH, { code: publicState.sessionCode, playerId });
+  }
+
+  function leaveGame() {
+    window.localStorage.removeItem('thc-u-know-session');
+    window.location.assign(import.meta.env.BASE_URL);
+  }
+
+  function toggleSound() {
+    const nextValue = !soundEnabled;
+    setSoundEnabled(nextValue);
+    window.localStorage.setItem('thc-u-know-sound', nextValue ? 'on' : 'off');
+    playGameSound('turn', nextValue);
   }
 
   const latestLog = publicState.actionLog.slice(-5).reverse();
@@ -78,20 +105,35 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
 
   return (
-    <main className="game-table">
+    <main
+      className="game-table"
+      data-current-player-id={publicState.currentPlayerId}
+      data-player-id={playerId}
+      data-pending-draw={publicState.pendingDraw}
+      data-round-number={publicState.roundNumber}
+      data-winner-id={publicState.winnerId}
+      data-updated-at={publicState.updatedAt}
+    >
       <PlayerRail players={publicState.players} currentPlayerId={publicState.currentPlayerId} />
       <section className="table-center">
         {winner && (
           <section className="winner-panel">
             <p className="eyebrow">Round Over</p>
             <h2>{winner.name} wins!</h2>
-            <button type="button" onClick={rematch}>Start Rematch</button>
+            <div className="button-row winner-actions">
+              <button type="button" onClick={rematch}>Start Rematch</button>
+              <button className="ghost-button" type="button" onClick={leaveGame}>Back to Home</button>
+            </div>
           </section>
         )}
         <div className="status-row">
           <strong>Active strain: {publicState.activeColor}</strong>
           <span>Direction: {publicState.direction === 1 ? 'Clockwise' : 'Counter-clockwise'}</span>
           {publicState.pendingDraw > 0 && <span className="danger">Pending draw: {publicState.pendingDraw}</span>}
+          <label className="sound-toggle">
+            <input type="checkbox" checked={soundEnabled} onChange={toggleSound} />
+            <span>Sound</span>
+          </label>
         </div>
         <div className="piles">
           <button className="pile" type="button" disabled={!isMyTurn} onClick={draw}>
@@ -100,7 +142,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
           </button>
           <div className="pile ashtray">
             <span>Ashtray</span>
-            <ThcCard card={publicState.topDiscard} />
+            <ThcCard card={publicState.topDiscard} zone="discard" />
           </div>
         </div>
         <section className="action-log">
@@ -142,7 +184,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
         )}
         <div className="hand-scroll">
           {privateState.hand.map(card => (
-            <ThcCard key={card.id} card={card} disabled={!isMyTurn} onClick={play} />
+            <ThcCard key={card.id} card={card} zone="hand" disabled={!isMyTurn} onClick={play} />
           ))}
         </div>
       </section>

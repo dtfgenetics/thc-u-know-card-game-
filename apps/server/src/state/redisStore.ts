@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { defaultSettings } from '@thc-u-know/shared';
 import type { GameSettings, GameState, Player } from '@thc-u-know/shared';
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { env } from '../config/env.js';
 import { createSessionCode, normalizeSessionCode } from './sessionCode.js';
 import type { JoinResult, SessionResult, SessionStore } from './store.js';
@@ -14,7 +14,7 @@ function sessionKey(code: string): string {
   return `${sessionPrefix}${normalizeSessionCode(code)}`;
 }
 
-function createPlayer(name: string, host = false, playerId = randomUUID()): Player {
+function createPlayer(name: string, host = false, playerId: string = randomUUID()): Player {
   return {
     id: playerId,
     name: name.trim(),
