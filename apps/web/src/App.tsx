@@ -26,7 +26,7 @@ type SocketErrorPayload = {
 };
 
 const savedSessionKey = 'thc-u-know-session';
-const logoPath = 'assets/logos/thc-u-know-logo.svg';
+const logoPath = 'assets/logos/thc-u-know-logo.svg?v=20260707';
 
 type SavedSession = {
   code: string;
