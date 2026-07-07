@@ -1,91 +1,88 @@
 # THC U Know Deployment Status
 
-Date started: 2026-07-01
+Last updated: 2026-07-07
 
-## Target
+## Current Status
 
-```txt
-Frontend target: https://dtfseeds.com/games/thc-u-know/
-Recommended backend target: https://api.dtfseeds.com
-```
+- Frontend: deployed and verified at `https://dtfseeds.com/games/thc-u-know/`.
+- Backend: not deployed publicly. The current Hostinger shared account has no Node.js runtime or process manager.
+- Multiplayer: fully verified locally, but unavailable on the public URL until a persistent Node/WebSocket service is provisioned.
+- Repository: pull requests `#2` and `#3` merged into `main`; GitHub CI runs `168` and `170` passed.
 
-## Current status
+The live frontend explicitly reports that the multiplayer server is unavailable and disables Host/Join instead of silently failing.
 
-```txt
-Status: NOT LIVE YET
-```
-
-## Build status
+## Live Paths
 
 ```txt
-pnpm install: NOT RUN / NOT RECORDED
-pnpm -r build: NOT RUN / NOT RECORDED
-pnpm test: NOT RUN / NOT RECORDED
-pnpm -r lint: NOT RUN / NOT RECORDED
-pnpm --filter @thc-u-know/web test:e2e: NOT RUN / NOT RECORDED
+Frontend URL: https://dtfseeds.com/games/thc-u-know/
+Frontend directory: /home/u933876325/domains/dtfseeds.com/public_html/games/thc-u-know/
+Expected health URL: https://dtfseeds.com/healthz
+Expected Socket.IO URL: https://dtfseeds.com/games/thc-u-know/socket.io
 ```
 
-## Frontend deployment
+Public verification:
+
+- Game page: HTTP 200.
+- Current JavaScript: `/games/thc-u-know/assets/index-Dwyv5Agk.js`, HTTP 200.
+- Current stylesheet: `/games/thc-u-know/assets/index-BlAUcrwn.css`, HTTP 200.
+- Logo, digital card art, and table assets: HTTP 200.
+- Desktop and mobile rendering: visually verified.
+- `/healthz`: WordPress HTTP 404, so no public Node service is present.
+- Game-route health and Socket.IO paths: return static SPA HTML, not backend JSON/Socket.IO handshakes.
+
+## Deployment Backups
+
+Backups created during the 2026-07-07 deployment:
 
 ```txt
-Host:
-URL:
-Build command:
-Output directory:
-VITE_BASE_PATH:
-VITE_SERVER_URL:
+/home/u933876325/backups/thc-u-know-before-20260707T172750Z.tar.gz
+SHA-256: 670ded86e419e2ee4ade97b117ce5d1a419cc8891404bb50adadabf9dafeb65d
+
+/home/u933876325/backups/thc-u-know-before-20260707T173830Z.tar.gz
+SHA-256: a0446b28b3002a5b30957e8fd8df7647145e0e01a8870063ba8e9c46ea09fbee
 ```
 
-## Backend deployment
+Only the `games/thc-u-know` directory was replaced. Other dtfseeds.com files and game directories were not changed.
+
+## Production Configuration
+
+No secrets were committed or uploaded.
 
 ```txt
-Host:
-URL:
-Health endpoint:
-NODE_ENV:
-WEB_ORIGIN:
-SESSION_STORE:
-Redis enabled:
+NODE_ENV=production
+PORT=5174
+WEB_ORIGIN=https://dtfseeds.com,https://www.dtfseeds.com
+WEB_BASE_PATH=/games/thc-u-know
+WEB_DIST_DIR=apps/web/dist
+SOCKET_IO_PATH=/games/thc-u-know/socket.io
+SESSION_STORE=memory
+ENABLE_REDIS_ADAPTER=false
+VITE_BASE_PATH=/games/thc-u-know/
+VITE_SOCKET_PATH=/games/thc-u-know/socket.io
 ```
 
-## DTFSeeds integration
+`VITE_SERVER_URL` is omitted for same-origin deployment. Use a separate HTTPS backend URL only if the Node service is hosted elsewhere.
+
+## Verification Results
+
+- `pnpm install`: passed; `pnpm-lock.yaml` generated and committed.
+- `pnpm -r lint`: passed.
+- `pnpm -r build`: passed.
+- `pnpm test`: passed, 17 tests.
+- Full two-player Playwright test: passed.
+- Host/join/start: passed locally.
+- Draw, number card, action card, wild color, target selection, and pending draw: passed locally.
+- Winner announcement, score update, and rematch score preservation: passed locally.
+- Production page, asset, health, polling, and WebSocket smoke tests: passed locally from one Node process.
+
+## Remaining Blocker
+
+Provision a persistent Node host that supports WebSocket upgrades, then route these paths to `pnpm start`:
 
 ```txt
-Integration method:
-- /games/thc-u-know/ static route
-- games.dtfseeds.com subdomain
-- iframe
-- link/button only
-
-Chosen method:
+/games/thc-u-know/
+/games/thc-u-know/socket.io
+/healthz
 ```
 
-## Live invite test
-
-```txt
-Host Smoke Circle: NOT TESTED
-Copy invite link: NOT TESTED
-Join from second device/browser: NOT TESTED
-Start game: NOT TESTED
-Play card: NOT TESTED
-Draw card: NOT TESTED
-Play wild and choose color: NOT TESTED
-Play target card and choose target: NOT TESTED
-Win round: NOT TESTED
-Score update: NOT TESTED
-Rematch: NOT TESTED
-```
-
-## Known blockers
-
-```txt
-1. Real dependency-backed build/test pass still required.
-2. Production backend host must support Node + Socket.IO WebSockets.
-3. Production VITE_SERVER_URL must point to the deployed backend.
-4. dtfseeds route/subdomain must be configured.
-5. Live two-player invite test must pass before launch claim.
-```
-
-## Notes
-
-Record all deployment changes here. Do not mark live until the frontend loads, the backend health endpoint works, Socket.IO connects, and a two-player game completes one round.
+The current shared Hostinger shell cannot provide that process. A Hostinger Node Web App plan, Hostinger VPS, or another persistent Node provider is required before public multiplayer can be marked live.
