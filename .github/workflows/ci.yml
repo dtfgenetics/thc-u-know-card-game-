@@ -25,7 +25,7 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile=false
+        run: pnpm install --frozen-lockfile
 
       - name: Type check
         run: pnpm -r lint
@@ -35,3 +35,9 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Install Playwright browser
+        run: pnpm --filter @thc-u-know/web exec playwright install --with-deps chromium
+
+      - name: Multiplayer end-to-end test
+        run: pnpm --filter @thc-u-know/web test:e2e
