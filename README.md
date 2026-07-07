@@ -20,7 +20,9 @@ The classic deck is locked to 108 cards:
 
 - 72 number cards: values 1-9, four colors, two copies each.
 - 24 color action cards: Couch Lock, Pass It Back, Cottonmouth, four colors, two copies each.
-- 12 wild cards: Strain Swap, Greenout, Dealer's Choice, and Mystery Nug.
+- 12 wild cards: 4 Strain Swap, 4 Greenout, 2 Dealer's Choice, and 2 Mystery Nug.
+
+Dealer's Choice lets the player choose the active strain. Mystery Nug reveals and plays the next card from the Stash.
 
 A regression test verifies this distribution before deployment.
 

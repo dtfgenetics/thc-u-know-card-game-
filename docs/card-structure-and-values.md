@@ -29,10 +29,9 @@ There are 4 colors. Each color has:
 
 | Value | Copies per color | Points |
 | ---: | ---: | ---: |
-| 0 | 1 | 0 |
 | 1-9 | 2 each | Face value |
 
-Total number cards: 76.
+Total number cards: 72. Zero cards are not part of the approved deck.
 
 ## Classic colored action cards
 
@@ -41,8 +40,8 @@ Each classic colored action exists in all 4 standard colors with 2 copies per co
 | Card | Copies per color | Total copies | Points | Effect |
 | --- | ---: | ---: | ---: | --- |
 | Couch Lock | 2 | 8 | 20 | Skip the next player. |
-| Puff Puff Pass Back | 2 | 8 | 20 | Reverse turn direction. Acts as skip in 2-player games. |
-| Pack Two | 2 | 8 | 20 | Next player draws 2 cards from the Stash. |
+| Pass It Back | 2 | 8 | 20 | Reverse turn direction. Acts as skip in 2-player games. |
+| Cottonmouth | 2 | 8 | 20 | Next player draws 2 cards from the Stash. |
 
 Total classic colored action cards: 24.
 
@@ -50,10 +49,12 @@ Total classic colored action cards: 24.
 
 | Card | Color | Classic copies | Party copies | Fast Sesh copies | No Mercy copies | Points | Requires color choice | Effect |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| Strain Switch | Wild Smoke | 4 | 4 | 4 | 4 | 50 | Yes | Choose active strain color. |
-| Hotbox +4 | Wild Smoke | 4 | 4 | 4 | 4 | 50 | Yes | Choose active strain color; next player draws 4. |
+| Strain Swap | Wild Smoke | 4 | 4 | 4 | 4 | 50 | Yes | Choose active strain color. |
+| Greenout | Wild Smoke | 4 | 4 | 4 | 4 | 50 | Yes | Choose active strain color; next player draws 4. |
+| Dealer's Choice | Wild Smoke | 2 | 2 | 2 | 2 | 50 | Yes | The player chooses the active strain color. |
+| Mystery Nug | Wild Smoke | 2 | 2 | 2 | 2 | 50 | No | Reveal and play the next card from the Stash. |
 
-Total classic wild cards: 8.
+Total classic wild cards: 12.
 
 ## Party wild cards
 
@@ -76,10 +77,10 @@ Total party wild cards: 8 in Party mode, 16 in No Mercy mode.
 
 | Mode | Number cards | Colored actions | Classic wilds | Party wilds | Total |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Classic | 76 | 24 | 8 | 0 | 108 |
-| Fast Sesh | 76 | 24 | 8 | 0 | 108 |
-| Party | 76 | 24 | 8 | 8 | 116 |
-| No Mercy | 76 | 24 | 8 | 16 | 124 |
+| Classic | 72 | 24 | 12 | 0 | 108 |
+| Fast Sesh | 72 | 24 | 12 | 0 | 108 |
+| Party | 72 | 24 | 12 | 8 | 116 |
+| No Mercy | 72 | 24 | 12 | 16 | 124 |
 
 ## Matching rules
 
@@ -97,7 +98,7 @@ If pending draw pressure exists:
 - Tolerance Break may always be played to clear pending draw pressure.
 - Stacking disabled: otherwise, the player must draw the full pending amount.
 - Stacking enabled: draw cards may be stacked.
-- Stackable draw cards: Pack Two, Munchies, Hotbox +4.
+- Stackable draw cards: Cottonmouth, Munchies, Greenout.
 
 ## Current intentionally disabled / future feature
 

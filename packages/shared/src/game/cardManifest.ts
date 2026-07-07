@@ -85,9 +85,9 @@ export const cardManifest: CardManifestEntry[] = [
     deckGroup: 'classic-wild',
     points: 50,
     copies: { classic: 2, party: 2, 'fast-sesh': 2, 'no-mercy': 2 },
-    needsChosenColor: true,
+    needsChosenColor: false,
     needsTarget: false,
-    effect: 'Choose the active strain color.'
+    effect: 'Reveal and play the next card from the Stash.'
   },
   {
     kind: 'munchies',
