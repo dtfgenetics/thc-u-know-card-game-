@@ -3,6 +3,11 @@ import { assetPaths } from './assetRegistry';
 
 type PlayableColor = Exclude<CardColor, 'black'>;
 type ActionKind = Exclude<CardKind, 'number'>;
+const assetVersion = '20260707';
+
+function versionedAsset(path: string): string {
+  return `${path}?v=${assetVersion}`;
+}
 
 export const numberCardArtByColor: Record<PlayableColor, string> = {
   purple: 'assets/cards/digital/number-purple.svg',
@@ -30,13 +35,14 @@ export const actionCardArtByKind: Record<ActionKind, string> = {
 };
 
 export function cardBackArt(): string {
-  return 'assets/cards/digital/card-back.svg';
+  return versionedAsset('assets/cards/digital/card-back.svg');
 }
 
 export function visualAssetForCard(card: Card): string {
   if (card.kind === 'number') {
-    return card.color === 'black' ? assetPaths.cards.frontNumber : numberCardArtByColor[card.color as PlayableColor];
+    const path = card.color === 'black' ? assetPaths.cards.frontNumber : numberCardArtByColor[card.color as PlayableColor];
+    return versionedAsset(path);
   }
 
-  return actionCardArtByKind[card.kind] ?? assetPaths.cards.frontAction;
+  return versionedAsset(actionCardArtByKind[card.kind] ?? assetPaths.cards.frontAction);
 }
