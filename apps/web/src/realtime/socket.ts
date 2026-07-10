@@ -11,6 +11,7 @@ const socketPath = import.meta.env.VITE_SOCKET_PATH ?? defaultSocketPath();
 
 export const socket = io(serverUrl, {
   path: socketPath,
-  transports: ['websocket'],
+  transports: ['websocket', 'polling'],
+  tryAllTransports: true,
   autoConnect: true
 });

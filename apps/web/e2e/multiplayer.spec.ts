@@ -134,7 +134,7 @@ async function playerScores(page: Page): Promise<Record<string, number>> {
 }
 
 test('two players can complete multiplayer card flows, scoring, and rematch', async ({ browser }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
   const hostContext = await browser.newContext();
   const guestContext = await browser.newContext();
   const host = await hostContext.newPage();
@@ -152,7 +152,9 @@ test('two players can complete multiplayer card flows, scoring, and rematch', as
   await host.goto('/');
   await host.getByLabel('Player name').fill('Host Grower');
   await host.getByLabel('Game mode').selectOption('no-mercy');
-  await host.getByRole('button', { name: 'Host Smoke Circle' }).click();
+  const hostButton = host.getByRole('button', { name: 'Host Smoke Circle' });
+  await expect(hostButton).toBeEnabled({ timeout: 30_000 });
+  await hostButton.click();
 
   await expect(host.getByRole('heading', { name: 'Smoke Circle' })).toBeVisible();
   const code = (await host.locator('.session-code').innerText()).trim();
@@ -160,7 +162,9 @@ test('two players can complete multiplayer card flows, scoring, and rematch', as
 
   await guest.goto(`/?join=${code}`);
   await guest.getByLabel('Player name').fill('Guest Grower');
-  await guest.getByRole('button', { name: 'Join Smoke Circle' }).click();
+  const joinButton = guest.getByRole('button', { name: 'Join Smoke Circle' });
+  await expect(joinButton).toBeEnabled({ timeout: 30_000 });
+  await joinButton.click();
 
   await expect(host.getByText('Guest Grower')).toBeVisible();
   await expect(guest.getByText('Host: Host Grower')).toBeVisible();

@@ -22,20 +22,24 @@ Expected Socket.IO URL: https://dtfseeds.com/games/thc-u-know/socket.io
 
 Public verification:
 
-- Game page: HTTP 200 on 2026-07-10T00:14:07Z static redeploy.
-- Current JavaScript: `/games/thc-u-know/assets/index-Dwyv5Agk.js`, HTTP 200.
+- Game page: HTTP 200 on 2026-07-10T01:08:32Z static redeploy.
+- Current JavaScript: `/games/thc-u-know/assets/index-D9F_rE0M.js`, HTTP 200.
 - Current stylesheet: `/games/thc-u-know/assets/index-BlAUcrwn.css`, HTTP 200.
 - Logo, digital card art, and table assets: HTTP 200.
 - Mobile rendering: visually verified with screenshot `C:\Users\green\AppData\Local\Temp\thc-u-know-live-20260710T001407Z.png`.
 - Browser render check: page title `THC U Know`, logo loaded, and unavailable-server message visible.
 - `/healthz`: WordPress HTTP 404, so no public Node service is present.
 - Game-route health and Socket.IO paths: return static SPA HTML, not backend JSON/Socket.IO handshakes.
+- Hostinger SSH check on 2026-07-10T01:08:32Z: `node`, `npm`, and `pm2` were still unavailable.
 
 ## Deployment Backups
 
 Backups created during deployment:
 
 ```txt
+/home/u933876325/backups/thc-u-know-before-20260710T010832Z.tar.gz
+SHA-256: afa21c31ab45bb4f2c722ab3a5c2b92c13200238c54ec9825aa107cc7096f516
+
 /home/u933876325/backups/thc-u-know-before-20260710T001407Z.tar.gz
 SHA-256: 33a2925f6555419eaafdafec0c61a878d609be4e5f63a8d2bda50c5daf1f7e15
 
@@ -73,7 +77,7 @@ VITE_SOCKET_PATH=/games/thc-u-know/socket.io
 - `pnpm -r lint`: passed.
 - `pnpm -r build`: passed.
 - `pnpm test`: passed, 17 tests.
-- Full two-player Playwright test: passed.
+- Full two-player Playwright test: passed after transport fallback hardening.
 - Host/join/start: passed locally.
 - Draw, number card, action card, wild color, target selection, and pending draw: passed locally.
 - Winner announcement, score update, and rematch score preservation: passed locally.

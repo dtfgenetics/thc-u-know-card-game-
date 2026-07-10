@@ -29,7 +29,7 @@ function trimTrailingSlash(value: string): string {
 const envSchema = z.object({
   NODE_ENV: z.string().default('development'),
   PORT: z.coerce.number().int().positive().default(5174),
-  WEB_ORIGIN: z.string().default('http://localhost:5173,https://dtfseeds.com,https://www.dtfseeds.com').refine(validateOriginList, {
+  WEB_ORIGIN: z.string().default('http://localhost:5173,http://127.0.0.1:5173,https://dtfseeds.com,https://www.dtfseeds.com').refine(validateOriginList, {
     message: 'WEB_ORIGIN must be one or more comma-separated URL origins'
   }),
   WEB_BASE_PATH: z.string().default('/games/thc-u-know'),
