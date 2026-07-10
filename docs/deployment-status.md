@@ -1,10 +1,10 @@
 # THC U Know Deployment Status
 
-Last updated: 2026-07-07
+Last updated: 2026-07-09
 
 ## Current Status
 
-- Frontend: deployed and verified at `https://dtfseeds.com/games/thc-u-know/`.
+- Frontend: redeployed and verified at `https://dtfseeds.com/games/thc-u-know/`.
 - Backend: not deployed publicly. The current Hostinger shared account has no Node.js runtime or process manager.
 - Multiplayer: fully verified locally, but unavailable on the public URL until a persistent Node/WebSocket service is provisioned.
 - Repository: pull requests `#2` and `#3` merged into `main`; GitHub CI runs `168` and `170` passed.
@@ -22,19 +22,23 @@ Expected Socket.IO URL: https://dtfseeds.com/games/thc-u-know/socket.io
 
 Public verification:
 
-- Game page: HTTP 200.
+- Game page: HTTP 200 on 2026-07-10T00:14:07Z static redeploy.
 - Current JavaScript: `/games/thc-u-know/assets/index-Dwyv5Agk.js`, HTTP 200.
 - Current stylesheet: `/games/thc-u-know/assets/index-BlAUcrwn.css`, HTTP 200.
 - Logo, digital card art, and table assets: HTTP 200.
-- Desktop and mobile rendering: visually verified.
+- Mobile rendering: visually verified with screenshot `C:\Users\green\AppData\Local\Temp\thc-u-know-live-20260710T001407Z.png`.
+- Browser render check: page title `THC U Know`, logo loaded, and unavailable-server message visible.
 - `/healthz`: WordPress HTTP 404, so no public Node service is present.
 - Game-route health and Socket.IO paths: return static SPA HTML, not backend JSON/Socket.IO handshakes.
 
 ## Deployment Backups
 
-Backups created during the 2026-07-07 deployment:
+Backups created during deployment:
 
 ```txt
+/home/u933876325/backups/thc-u-know-before-20260710T001407Z.tar.gz
+SHA-256: 33a2925f6555419eaafdafec0c61a878d609be4e5f63a8d2bda50c5daf1f7e15
+
 /home/u933876325/backups/thc-u-know-before-20260707T172750Z.tar.gz
 SHA-256: 670ded86e419e2ee4ade97b117ce5d1a419cc8891404bb50adadabf9dafeb65d
 
