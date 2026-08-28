@@ -1,0 +1,31 @@
+.invite-status {
+  min-height: 1.5em;
+  margin: 0.75rem 0;
+  color: #d5ffc2;
+  font-weight: 700;
+}
+
+:where(button, input, select, a, [tabindex]):focus-visible {
+  outline: 3px solid #ffdf75;
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .invite-actions button {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .session-code {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
