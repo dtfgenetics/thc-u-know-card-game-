@@ -30,6 +30,17 @@ function requiresChosenColor(card: Card): boolean {
   return card.kind !== 'number' && manifestEntry(card.kind).needsChosenColor;
 }
 
+function requiresTarget(card: Card): boolean {
+  return card.kind !== 'number' && manifestEntry(card.kind).needsTarget;
+}
+
+function validateTarget(state: GameState, input: PlayCardInput, card: Card): string | null {
+  if (!requiresTarget(card) || !input.targetPlayerId) return null;
+  if (input.targetPlayerId === input.playerId) return 'Target must be another player';
+  if (!state.players.some(player => player.id === input.targetPlayerId)) return 'Target player was not found';
+  return null;
+}
+
 function removeCardFromHand(hand: Card[], cardId: string): { card?: Card; cards: Card[] } {
   const index = hand.findIndex(card => card.id === cardId);
   if (index < 0) return { cards: hand };
@@ -237,6 +248,9 @@ export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   if (requiresChosenColor(card) && !normalizeChosenColor(input.chosenColor)) {
     return { ok: false, reason: 'Color-changing wild cards require a chosen strain color', state };
   }
+
+  const targetError = validateTarget(state, input, card);
+  if (targetError) return { ok: false, reason: targetError, state };
 
   let nextState = updateHand(state, input.playerId, cards);
   nextState = {
