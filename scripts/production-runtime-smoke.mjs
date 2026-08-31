@@ -55,7 +55,10 @@ try {
     assert.equal(response.status, 200, `${route} returned ${response.status}`);
     const html = await response.text();
     assert.match(html, /THC U Know/i, `${route} did not return the built game HTML`);
-    assert.match(html, /<div id="root"><\/div>/, `${route} did not return the React shell`);
+    // The production shell may contain accessible loading/fallback content inside
+    // #root. Requiring an empty root creates a false negative even though React
+    // has the correct mount point and the built bundle is served correctly.
+    assert.match(html, /<div\s+id="root"(?:\s[^>]*)?>/i, `${route} did not return the React root container`);
     assert.doesNotMatch(html, /src="\/src\//, `${route} returned a development Vite shell`);
   }
 
