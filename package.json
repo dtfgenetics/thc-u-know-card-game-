@@ -8,7 +8,8 @@
     "dev": "pnpm --parallel --filter @thc-u-know/server --filter @thc-u-know/web dev",
     "test": "pnpm --filter @thc-u-know/shared test",
     "lint": "pnpm -r lint",
-    "start": "node apps/server/dist/index.js"
+    "start": "node apps/server/dist/index.js",
+    "live:check": "node scripts/check-live.mjs"
   },
   "engines": {
     "node": ">=20.0.0",
