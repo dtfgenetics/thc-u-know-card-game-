@@ -8,6 +8,8 @@ on:
         required: true
         default: https://dtfseeds.com
         type: string
+  schedule:
+    - cron: '17 */6 * * *'
 
 permissions:
   contents: read
@@ -36,5 +38,5 @@ jobs:
 
       - name: Probe production frontend, health routes, and Socket.IO handshake
         env:
-          LIVE_BASE_URL: ${{ inputs.live_base_url }}
+          LIVE_BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.live_base_url || 'https://dtfseeds.com' }}
         run: pnpm live:check
