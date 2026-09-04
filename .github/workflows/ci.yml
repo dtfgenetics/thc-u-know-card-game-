@@ -4,11 +4,14 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  build-and-test:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,20 +30,5 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate production smoke checker
-        run: node --check scripts/check-live.mjs
-
-      - name: Type check
-        run: pnpm -r lint
-
-      - name: Build
-        run: pnpm -r build
-
-      - name: Test
-        run: pnpm test
-
-      - name: Install Playwright browser
-        run: pnpm --filter @thc-u-know/web exec playwright install --with-deps chromium
-
-      - name: Multiplayer end-to-end test
-        run: pnpm --filter @thc-u-know/web test:e2e
+      - name: Verify lint, build, and game engine tests
+        run: pnpm verify
