@@ -13,5 +13,11 @@ export const socket = io(serverUrl, {
   path: socketPath,
   transports: ['websocket', 'polling'],
   tryAllTransports: true,
-  autoConnect: true
+  autoConnect: true,
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 500,
+  reconnectionDelayMax: 5_000,
+  randomizationFactor: 0.4,
+  timeout: 10_000
 });
