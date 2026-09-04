@@ -19,7 +19,7 @@ async function request(origin, pathname, options = {}) {
     redirect: 'follow',
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
-      'user-agent': 'thc-u-know-live-smoke/1.0',
+      'user-agent': 'thc-u-know-live-smoke/1.1',
       accept: options.accept || '*/*'
     }
   });
@@ -63,11 +63,18 @@ async function checkHealth(origin, pathname, label) {
   console.log(`PASS ${label} ${pathname}`);
 }
 
+async function checkOptionalRootHealth(origin) {
+  try {
+    await checkHealth(origin, ROOT_HEALTH_PATH, 'root health');
+  } catch (error) {
+    console.warn(`WARN root health is not routed to THC U Know: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
+
 async function checkSocket(origin) {
   const result = await request(origin, SOCKET_PATH, { accept: 'text/plain' });
   assertStatus(result, 200, 'Socket.IO polling handshake');
 
-  // Engine.IO opens a polling session with packet type 0 followed by JSON.
   if (!result.body.startsWith('0')) {
     fail(`Socket.IO polling handshake: expected Engine.IO open packet, got ${JSON.stringify(result.body.slice(0, 120))}`);
   }
@@ -97,11 +104,11 @@ async function main() {
   console.log(`THC U Know production smoke: ${origin}`);
 
   await checkGame(origin);
-  await checkHealth(origin, ROOT_HEALTH_PATH, 'root health');
   await checkHealth(origin, GAME_HEALTH_PATH, 'game health');
   await checkSocket(origin);
+  await checkOptionalRootHealth(origin);
 
-  console.log('THC U Know production smoke passed: frontend, health routes, and Socket.IO routing are live.');
+  console.log('THC U Know production smoke passed: frontend, game health, and Socket.IO routing are live.');
 }
 
 main().catch((error) => {
