@@ -43,9 +43,10 @@ assets/         Placeholder art/sounds folder
 
 ```bash
 pnpm install
-pnpm -r build
-pnpm test
+pnpm verify
 ```
+
+`pnpm verify` runs lint, all package builds, and shared game-engine tests. Do not treat a green build alone as a production release.
 
 Run the server:
 
@@ -66,8 +67,10 @@ pnpm --filter @thc-u-know/web dev
 - The server can serve the built React app when `WEB_DIST_DIR` points to `apps/web/dist`.
 - In production, the web app uses the same origin Socket.IO server unless `VITE_SERVER_URL` is set.
 - For subdirectory deployment, Socket.IO should use `/games/thc-u-know/socket.io`.
+- Production must run a persistent Node process; static hosting alone cannot provide multiplayer rooms.
+- Automatic live smoke checks probe production every six hours, but release readiness still requires a two-browser multiplayer playtest.
 
-See `docs/DTFSEEDS_DEPLOYMENT.md`, `docs/CODEX_LIVE_DEPLOY_PROMPT.md`, and `docs/LIVE_READINESS_CHECKLIST.md` for deployment steps.
+See `docs/DTFSEEDS_DEPLOYMENT.md`, `docs/PRODUCTION_RELEASE_GATE.md`, `docs/CODEX_LIVE_DEPLOY_PROMPT.md`, and `docs/LIVE_READINESS_CHECKLIST.md` for deployment and release steps.
 
 ## License
 
