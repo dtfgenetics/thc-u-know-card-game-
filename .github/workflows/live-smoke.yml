@@ -4,9 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       live_base_url:
-        description: Production origin to test
+        description: Public frontend origin to test
         required: true
         default: https://dtfseeds.com
+        type: string
+      live_server_url:
+        description: Optional Node/Socket.IO origin when backend is hosted separately
+        required: false
+        default: ''
         type: string
   schedule:
     - cron: '17 */6 * * *'
@@ -39,4 +44,5 @@ jobs:
       - name: Probe production frontend, health routes, and Socket.IO handshake
         env:
           LIVE_BASE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.live_base_url || 'https://dtfseeds.com' }}
+          LIVE_SERVER_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.live_server_url || vars.THC_U_KNOW_SERVER_ORIGIN || '' }}
         run: pnpm live:check
