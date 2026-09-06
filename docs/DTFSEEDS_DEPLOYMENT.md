@@ -59,14 +59,35 @@ Hostinger options:
 
 ## Post-deploy checks
 
-1. Run `LIVE_BASE_URL=https://dtfseeds.com pnpm live:check`.
-2. Open `https://dtfseeds.com/games/thc-u-know/healthz` and confirm JSON ok response.
-3. Open `https://dtfseeds.com/games/thc-u-know/socket.io/?EIO=4&transport=polling` and confirm it returns a Socket.IO handshake, not the React `index.html`.
-4. Open `https://dtfseeds.com/games/thc-u-know/`.
-5. Create a room with player one.
-6. Join through the invite link in a second browser.
-7. Start game, draw, play a number card, play action cards, play a wild, refresh/rejoin, and rematch.
+### Same-origin Node routing
 
-The scheduled `Live Production Smoke` workflow runs every six hours to detect routing/runtime regressions between deployments.
+```bash
+LIVE_BASE_URL=https://dtfseeds.com pnpm live:check
+```
+
+This expects the frontend, `/games/thc-u-know/healthz`, and `/games/thc-u-know/socket.io` to be routed through the same public origin.
+
+### Separate Node backend origin
+
+If WordPress/static hosting serves the frontend while a Node-capable origin serves multiplayer, run:
+
+```bash
+LIVE_BASE_URL=https://dtfseeds.com \
+LIVE_SERVER_URL=https://games-api.dtfseeds.com \
+pnpm live:check
+```
+
+Set the repository Actions variable `THC_U_KNOW_SERVER_ORIGIN` to the deployed Node origin so scheduled smoke checks use the same split-origin topology. The web build must use the same origin through `VITE_SERVER_URL`.
+
+Then verify:
+
+1. The public game route contains the THC U Know app.
+2. `${LIVE_SERVER_URL:-$LIVE_BASE_URL}/games/thc-u-know/healthz` returns JSON `{ "ok": true, "service": "thc-u-know-server" }`.
+3. `${LIVE_SERVER_URL:-$LIVE_BASE_URL}/games/thc-u-know/socket.io/?EIO=4&transport=polling` returns an Engine.IO open packet, not HTML.
+4. Create a room with player one.
+5. Join through the invite link in a second browser.
+6. Start game, draw, play a number card, play action cards, play a wild, refresh/rejoin, and rematch.
+
+The scheduled `Live Production Smoke` workflow runs every six hours to detect routing/runtime regressions between deployments. If a health or Socket.IO request returns HTML, the request is reaching the WordPress/static frontend instead of the Node multiplayer process and the route/proxy or dedicated backend origin still needs deployment work.
 
 Rollback branch: `backup-main-before-direct-push`.
