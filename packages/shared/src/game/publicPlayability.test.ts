@@ -50,7 +50,7 @@ const dealerChoice: Card = {
 };
 const packTwo: Card = {
   id: 'pack-two',
-  color: 'green',
+  color: 'purple',
   kind: 'pack-two',
   label: 'Pack Two',
   points: 20
@@ -109,7 +109,7 @@ describe('public card playability', () => {
     });
   });
 
-  it('allows draw-stack answers when stacking is enabled and still rejects unrelated cards', () => {
+  it('allows matching draw-stack answers when stacking is enabled and still rejects unrelated cards', () => {
     const state = tableState({
       pendingDraw: 2,
       settings: { ...tableState().settings, stacking: true }
