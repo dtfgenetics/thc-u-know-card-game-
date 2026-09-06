@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Card, CardColor, PrivatePlayerState, PublicGameState } from '@thc-u-know/shared';
-import { Events, manifestEntry } from '@thc-u-know/shared';
+import { Events, canPlayCardFromPublicState, manifestEntry } from '@thc-u-know/shared';
 import { socket } from '../realtime/socket';
 import { playGameSound } from '../audio/gameSounds';
 import { ChatBox } from './ChatBox';
@@ -103,12 +103,41 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const latestLog = publicState.actionLog.slice(-5).reverse();
   const targetOptions = publicState.players.filter(player => player.id !== playerId);
   const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
+  const currentPlayer = publicState.players.find(player => player.id === publicState.currentPlayerId);
+  const handPlayability = privateState.hand.map(card => ({
+    card,
+    result: canPlayCardFromPublicState(publicState, playerId, card)
+  }));
+  const playableCount = handPlayability.filter(entry => entry.result.ok).length;
+  const drawRecommended = isMyTurn && playableCount === 0;
+
+  const turnHeadline = winner
+    ? 'Round complete'
+    : isMyTurn
+      ? drawRecommended
+        ? 'Draw from the Stash'
+        : 'Play a highlighted card'
+      : `${currentPlayer?.name ?? 'Another grower'} is up`;
+
+  const turnDetail = winner
+    ? `${winner.name} took the round.`
+    : isMyTurn && publicState.pendingDraw > 0
+      ? playableCount > 0
+        ? `${publicState.pendingDraw}-card draw pressure is active. ${playableCount} legal response${playableCount === 1 ? '' : 's'} in hand.`
+        : `Draw ${publicState.pendingDraw} card${publicState.pendingDraw === 1 ? '' : 's'} from the Stash to clear the pressure.`
+      : isMyTurn && playableCount > 0
+        ? `${playableCount} playable card${playableCount === 1 ? '' : 's'} match the ${publicState.activeColor} strain, top card, or wild rules.`
+        : isMyTurn
+          ? 'No legal card is in your hand right now.'
+          : 'Watch the table. Your hand unlocks automatically when the turn reaches you.';
 
   return (
     <main
       className="game-table"
       data-current-player-id={publicState.currentPlayerId}
       data-player-id={playerId}
+      data-is-my-turn={String(isMyTurn)}
+      data-playable-count={playableCount}
       data-pending-draw={publicState.pendingDraw}
       data-round-number={publicState.roundNumber}
       data-winner-id={publicState.winnerId}
@@ -126,6 +155,21 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
             </div>
           </section>
         )}
+        <section
+          className={`turn-banner ${isMyTurn ? 'is-my-turn' : 'is-waiting'} ${publicState.pendingDraw > 0 ? 'has-pressure' : ''}`}
+          aria-live="polite"
+        >
+          <div className="turn-copy">
+            <span>{isMyTurn ? 'YOUR TURN' : winner ? 'ROUND STATUS' : 'TABLE TURN'}</span>
+            <strong>{turnHeadline}</strong>
+            <small>{turnDetail}</small>
+          </div>
+          <div className="turn-facts" aria-label="Current table facts">
+            <span className={`strain-chip card-${publicState.activeColor}`}>{publicState.activeColor}</span>
+            <span><b>{playableCount}</b> playable</span>
+            {publicState.pendingDraw > 0 && <span className="pressure-chip">+{publicState.pendingDraw} pressure</span>}
+          </div>
+        </section>
         <div className="status-row">
           <strong>Active strain: {publicState.activeColor}</strong>
           <span>Direction: {publicState.direction === 1 ? 'Clockwise' : 'Counter-clockwise'}</span>
@@ -136,9 +180,15 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
           </label>
         </div>
         <div className="piles">
-          <button className="pile" type="button" disabled={!isMyTurn} onClick={draw}>
-            <span>Stash</span>
+          <button
+            className={`pile stash-pile ${drawRecommended ? 'draw-recommended' : ''}`}
+            type="button"
+            disabled={!isMyTurn}
+            onClick={draw}
+          >
+            <span>{drawRecommended ? 'Draw here' : 'Stash'}</span>
             <strong>{publicState.drawPileCount}</strong>
+            {drawRecommended && <small>No legal card</small>}
           </button>
           <div className="pile ashtray">
             <span>Ashtray</span>
@@ -153,7 +203,18 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
       </section>
       <section className="hand-zone">
         <div className="hand-header">
-          <h2>Your Hand</h2>
+          <div>
+            <h2>Your Hand</h2>
+            <p className={`hand-guidance ${drawRecommended ? 'draw-needed' : ''}`} aria-live="polite">
+              {winner
+                ? 'Round complete.'
+                : isMyTurn
+                  ? playableCount > 0
+                    ? `${playableCount} card${playableCount === 1 ? '' : 's'} ready to play.`
+                    : 'No legal card. Draw from the Stash.'
+                  : 'Cards are dimmed until your turn.'}
+            </p>
+          </div>
           <button type="button" disabled={Boolean(publicState.winnerId)} onClick={callThcUKnow}>THC U Know!</button>
         </div>
         {pendingWild && (
@@ -183,8 +244,16 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
           </div>
         )}
         <div className="hand-scroll">
-          {privateState.hand.map(card => (
-            <ThcCard key={card.id} card={card} zone="hand" disabled={!isMyTurn} onClick={play} />
+          {handPlayability.map(({ card, result }) => (
+            <ThcCard
+              key={card.id}
+              card={card}
+              zone="hand"
+              playable={result.ok}
+              disabled={!result.ok}
+              disabledReason={result.ok ? undefined : result.reason}
+              onClick={play}
+            />
           ))}
         </div>
       </section>

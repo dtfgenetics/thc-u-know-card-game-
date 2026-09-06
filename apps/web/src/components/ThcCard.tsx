@@ -5,11 +5,21 @@ type Props = {
   card?: Card;
   hidden?: boolean;
   disabled?: boolean;
+  playable?: boolean;
+  disabledReason?: string;
   zone?: 'hand' | 'discard';
   onClick?: (card: Card) => void;
 };
 
-export function ThcCard({ card, hidden = false, disabled = false, zone, onClick }: Props) {
+export function ThcCard({
+  card,
+  hidden = false,
+  disabled = false,
+  playable,
+  disabledReason,
+  zone,
+  onClick
+}: Props) {
   if (hidden || !card) {
     return (
       <div className="card card-back" aria-label="Hidden THC U Know card">
@@ -19,18 +29,23 @@ export function ThcCard({ card, hidden = false, disabled = false, zone, onClick 
     );
   }
 
+  const playabilityClass = playable === undefined ? '' : playable ? ' is-playable' : ' is-blocked';
+  const accessibleLabel = disabledReason ? `${card.label}. ${disabledReason}` : card.label;
+
   return (
     <button
-      className={`card card-${card.color}`}
+      className={`card card-${card.color}${playabilityClass}`}
       type="button"
       disabled={disabled || !onClick}
+      aria-label={accessibleLabel}
       data-card-id={card.id}
       data-card-kind={card.kind}
       data-card-color={card.color}
       data-card-value={card.value}
       data-card-zone={zone}
+      data-card-playable={playable === undefined ? undefined : String(playable)}
       onClick={() => onClick?.(card)}
-      title={card.label}
+      title={accessibleLabel}
     >
       <img className="card-art" src={visualAssetForCard(card)} alt="" aria-hidden="true" />
       <span className="card-label">{card.label}</span>

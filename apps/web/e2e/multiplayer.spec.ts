@@ -171,6 +171,17 @@ test('two players can complete multiplayer card flows, scoring, and rematch', as
   await host.getByRole('button', { name: 'Start Game' }).click();
   await expect(host.getByRole('heading', { name: 'Your Hand' })).toBeVisible();
   await expect(guest.getByRole('heading', { name: 'Your Hand' })).toBeVisible();
+  await expect(host.locator('.turn-banner')).toBeVisible();
+  await expect(guest.locator('.turn-banner')).toBeVisible();
+
+  const firstActivePage = await currentTurnPage(pages);
+  const firstWaitingPage = firstActivePage === host ? guest : host;
+  const firstActiveTable = firstActivePage.locator('.game-table');
+  await expect(firstActiveTable).toHaveAttribute('data-is-my-turn', 'true');
+  await expect(firstWaitingPage.locator('.game-table')).toHaveAttribute('data-is-my-turn', 'false');
+  const firstPlayableCount = Number(await firstActiveTable.getAttribute('data-playable-count'));
+  await expect(firstActivePage.locator('[data-card-zone="hand"][data-card-playable="true"]:not(:disabled)')).toHaveCount(firstPlayableCount);
+  await expect(firstWaitingPage.locator('[data-card-zone="hand"]:not(:disabled)')).toHaveCount(0);
 
   let verifiedScorePreservation = false;
   let completedRounds = 0;
