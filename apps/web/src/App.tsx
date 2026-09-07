@@ -116,8 +116,11 @@ export function App() {
   }, [joinCode]);
 
   function hostGame() {
+    const playerName = name.trim();
+    if (!playerName || !socketConnected) return;
+    setError(null);
     socket.emit(Events.SESSION_CREATE, {
-      playerName: name,
+      playerName,
       settings: {
         mode,
         startingHandSize: mode === 'fast-sesh' ? 5 : 7,
@@ -130,8 +133,13 @@ export function App() {
   }
 
   function joinGame() {
+    const playerName = name.trim();
+    const sessionCode = code.trim().toUpperCase();
+    if (!playerName || !sessionCode || !socketConnected) return;
     const saved = readSavedSession();
-    socket.emit(Events.SESSION_JOIN, { code, playerName: name, playerId: saved?.code === code ? saved.playerId : undefined });
+    setError(null);
+    setCode(sessionCode);
+    socket.emit(Events.SESSION_JOIN, { code: sessionCode, playerName, playerId: saved?.code === sessionCode ? saved.playerId : undefined });
   }
 
   function startGame() {
@@ -151,6 +159,7 @@ export function App() {
 
   function onNameChange(event: ChangeEvent<HTMLInputElement>) {
     setName(event.target.value);
+    if (error) setError(null);
   }
 
   function onModeChange(event: ChangeEvent<HTMLSelectElement>) {
@@ -158,7 +167,8 @@ export function App() {
   }
 
   function onCodeChange(event: ChangeEvent<HTMLInputElement>) {
-    setCode(event.target.value.toUpperCase());
+    setCode(event.target.value.toUpperCase().replace(/\s+/g, ''));
+    if (error) setError(null);
   }
 
   if (player && session && publicState && privateState) {
@@ -166,6 +176,11 @@ export function App() {
   }
 
   const isHost = Boolean(player && session?.hostId === player.id);
+  const connectionCopy = socketConnected
+    ? 'Multiplayer server connected.'
+    : connectionFailed
+      ? 'Multiplayer server unavailable. Reconnect is required before hosting or joining.'
+      : 'Connecting to multiplayer server…';
 
   return (
     <div className="app-shell">
@@ -176,18 +191,29 @@ export function App() {
         <p>Host a Smoke Circle, invite friends, and play original UNNO-style cannabis parody rules.</p>
       </header>
 
-      {error && <div className="error-box">{error}</div>}
+      <p className="connection-status" role="status" aria-live="polite">
+        {connectionCopy}
+      </p>
+
+      {error && <div className="error-box" role="alert" aria-live="assertive">{error}</div>}
       {connectionFailed && (
-        <div className="error-box" role="status">
+        <div className="error-box" role="alert">
           Multiplayer server unavailable. The game server is not connected.
         </div>
       )}
 
       {!session && (
-        <section className="panel start-panel">
+        <section className="panel start-panel" aria-labelledby="session-start-heading">
+          <h2 id="session-start-heading">Start or join a Smoke Circle</h2>
           <label>
             Player name
-            <input value={name} onChange={onNameChange} placeholder="Enter your name" />
+            <input
+              value={name}
+              onChange={onNameChange}
+              placeholder="Enter your name"
+              autoComplete="nickname"
+              maxLength={32}
+            />
           </label>
           <label>
             Game mode
@@ -203,25 +229,37 @@ export function App() {
           </div>
           <label>
             Session code
-            <input value={code} onChange={onCodeChange} placeholder="ABC123" />
+            <input
+              value={code}
+              onChange={onCodeChange}
+              placeholder="ABC123"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              aria-describedby="session-code-help"
+            />
           </label>
+          <p id="session-code-help">Paste the invite code exactly as shared. Spaces are removed automatically.</p>
           <button type="button" disabled={!name.trim() || !code.trim() || !socketConnected} onClick={joinGame}>Join Smoke Circle</button>
           {savedSession && <button className="ghost-button" type="button" onClick={clearSavedSession}>Forget Saved Session</button>}
         </section>
       )}
 
       {session && player && (
-        <section className="lobby-grid">
+        <section className="lobby-grid" aria-label={`Smoke Circle ${session.code}`}>
           <InvitePanel code={session.code} />
           <section className="panel">
             <h2>Smoke Circle</h2>
             {session.settings && <p>Mode: <strong>{session.settings.mode}</strong> | Hand: <strong>{session.settings.startingHandSize}</strong> | Target: <strong>{session.settings.targetScore}</strong></p>}
+            <p role="status" aria-live="polite">
+              {session.players.length} player{session.players.length === 1 ? '' : 's'} in the room. {session.started ? 'Game started.' : isHost ? 'You are the host.' : 'Waiting for the host to start.'}
+            </p>
             <ul className="player-list">
               {session.players.map(item => (
                 <li key={item.id}>
                   <span>{item.host ? 'Host: ' : ''}{item.name}{item.connected ? '' : ' | disconnected'}</span>
                   {isHost && item.id !== player.id && !session.started && (
-                    <button type="button" onClick={() => kick(item.id)}>Kick</button>
+                    <button type="button" onClick={() => kick(item.id)} aria-label={`Kick ${item.name} from the Smoke Circle`}>Kick</button>
                   )}
                 </li>
               ))}
@@ -230,6 +268,7 @@ export function App() {
               Start Game
             </button>
             {session.players.length < 2 && <p>Waiting for at least one more player.</p>}
+            {!isHost && !session.started && <p>Only the host can start the game.</p>}
           </section>
         </section>
       )}
