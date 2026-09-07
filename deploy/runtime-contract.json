@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "game": "thc-u-know",
+  "runtime": "node-full-stack-socketio",
+  "nodeVersion": 22,
+  "webRoute": "/games/thc-u-know/",
+  "webBasePath": "/games/thc-u-know",
+  "socketPath": "/games/thc-u-know/socket.io",
+  "healthRoutes": [
+    "/healthz",
+    "/games/thc-u-know/healthz"
+  ],
+  "webDist": "apps/web/dist",
+  "serverEntry": "apps/server/dist/index.js",
+  "sameOriginPreferred": true,
+  "requiresWebSocketUpgrade": true,
+  "staticOnlyDeploymentSupported": false,
+  "productionEnvironment": {
+    "NODE_ENV": "production",
+    "WEB_BASE_PATH": "/games/thc-u-know",
+    "WEB_DIST_DIR": "apps/web/dist",
+    "SOCKET_IO_PATH": "/games/thc-u-know/socket.io",
+    "VITE_BASE_PATH": "/games/thc-u-know/",
+    "VITE_SOCKET_PATH": "/games/thc-u-know/socket.io"
+  },
+  "releaseGates": [
+    "pnpm -r lint",
+    "pnpm -r build",
+    "pnpm test",
+    "node scripts/production-runtime-smoke.mjs",
+    "pnpm --filter @thc-u-know/web test:e2e"
+  ]
+}
