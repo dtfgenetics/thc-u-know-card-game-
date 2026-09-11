@@ -8,6 +8,18 @@ const port = 4180;
 const origin = `http://127.0.0.1:${port}`;
 const gameBase = '/games/thc-u-know';
 const socketPath = `${gameBase}/socket.io/`;
+const requiredHeaderTokens = [
+  'data-dtf-shell="header-v5"',
+  'dtf-sitewide-header-v5-script',
+  '<a href="/">Home</a>',
+  '<a href="/seeds/">Seeds</a>',
+  '<a href="/learn/">Learn</a>',
+  '<a href="/courses/">Courses</a>',
+  '>Diagnostic</a>',
+  '<a href="/games/"',
+  '<a href="/community/">Community</a>',
+  '<a href="/shop/">Shop</a>'
+];
 
 const child = spawn(process.execPath, ['apps/server/dist/index.js'], {
   cwd: repoRoot,
@@ -41,6 +53,12 @@ async function waitForHealth() {
   throw new Error(`Production server did not become healthy.\n${stdout}\n${stderr}`);
 }
 
+function assertApprovedHeader(html, label) {
+  for (const token of requiredHeaderTokens) {
+    assert.ok(html.includes(token), `${label} is missing approved DTFSeeds header token: ${token}`);
+  }
+}
+
 try {
   const health = await waitForHealth();
   assert.equal(health.ok, true);
@@ -57,10 +75,12 @@ try {
     assert.match(html, /THC U Know/i, `${route} did not return the built game HTML`);
     assert.match(html, /<div\s+id="root"(?:\s[^>]*)?>/i, `${route} did not return the React root container`);
     assert.doesNotMatch(html, /src="\/src\//, `${route} returned a development Vite shell`);
+    assertApprovedHeader(html, route);
   }
 
   const indexHtml = await readFile(path.join(repoRoot, 'apps/web/dist/index.html'), 'utf8');
   assert.match(indexHtml, /\/games\/thc-u-know\/assets\//, 'Production web build is not based under /games/thc-u-know/.');
+  assertApprovedHeader(indexHtml, 'apps/web/dist/index.html');
 
   const handshake = await fetch(`${origin}${socketPath}?EIO=4&transport=polling&t=production-smoke`, {
     headers: { Origin: origin }
@@ -87,6 +107,7 @@ try {
     socketPath,
     engineIoHandshake: true,
     inviteQueryServedBySpa: true,
+    approvedSitewideHeader: 'v5',
     serverStdoutMarker: stdout.includes(socketPath)
   }, null, 2));
 } finally {
