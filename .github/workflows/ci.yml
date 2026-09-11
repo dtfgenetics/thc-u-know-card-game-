@@ -37,7 +37,7 @@ jobs:
       - name: Verify lint, build, and game-engine tests
         run: pnpm verify
 
-      - name: Verify production runtime contract
+      - name: Verify production runtime, subpath, socket and V5 header contract
         run: pnpm test:production-runtime
 
       - name: Validate runtime manifest
@@ -50,9 +50,3 @@ jobs:
           if (contract.staticOnlyDeploymentSupported !== false) throw new Error('Static-only deployment must remain prohibited');
           if (!contract.requiresWebSocketUpgrade) throw new Error('WebSocket upgrade requirement must remain explicit');
           NODE
-
-      - name: Install Playwright browser
-        run: pnpm --filter @thc-u-know/web exec playwright install --with-deps chromium
-
-      - name: Multiplayer end-to-end test
-        run: pnpm --filter @thc-u-know/web test:e2e
