@@ -23,12 +23,21 @@ function cardNeedsTarget(card: Card): boolean {
   return card.kind !== 'number' && manifestEntry(card.kind).needsTarget;
 }
 
+function centeredHandScrollLeft(containerWidth: number, scrollWidth: number, itemLeft: number, itemWidth: number): number {
+  const maxScroll = Math.max(0, scrollWidth - containerWidth);
+  const desired = itemLeft + itemWidth / 2 - containerWidth / 2;
+  return Math.max(0, Math.min(desired, maxScroll));
+}
+
 export function GameTable({ playerId, publicState, privateState }: Props) {
   const isMyTurn = publicState.currentPlayerId === playerId && !publicState.winnerId;
   const [pendingWild, setPendingWild] = useState<Card | null>(null);
   const [pendingTarget, setPendingTarget] = useState<Card | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(() => window.localStorage.getItem('thc-u-know-sound') !== 'off');
   const previousActionId = useRef<string | undefined>(undefined);
+  const handScrollRef = useRef<HTMLDivElement | null>(null);
+  const wasMyTurnRef = useRef(false);
+  const previousPlayableCountRef = useRef(0);
 
   useEffect(() => {
     const latestAction = publicState.actionLog.at(-1);
@@ -110,6 +119,25 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }));
   const playableCount = handPlayability.filter(entry => entry.result.ok).length;
   const drawRecommended = isMyTurn && playableCount === 0;
+
+  useEffect(() => {
+    const justBecameMyTurn = isMyTurn && !wasMyTurnRef.current;
+    const newlyHasPlayableCard = isMyTurn && previousPlayableCountRef.current === 0 && playableCount > 0;
+    wasMyTurnRef.current = isMyTurn;
+    previousPlayableCountRef.current = playableCount;
+
+    if ((!justBecameMyTurn && !newlyHasPlayableCard) || playableCount <= 0 || publicState.winnerId) return;
+    const scroller = handScrollRef.current;
+    const target = scroller?.querySelector<HTMLButtonElement>('.card.is-playable:not(:disabled)');
+    if (!scroller || !target) return;
+
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    window.requestAnimationFrame(() => {
+      if (!target.isConnected) return;
+      const left = centeredHandScrollLeft(scroller.clientWidth, scroller.scrollWidth, target.offsetLeft, target.offsetWidth);
+      scroller.scrollTo({ left, behavior: reducedMotion ? 'auto' : 'smooth' });
+    });
+  }, [isMyTurn, playableCount, publicState.winnerId]);
 
   const turnHeadline = winner
     ? 'Round complete'
@@ -243,7 +271,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
             </div>
           </div>
         )}
-        <div className="hand-scroll">
+        <div className="hand-scroll" ref={handScrollRef}>
           {handPlayability.map(({ card, result }) => (
             <ThcCard
               key={card.id}
