@@ -45,8 +45,20 @@ jobs:
           node --input-type=module <<'NODE'
           import fs from 'node:fs';
           const contract = JSON.parse(fs.readFileSync('deploy/runtime-contract.json', 'utf8'));
+          if (contract.schemaVersion !== 2) throw new Error('Unexpected runtime contract schema');
           if (contract.webRoute !== '/games/thc-u-know/') throw new Error('Unexpected web route');
           if (contract.socketPath !== '/games/thc-u-know/socket.io') throw new Error('Unexpected Socket.IO path');
           if (contract.staticOnlyDeploymentSupported !== false) throw new Error('Static-only deployment must remain prohibited');
+          if (!contract.requiresPersistentNodeProcess) throw new Error('Persistent Node runtime requirement must remain explicit');
           if (!contract.requiresWebSocketUpgrade) throw new Error('WebSocket upgrade requirement must remain explicit');
+          if (!contract.splitOriginSupported || contract.splitOriginVariable !== 'THC_U_KNOW_SERVER_ORIGIN') {
+            throw new Error('Split-origin production fallback is not documented correctly');
+          }
+          const gates = contract.releaseGates || [];
+          if (gates.some(gate => /playwright|test:e2e/i.test(String(gate)))) {
+            throw new Error('Playwright/E2E browser runner must not be part of the DTFSeeds release contract');
+          }
+          for (const gate of ['pnpm lint','pnpm build','pnpm test','pnpm test:production-runtime','pnpm live:check','manual-two-browser-multiplayer-check']) {
+            if (!gates.includes(gate)) throw new Error(`Missing deterministic release gate: ${gate}`);
+          }
           NODE
