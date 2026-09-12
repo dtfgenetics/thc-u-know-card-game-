@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "game": "thc-u-know",
   "runtime": "node-full-stack-socketio",
   "nodeVersion": 22,
@@ -13,10 +13,14 @@
   "webDist": "apps/web/dist",
   "serverEntry": "apps/server/dist/index.js",
   "sameOriginPreferred": true,
+  "splitOriginSupported": true,
+  "splitOriginVariable": "THC_U_KNOW_SERVER_ORIGIN",
+  "requiresPersistentNodeProcess": true,
   "requiresWebSocketUpgrade": true,
   "staticOnlyDeploymentSupported": false,
   "productionEnvironment": {
     "NODE_ENV": "production",
+    "WEB_ORIGIN": "https://dtfseeds.com,https://www.dtfseeds.com",
     "WEB_BASE_PATH": "/games/thc-u-know",
     "WEB_DIST_DIR": "apps/web/dist",
     "SOCKET_IO_PATH": "/games/thc-u-know/socket.io",
@@ -24,10 +28,12 @@
     "VITE_SOCKET_PATH": "/games/thc-u-know/socket.io"
   },
   "releaseGates": [
-    "pnpm -r lint",
-    "pnpm -r build",
+    "pnpm lint",
+    "pnpm build",
     "pnpm test",
-    "node scripts/production-runtime-smoke.mjs",
-    "pnpm --filter @thc-u-know/web test:e2e"
-  ]
+    "pnpm test:production-runtime",
+    "pnpm live:check",
+    "manual-two-browser-multiplayer-check"
+  ],
+  "productionBlocker": "A Node/Socket.IO origin must be deployed and either reverse-proxied to the game-scoped health/socket routes or configured as THC_U_KNOW_SERVER_ORIGIN."
 }
