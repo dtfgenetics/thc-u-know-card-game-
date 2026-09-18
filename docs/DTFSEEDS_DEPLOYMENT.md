@@ -14,7 +14,7 @@ pnpm verify
 pnpm test:production-runtime
 ```
 
-Do not deploy if any command fails. Repository validation is deterministic and does not depend on Playwright or a browser-automation gate. The production-runtime check boots the compiled server, verifies the scoped app route, health endpoints, Socket.IO handshake, subpath isolation, built asset base path, and the approved DTFSeeds V5 header contract.
+Do not deploy if any command fails. Repository validation is deterministic and does not depend on Playwright or a browser-automation gate. The production-runtime check boots the compiled server, verifies the scoped app route, health endpoints, Socket.IO handshake, subpath isolation, built asset base path, and the canonical DTFSeeds V6 header contract.
 
 ## Production environment
 
