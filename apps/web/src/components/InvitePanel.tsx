@@ -11,13 +11,31 @@ export function InvitePanel({ code }: Props) {
   const [status, setStatus] = useState('');
 
   async function copy(value: string, label: string) {
+    let copied = false;
     try {
-      if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable');
-      await navigator.clipboard.writeText(value);
-      setStatus(`${label} copied.`);
-    } catch {
-      setStatus('Copy was blocked by the browser. Select the session code above to share it manually.');
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+        copied = true;
+      }
+    } catch {}
+
+    if (!copied) {
+      try {
+        const field = document.createElement('textarea');
+        field.value = value;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        field.style.pointerEvents = 'none';
+        document.body.append(field);
+        field.select();
+        field.setSelectionRange(0, value.length);
+        copied = document.execCommand?.('copy') === true;
+        field.remove();
+      } catch {}
     }
+
+    setStatus(copied ? `${label} copied.` : 'Copy failed. Share the QR code or select the session code manually.');
   }
 
   async function shareInvite() {
