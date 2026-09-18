@@ -9,16 +9,15 @@ const origin = `http://127.0.0.1:${port}`;
 const gameBase = '/games/thc-u-know';
 const socketPath = `${gameBase}/socket.io/`;
 const requiredHeaderTokens = [
-  'data-dtf-shell="header-v5"',
-  'dtf-sitewide-header-v5-script',
-  '<a href="/">Home</a>',
-  '<a href="/seeds/">Seeds</a>',
-  '<a href="/learn/">Learn</a>',
-  '<a href="/courses/">Courses</a>',
-  '>Diagnostic</a>',
+  'data-dtf-shell="header-v6"',
+  'data-dtf-sitewide-header="canonical-six-v1"',
+  'dtf-sitewide-header-v6-script',
+  '>Genetics</a>',
+  '>Learn</a>',
+  '>Tools</a>',
   '<a href="/games/"',
-  '<a href="/community/">Community</a>',
-  '<a href="/shop/">Shop</a>'
+  '>Community</a>',
+  '>Shop</a>'
 ];
 
 const child = spawn(process.execPath, ['apps/server/dist/index.js'], {
@@ -107,7 +106,7 @@ try {
     socketPath,
     engineIoHandshake: true,
     inviteQueryServedBySpa: true,
-    approvedSitewideHeader: 'v5',
+    approvedSitewideHeader: 'v6',
     serverStdoutMarker: stdout.includes(socketPath)
   }, null, 2));
 } finally {
