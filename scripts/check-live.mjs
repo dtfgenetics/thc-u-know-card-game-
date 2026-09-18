@@ -5,16 +5,15 @@ const ROOT_HEALTH_PATH = '/healthz';
 const SOCKET_PATH = '/games/thc-u-know/socket.io/?EIO=4&transport=polling';
 const REQUEST_TIMEOUT_MS = 12_000;
 const REQUIRED_HEADER_TOKENS = [
-  'data-dtf-shell="header-v5"',
-  'dtf-sitewide-header-v5-script',
-  '<a href="/">Home</a>',
-  '<a href="/seeds/">Seeds</a>',
-  '<a href="/learn/">Learn</a>',
-  '<a href="/courses/">Courses</a>',
-  '>Diagnostic</a>',
+  'data-dtf-shell="header-v6"',
+  'data-dtf-sitewide-header="canonical-six-v1"',
+  'dtf-sitewide-header-v6-script',
+  '>Genetics</a>',
+  '>Learn</a>',
+  '>Tools</a>',
   '<a href="/games/"',
-  '<a href="/community/">Community</a>',
-  '<a href="/shop/">Shop</a>'
+  '>Community</a>',
+  '>Shop</a>'
 ];
 
 function normalizeOrigin(value, fallback = DEFAULT_WEB_ORIGIN) {
@@ -28,12 +27,12 @@ function fail(message) {
 
 async function request(origin, pathname, options = {}) {
   const url = new URL(pathname, origin);
-  if (options.cacheBust) url.searchParams.set('dtf_v5_smoke', `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  if (options.cacheBust) url.searchParams.set('dtf_v6_smoke', `${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const response = await fetch(url, {
     redirect: 'follow',
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
-      'user-agent': 'thc-u-know-live-smoke/1.3',
+      'user-agent': 'thc-u-know-live-smoke/1.4',
       accept: options.accept || '*/*',
       'cache-control': 'no-cache, no-store, max-age=0',
       pragma: 'no-cache'
@@ -68,9 +67,9 @@ async function checkGame(origin) {
   if (!/THC U Know/i.test(result.body)) fail('game route: response does not contain the THC U Know app');
   if (!result.contentType.includes('text/html')) fail(`game route: expected HTML, got ${result.contentType || 'unknown content type'}`);
   for (const token of REQUIRED_HEADER_TOKENS) {
-    if (!result.body.includes(token)) fail(`game route: approved DTFSeeds V5 header token is missing: ${token}`);
+    if (!result.body.includes(token)) fail(`game route: approved DTFSeeds V6 header token is missing: ${token}`);
   }
-  console.log(`PASS game route + approved V5 header ${new URL(GAME_PATH, origin)}`);
+  console.log(`PASS game route + approved V6 header ${new URL(GAME_PATH, origin)}`);
 }
 
 async function checkHealth(origin, pathname, label) {
@@ -138,7 +137,7 @@ async function main() {
   await checkSocket(serverOrigin);
   await checkOptionalRootHealth(serverOrigin);
 
-  console.log('THC U Know production smoke passed: frontend, approved V5 header, game health, and Socket.IO routing are live.');
+  console.log('THC U Know production smoke passed: frontend, approved V6 header, game health, and Socket.IO routing are live.');
 }
 
 main().catch((error) => {
