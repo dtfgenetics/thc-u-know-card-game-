@@ -29,3 +29,13 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@media (forced-colors: active) {
+  button, input, select, .panel, .card, .player-pill, .turn-banner {
+    border: 1px solid ButtonText;
+  }
+  :where(button, input, select, a, [tabindex]):focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 3px;
+  }
+}
