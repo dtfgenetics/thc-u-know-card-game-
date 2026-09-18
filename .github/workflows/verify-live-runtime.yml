@@ -1,0 +1,45 @@
+name: Verify THC U Know Live Runtime
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 10 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-thc-u-know-live
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Validate live checker
+        run: node --check scripts/check-live.mjs
+
+      - name: Verify production route, health and Socket.IO
+        run: npm run live:check
+
+      - name: Summarize
+        if: always()
+        run: |
+          {
+            echo '## THC U Know live runtime verification'
+            echo
+            echo '- Web: https://dtfseeds.com/games/thc-u-know/'
+            echo '- Health: https://dtfseeds.com/games/thc-u-know/healthz'
+            echo '- Socket.IO: https://dtfseeds.com/games/thc-u-know/socket.io/'
+            echo '- Requires the canonical V6 DTFSeeds header and server identity.'
+            echo '- A green run is still followed by the manual two-browser multiplayer gate before public promotion.'
+          } >> "$GITHUB_STEP_SUMMARY"
