@@ -37,7 +37,7 @@ jobs:
       - name: Verify lint, build, and game-engine tests
         run: pnpm verify
 
-      - name: Verify production runtime, subpath, socket and V5 header contract
+      - name: Verify production runtime, subpath, socket and V6 header contract
         run: pnpm test:production-runtime
 
       - name: Validate runtime manifest
