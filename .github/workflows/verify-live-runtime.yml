@@ -1,9 +1,9 @@
-name: Verify THC U Know Live Runtime
+name: Live Production Smoke
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '17 10 * * *'
+    - cron: '17 */6 * * *'
 
 permissions:
   contents: read
