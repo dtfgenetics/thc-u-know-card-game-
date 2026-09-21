@@ -6,11 +6,13 @@ const SOCKET_PATH = '/games/thc-u-know/socket.io/?EIO=4&transport=polling';
 const REQUEST_TIMEOUT_MS = 12_000;
 const REQUIRED_HEADER_TOKENS = [
   'data-dtf-shell="header-v6"',
-  'data-dtf-sitewide-header="canonical-six-v1"',
+  'data-dtf-sitewide-header="canonical-eight-v1"',
   'dtf-sitewide-header-v6-script',
-  '>Genetics</a>',
+  '>Home</a>',
+  '>Seeds</a>',
   '>Learn</a>',
-  '>Tools</a>',
+  '>Courses</a>',
+  '>Diagnostic</a>',
   '<a href="/games/"',
   '>Community</a>',
   '>Shop</a>'
