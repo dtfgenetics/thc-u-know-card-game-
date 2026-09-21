@@ -1,9 +1,12 @@
-name: Live Production Smoke
+name: Verify THC U Know Live Runtime
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '17 */6 * * *'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/check-live.mjs'
+      - '.github/workflows/verify-live-runtime.yml'
 
 permissions:
   contents: read
