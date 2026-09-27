@@ -12,6 +12,7 @@ type Props = {
   playerId: string;
   publicState: PublicGameState;
   privateState: PrivatePlayerState;
+  socketConnected: boolean;
 };
 
 const wildColors: CardColor[] = ['purple', 'green', 'gold', 'blue'];
@@ -30,7 +31,7 @@ function centeredHandScrollLeft(containerWidth: number, scrollWidth: number, ite
   return Math.max(0, Math.min(desired, maxScroll));
 }
 
-export function GameTable({ playerId, publicState, privateState }: Props) {
+export function GameTable({ playerId, publicState, privateState, socketConnected }: Props) {
   const isMyTurn = publicState.currentPlayerId === playerId && !publicState.winnerId;
   const [pendingWild, setPendingWild] = useState<Card | null>(null);
   const [pendingTarget, setPendingTarget] = useState<Card | null>(null);
@@ -76,7 +77,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }, [publicState.actionLog, publicState.winnerId, soundEnabled]);
 
   function emitPlay(card: Card, options?: { chosenColor?: CardColor; targetPlayerId?: string }) {
-    if (actionPending) return;
+    if (actionPending || !socketConnected) return;
     setActionPending(true);
     socket.emit(Events.GAME_PLAY_CARD, {
       code: publicState.sessionCode,
@@ -88,7 +89,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   function play(card: Card) {
-    if (actionPending) return;
+    if (actionPending || !socketConnected) return;
     if (cardNeedsChosenColor(card)) {
       setPendingWild(card);
       return;
@@ -113,20 +114,20 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   function draw() {
-    if (actionPending) return;
+    if (actionPending || !socketConnected) return;
     setActionPending(true);
     playGameSound('draw', soundEnabled);
     socket.emit(Events.GAME_DRAW_CARD, { code: publicState.sessionCode, playerId });
   }
 
   function callThcUKnow() {
-    if (actionPending) return;
+    if (actionPending || !socketConnected) return;
     setActionPending(true);
     socket.emit(Events.GAME_CALL_THC_U_KNOW, { code: publicState.sessionCode, playerId });
   }
 
   function rematch() {
-    if (actionPending) return;
+    if (actionPending || !socketConnected) return;
     setActionPending(true);
     playGameSound('turn', soundEnabled);
     socket.emit(Events.GAME_REMATCH, { code: publicState.sessionCode, playerId });
@@ -217,6 +218,11 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
       data-updated-at={publicState.updatedAt}
       aria-busy={actionPending}
     >
+      {!socketConnected && (
+        <p className="reconnect-banner" role="status" aria-live="assertive">
+          Connection lost. Reconnecting to your Smoke Circle… Actions are paused until the multiplayer server returns.
+        </p>
+      )}
       <PlayerRail players={publicState.players} currentPlayerId={publicState.currentPlayerId} />
       <section className="table-center">
         {winner && (
@@ -280,7 +286,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
             )}
             <div className="button-row winner-actions">
               {localPlayer?.host ? (
-                <button type="button" disabled={actionPending || !canStartNextRound} onClick={rematch}>
+                <button type="button" disabled={actionPending || !canStartNextRound || !socketConnected} onClick={rematch}>
                   {matchWinner ? 'New Match' : 'Start Next Round'}
                 </button>
               ) : (
@@ -323,7 +329,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
           <button
             className={`pile stash-pile ${drawRecommended ? 'draw-recommended' : ''}`}
             type="button"
-            disabled={!isMyTurn || actionPending}
+            disabled={!isMyTurn || actionPending || !socketConnected}
             onClick={draw}
           >
             <span>{drawRecommended ? 'Draw here' : 'Stash'}</span>
@@ -368,7 +374,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
                   : 'Cards are dimmed until your turn.'}
             </p>
           </div>
-          <button type="button" disabled={!canCallThcUKnow || actionPending} onClick={callThcUKnow}>
+          <button type="button" disabled={!canCallThcUKnow || actionPending || !socketConnected} onClick={callThcUKnow}>
             {localPlayer?.calledThcUKnow ? 'THC U Know called' : 'THC U Know!'}
           </button>
         </div>
@@ -411,7 +417,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
               card={card}
               zone="hand"
               playable={result.ok}
-              disabled={!result.ok || actionPending}
+              disabled={!result.ok || actionPending || !socketConnected}
               disabledReason={result.ok ? undefined : result.reason}
               onClick={play}
             />
