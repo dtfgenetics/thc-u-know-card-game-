@@ -25,12 +25,12 @@ export class MemorySessionStore implements SessionStore {
     return saveSession(session);
   }
 
-  async joinSession(code: string, playerName: string, playerId?: string): Promise<JoinResult> {
-    return joinSession(code, playerName, playerId);
+  async joinSession(code: string, playerName: string, playerId?: string, resumeToken?: string): Promise<JoinResult> {
+    return joinSession(code, playerName, playerId, resumeToken);
   }
 
-  async rejoinSession(code: string, playerId: string): Promise<JoinResult> {
-    return rejoinSession(code, playerId);
+  async rejoinSession(code: string, playerId: string, resumeToken: string): Promise<JoinResult> {
+    return rejoinSession(code, playerId, resumeToken);
   }
 
   async setGame(code: string, game: GameState): Promise<Session | undefined> {
