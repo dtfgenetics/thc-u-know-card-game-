@@ -1,5 +1,5 @@
 import type { Server, Socket } from 'socket.io';
-import { Events, createGameState, createNextRoundState, drawCards, playCard } from '@thc-u-know/shared';
+import { Events, canCallThcUKnow, createGameState, createNextRoundState, drawCards, playCard } from '@thc-u-know/shared';
 import type { CardColor, GameSettings } from '@thc-u-know/shared';
 import { publicSession } from '../state/store.js';
 import type { SessionStore } from '../state/store.js';
@@ -188,7 +188,9 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
       const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
-      if (!session?.game) return;
+      if (!session?.game) return emitSocketError(socket, 'Game not found');
+      const call = canCallThcUKnow(session.game, playerId);
+      if (!call.ok) return emitSocketError(socket, call.reason);
       const players = session.players.map(player =>
         player.id === playerId ? { ...player, calledThcUKnow: true } : player
       );
