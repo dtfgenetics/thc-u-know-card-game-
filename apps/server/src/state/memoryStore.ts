@@ -116,6 +116,7 @@ export function kickPlayer(code: string, hostId: string, targetPlayerId: string)
   const session = getSession(code);
   if (!session) return { error: 'Smoke Circle not found' };
   if (session.hostId !== hostId) return { error: 'Only the host can kick players' };
+  if (session.game?.started) return { error: 'Players cannot be kicked after the game starts' };
   if (targetPlayerId === hostId) return { error: 'Host cannot kick themselves' };
   if (!session.players.some(player => player.id === targetPlayerId)) return { error: 'Player not found' };
 
