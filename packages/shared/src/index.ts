@@ -16,3 +16,5 @@ export * from './game/publicState.js';
 export * from './game/callThcUKnow.js';
 
 export * from './game/roundStart.js';
+
+export * from './game/hostSuccession.js';
