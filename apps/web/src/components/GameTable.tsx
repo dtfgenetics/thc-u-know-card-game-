@@ -140,6 +140,8 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const roundPoints = publicState.lastRoundScore?.pointsAwarded ?? 0;
   const currentPlayer = publicState.players.find(player => player.id === publicState.currentPlayerId);
   const localPlayer = publicState.players.find(player => player.id === playerId);
+  const disconnectedPlayers = publicState.players.filter(player => !player.connected);
+  const canStartNextRound = Boolean(localPlayer?.host) && publicState.players.length >= 2 && disconnectedPlayers.length === 0;
   const handPlayability = privateState.hand.map(card => ({
     card,
     result: canPlayCardFromPublicState(publicState, playerId, card)
@@ -230,11 +232,20 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
                 : `${winner.name} earned ${roundPoints} point${roundPoints === 1 ? '' : 's'}. Scores carry into round ${publicState.roundNumber + 1}.`}
             </p>
             <div className="button-row winner-actions">
-              <button type="button" disabled={actionPending} onClick={rematch}>
-                {matchWinner ? 'New Match' : 'Start Next Round'}
-              </button>
+              {localPlayer?.host ? (
+                <button type="button" disabled={actionPending || !canStartNextRound} onClick={rematch}>
+                  {matchWinner ? 'New Match' : 'Start Next Round'}
+                </button>
+              ) : (
+                <span className="muted">Waiting for the host to {matchWinner ? 'start a new match' : 'start the next round'}.</span>
+              )}
               <button className="ghost-button" type="button" onClick={leaveGame}>Back to Home</button>
             </div>
+            {localPlayer?.host && disconnectedPlayers.length > 0 && (
+              <p className="round-result-copy" role="status">
+                Waiting for {disconnectedPlayers.map(player => player.name).join(', ')} to reconnect before continuing.
+              </p>
+            )}
           </section>
         )}
         <section
