@@ -81,7 +81,7 @@ function swapHands(state: GameState, playerA: string, playerB: string): GameStat
 
 function passTheTray(state: GameState): GameState {
   const handsByPlayer = new Map(state.hands.map(hand => [hand.playerId, hand.cards]));
-  const orderedPlayers = state.players.map(player => player.id);
+  const orderedPlayers = state.players.filter(player => player.connected).map(player => player.id);
   const passed = new Map<string, Card>();
 
   for (const playerId of orderedPlayers) {
@@ -96,6 +96,7 @@ function passTheTray(state: GameState): GameState {
     ...state,
     hands: state.hands.map(hand => {
       const playerIndex = orderedPlayers.indexOf(hand.playerId);
+      if (playerIndex < 0) return hand;
       const fromPlayer = orderedPlayers[(playerIndex - state.direction + orderedPlayers.length) % orderedPlayers.length];
       const outgoing = passed.get(hand.playerId);
       const incoming = fromPlayer ? passed.get(fromPlayer) : undefined;
@@ -159,9 +160,11 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
     case 'paranoia':
       return logAction(advanceTurn(nextState, 2), input.playerId, `${actor} played ${card.label}. Next player got skipped.`);
     case 'puff-puff-pass-back':
-    case 'rotation':
+    case 'rotation': {
       nextState = reverseDirection(nextState);
-      return logAction(advanceTurn(nextState, nextState.players.length === 2 ? 2 : 1), input.playerId, `${actor} played ${card.label}. The rotation reversed.`);
+      const connectedCount = nextState.players.filter(player => player.connected).length;
+      return logAction(advanceTurn(nextState, connectedCount === 2 ? 2 : 1), input.playerId, `${actor} played ${card.label}. The rotation reversed.`);
+    }
     case 'pack-two':
     case 'munchies':
       return logAction({ ...advanceTurn(nextState), pendingDraw: nextState.pendingDraw + 2 }, input.playerId, `${actor} played ${card.label}. Next player must draw 2.`);
@@ -185,9 +188,9 @@ function applyAction(state: GameState, card: Card, input: PlayCardInput): GameSt
       return logAction(advanceTurn(passTheTray(nextState)), input.playerId, `${actor} passed the tray. Everyone passed one card.`);
     case 'smoke-sesh': {
       for (const player of nextState.players) {
-        if (player.id !== input.playerId) nextState = drawForPlayer(nextState, player.id, 1);
+        if (player.id !== input.playerId && player.connected) nextState = drawForPlayer(nextState, player.id, 1);
       }
-      return logAction(advanceTurn(nextState), input.playerId, `${actor} started a Smoke Sesh. Everyone else drew 1.`);
+      return logAction(advanceTurn(nextState), input.playerId, `${actor} started a Smoke Sesh. Every connected opponent drew 1.`);
     }
     case 'greener-side': {
       const targetId = input.targetPlayerId && nextState.players.some(player => player.id === input.targetPlayerId)
@@ -227,7 +230,7 @@ function applyFinalCardEffects(state: GameState, card: Card, input: PlayCardInpu
     }
     case 'smoke-sesh':
       for (const player of nextState.players) {
-        if (player.id !== input.playerId) nextState = drawForPlayer(nextState, player.id, 1);
+        if (player.id !== input.playerId && player.connected) nextState = drawForPlayer(nextState, player.id, 1);
       }
       return nextState;
     case 'greener-side': {
