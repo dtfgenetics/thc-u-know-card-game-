@@ -105,7 +105,11 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       }
 
       joinSocketRooms(socket, result.session.code, result.player.id);
-      socket.emit(Events.SESSION_JOINED, { session: publicSession(result.session), player: result.player });
+      socket.emit(Events.SESSION_JOINED, {
+        session: publicSession(result.session),
+        player: result.player,
+        resumeToken: result.resumeToken
+      });
       await emitFullState(io, store, result.session.code);
     });
 
