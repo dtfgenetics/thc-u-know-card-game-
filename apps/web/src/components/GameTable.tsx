@@ -36,6 +36,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
   const [pendingWild, setPendingWild] = useState<Card | null>(null);
   const [pendingTarget, setPendingTarget] = useState<Card | null>(null);
   const [actionPending, setActionPending] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(() => window.localStorage.getItem('thc-u-know-sound') !== 'off');
   const previousActionId = useRef<string | undefined>(undefined);
   const handScrollRef = useRef<HTMLDivElement | null>(null);
@@ -56,8 +57,9 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
   }, [soundEnabled]);
 
   useEffect(() => {
-    function onActionError() {
+    function onActionError(payload: { message?: string }) {
       setActionPending(false);
+      setActionError(payload.message ?? 'That action could not be completed');
       playGameSound('error', soundEnabled);
     }
 
@@ -171,6 +173,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
 
   useEffect(() => {
     setActionPending(false);
+    setActionError(null);
   }, [publicState.updatedAt, privateState.hand.length]);
 
   useEffect(() => {
@@ -229,6 +232,11 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
       {!socketConnected && (
         <p className="reconnect-banner" role="status" aria-live="assertive">
           Connection lost. Reconnecting to your Smoke Circle… Actions are paused until the multiplayer server returns.
+        </p>
+      )}
+      {actionError && (
+        <p className="game-error-banner" role="alert" aria-live="assertive">
+          {actionError}
         </p>
       )}
       <PlayerRail
