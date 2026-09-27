@@ -22,3 +22,9 @@ assert.match(
 );
 
 console.log('THC U Know live smoke origin contract passed.');
+
+assert.match(checker, /REQUIRED_NAV_ROUTES/, 'live checker must validate canonical nav routes semantically');
+assert.match(checker, /'\/tools\/'/, 'live checker must require the current Tools route');
+assert.doesNotMatch(checker, />Diagnostic<|\/diagnostic\//, 'live checker must not require the retired Diagnostic nav label');
+assert.match(workflow, /https:\/\/api\.dtfseeds\.com\/games\/thc-u-know\/healthz/, 'live summary must point health checks at the API origin');
+assert.match(workflow, /https:\/\/api\.dtfseeds\.com\/games\/thc-u-know\/socket\.io\//, 'live summary must point Socket.IO checks at the API origin');
