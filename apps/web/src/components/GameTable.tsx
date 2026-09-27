@@ -223,11 +223,19 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
             <ThcCard card={publicState.topDiscard} zone="discard" />
           </div>
         </div>
-        <section className="action-log">
-          <h3>Table Talk</h3>
-          {latestLog.map(item => <p key={item.id}>{item.message}</p>)}
-        </section>
-        <ChatBox code={publicState.sessionCode} playerId={playerId} />
+        <details className="table-secondary">
+          <summary>
+            <span>Table Talk & Smoke Talk</span>
+            <small>History and chat</small>
+          </summary>
+          <div className="table-secondary-content">
+            <section className="action-log">
+              <h3>Table Talk</h3>
+              {latestLog.map(item => <p key={item.id}>{item.message}</p>)}
+            </section>
+            <ChatBox code={publicState.sessionCode} playerId={playerId} />
+          </div>
+        </details>
       </section>
       <section className="hand-zone">
         <div className="hand-header">
