@@ -147,6 +147,14 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   from { opacity: 0; transform: translateY(-4px) scale(0.99); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+@keyframes turn-state-in {
+  from { opacity: 0.82; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes discard-land {
+  from { opacity: 0.78; transform: translateY(-4px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 .winner-panel { width: min(720px, 100%); margin: 0 auto; padding: 1.25rem; text-align: center; border-radius: 28px; background: linear-gradient(145deg, rgba(159,234,77,0.25), rgba(0,0,0,0.34)); border: 1px solid rgba(159,234,77,0.4); }
 .winner-panel h2 { margin: 0.25rem 0 1rem; font-size: clamp(2rem, 6vw, 4rem); }
 .round-score-summary {
@@ -221,6 +229,7 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .winner-actions { justify-content: center; }
 .turn-banner {
   width: min(780px, 100%);
+  animation: turn-state-in 180ms ease-out;
   margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -263,7 +272,11 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   box-shadow: 0 0 0 4px rgba(255,223,117,0.15), 0 18px 40px rgba(0,0,0,0.34);
   background: linear-gradient(rgba(65,42,3,0.38), rgba(0,0,0,0.7)), rgba(20, 44, 20, 0.9);
 }
-.ashtray { padding: 1rem; background: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), rgba(42, 24, 16, 0.9); }
+.ashtray {
+  padding: 1rem;
+  background: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), rgba(42, 24, 16, 0.9);
+  animation: discard-land 180ms ease-out;
+}
 .table-secondary {
   width: min(720px, 100%);
   margin: 0 auto;
@@ -479,6 +492,8 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 
 @media (prefers-reduced-motion: reduce) {
   .latest-action-banner { animation: none; }
+  .turn-banner,
+  .ashtray { animation: none; }
   .card { transition: none; }
   .hand-scroll { scroll-behavior: auto; }
 }
