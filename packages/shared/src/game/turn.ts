@@ -7,11 +7,23 @@ export function currentPlayerIndex(state: GameState): number {
 export function nextPlayerId(state: GameState, steps = 1): string {
   const currentIndex = currentPlayerIndex(state);
   if (currentIndex < 0) throw new Error('Current player is not in the game');
+  if (steps <= 0) return state.currentPlayerId;
 
   const playerCount = state.players.length;
-  const offset = steps * state.direction;
-  const nextIndex = (currentIndex + offset + playerCount * 10) % playerCount;
-  return state.players[nextIndex]?.id ?? state.currentPlayerId;
+  if (playerCount <= 1 || !state.players.some(player => player.connected)) {
+    return state.currentPlayerId;
+  }
+
+  let index = currentIndex;
+  let connectedMoves = 0;
+
+  while (connectedMoves < steps) {
+    index = (index + state.direction + playerCount) % playerCount;
+    const candidate = state.players[index];
+    if (candidate?.connected) connectedMoves += 1;
+  }
+
+  return state.players[index]?.id ?? state.currentPlayerId;
 }
 
 export function advanceTurn(state: GameState, steps = 1): GameState {
