@@ -114,6 +114,38 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .round-standing > span > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .round-standing small { color: #c9d8c3; font-size: 0.72rem; }
 .round-standing > strong { color: #ffdf75; white-space: nowrap; }
+.round-history {
+  width: min(620px, 100%);
+  margin: 0 auto 1rem;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  background: rgba(0,0,0,0.16);
+  overflow: hidden;
+  text-align: left;
+}
+.round-history > summary {
+  min-height: 44px;
+  padding: 0.7rem 0.85rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 900;
+  color: #e8ffd8;
+}
+.round-history-list { display: grid; gap: 0.45rem; padding: 0 0.7rem 0.7rem; }
+.round-history-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+}
+.round-history-row > span { display: grid; gap: 0.1rem; }
+.round-history-row > span:last-child { text-align: right; }
+.round-history-row small { color: #c9d8c3; font-size: 0.7rem; }
+.round-history-row > span:last-child > strong { color: #ffdf75; }
 .winner-actions { justify-content: center; }
 .turn-banner {
   width: min(780px, 100%);
