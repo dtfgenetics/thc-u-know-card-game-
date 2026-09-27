@@ -1,5 +1,5 @@
 import type { Server, Socket } from 'socket.io';
-import { Events, canCallThcUKnow, createGameState, createNextRoundState, drawCards, playCard } from '@thc-u-know/shared';
+import { Events, canCallThcUKnow, canStartRound, createGameState, createNextRoundState, drawCards, playCard } from '@thc-u-know/shared';
 import type { CardColor, GameSettings } from '@thc-u-know/shared';
 import { publicSession } from '../state/store.js';
 import type { SessionStore } from '../state/store.js';
@@ -114,8 +114,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const playerId = payloadString(payload, 'playerId', socket.data.playerId);
       const session = await store.getSession(code);
       if (!session) return emitSocketError(socket, 'Smoke Circle not found');
-      if (session.hostId !== playerId) return emitSocketError(socket, 'Only the host can start the game');
-      if (session.players.length < 2) return emitSocketError(socket, 'At least 2 players are required');
+      const start = canStartRound(session.players, session.hostId, playerId);
+      if (!start.ok) return emitSocketError(socket, start.reason);
 
       const game = createGameState({ sessionCode: session.code, players: session.players, settings: session.settings });
       const updated = await store.setGame(code, game);
@@ -131,8 +131,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const session = await store.getSession(code);
       if (!session?.game) return emitSocketError(socket, 'Game not found');
       if (!session.game.winnerId && !session.game.drawRound) return emitSocketError(socket, 'Round is not over yet');
-      if (!session.players.some(player => player.id === playerId)) return emitSocketError(socket, 'Player not found');
-      if (session.players.length < 2) return emitSocketError(socket, 'At least 2 players are required');
+      const start = canStartRound(session.players, session.hostId, playerId);
+      if (!start.ok) return emitSocketError(socket, start.reason);
 
       const game = session.game.matchWinnerId
         ? createGameState({ sessionCode: session.code, players: session.players.map(player => ({ ...player, calledThcUKnow: false })), settings: session.settings })

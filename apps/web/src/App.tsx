@@ -176,6 +176,8 @@ export function App() {
   }
 
   const isHost = Boolean(player && session?.hostId === player.id);
+  const disconnectedPlayers = session?.players.filter(item => !item.connected) ?? [];
+  const canStartLobby = Boolean(session && isHost && session.players.length >= 2 && disconnectedPlayers.length === 0);
   const connectionCopy = socketConnected
     ? 'Multiplayer server connected.'
     : connectionFailed
@@ -264,10 +266,15 @@ export function App() {
                 </li>
               ))}
             </ul>
-            <button type="button" disabled={session.players.length < 2 || !isHost} onClick={startGame}>
+            <button type="button" disabled={!canStartLobby} onClick={startGame}>
               Start Game
             </button>
             {session.players.length < 2 && <p>Waiting for at least one more player.</p>}
+            {disconnectedPlayers.length > 0 && (
+              <p role="status">
+                Waiting for {disconnectedPlayers.map(item => item.name).join(', ')} to reconnect before the host can start.
+              </p>
+            )}
             {!isHost && !session.started && <p>Only the host can start the game.</p>}
           </section>
         </section>
