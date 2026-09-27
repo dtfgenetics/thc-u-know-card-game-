@@ -4,12 +4,19 @@ import fs from 'node:fs';
 const invite = fs.readFileSync('apps/web/src/components/InvitePanel.tsx', 'utf8');
 const appCss = fs.readFileSync('apps/web/src/styles/app.css', 'utf8');
 const polish = fs.readFileSync('apps/web/src/styles/polish.css', 'utf8');
+const browserExperience = fs.readFileSync('apps/web/src/browserExperience.ts', 'utf8');
+const gameTable = fs.readFileSync('apps/web/src/components/GameTable.tsx', 'utf8');
 
-assert.match(invite, /navigator\.clipboard\?\.writeText/);
-assert.match(invite, /document\.createElement\('textarea'\)/);
-assert.match(invite, /document\.execCommand\?\.\('copy'\) === true/);
-assert.match(invite, /Copy failed\. Share the QR code or select the session code manually\./);
+assert.match(invite, /shareInviteWithFallback/);
+assert.match(invite, /Sharing was unavailable, so the invite link was copied instead\./);
 assert.match(invite, /QRCodeSVG/);
+assert.match(browserExperience, /navigator\.clipboard\?\.writeText/);
+assert.match(browserExperience, /document\.createElement\('textarea'\)/);
+assert.match(browserExperience, /document\.execCommand\?\.\('copy'\) === true/);
+assert.match(browserExperience, /navigator\.share/);
+assert.match(browserExperience, /wakeLock\?\.request/);
+assert.match(gameTable, /createScreenWakeLockController/);
+assert.match(gameTable, /controller\.acquire\(\)/);
 
 assert.match(appCss, /button \{[\s\S]*min-height: 44px;[\s\S]*touch-action: manipulation;/);
 assert.match(polish, /@media \(forced-colors: active\)/);
