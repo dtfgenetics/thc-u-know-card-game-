@@ -11,7 +11,7 @@ assert.match(table, /useEffect\(\(\) => \{[\s\S]*?setActionPending\(false\)[\s\S
 assert.match(table, /aria-busy=\{actionPending\}/, 'game surface must expose pending-action state');
 assert.match(table, /socket\.on\(Events\.ERROR, onActionError\)/, 'server errors must release the local action lock');
 assert.match(table, /socket\.off\(Events\.ERROR, onActionError\)/, 'server error recovery listener must be cleaned up');
-assert.match(table, /function onActionError\(\) \{[\s\S]*?setActionPending\(false\)/, 'server action errors must clear actionPending');
+assert.match(table, /function onActionError\((?:payload: \{ message\?: string \})?\) \{[\s\S]*?setActionPending\(false\)/, 'server action errors must clear actionPending');
 assert.match(table, /disabled=\{!isMyTurn \|\| actionPending(?: \|\| !socketConnected)?\}/, 'stash must lock while an action is pending');
 assert.match(table, /disabled=\{!result\.ok \|\| actionPending(?: \|\| !socketConnected)?\}/, 'hand cards must lock while an action is pending');
 assert.match(table, /const canCallThcUKnow = [^;]*privateState\.hand\.length === 1[^;]*!localPlayer\?\.calledThcUKnow/, 'THC U Know call should only be offered at one card and before calling');
