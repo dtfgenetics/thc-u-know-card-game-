@@ -55,6 +55,17 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }, []);
 
   useEffect(() => {
+    function onActionError() {
+      setActionPending(false);
+    }
+
+    socket.on(Events.ERROR, onActionError);
+    return () => {
+      socket.off(Events.ERROR, onActionError);
+    };
+  }, []);
+
+  useEffect(() => {
     const latestAction = publicState.actionLog.at(-1);
     if (!latestAction || latestAction.id === previousActionId.current) return;
     previousActionId.current = latestAction.id;
