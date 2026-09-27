@@ -328,6 +328,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
           </section>
         )}
         <section
+          key={publicState.currentPlayerId}
           className={`turn-banner ${isMyTurn ? 'is-my-turn' : 'is-waiting'} ${publicState.pendingDraw > 0 ? 'has-pressure' : ''}`}
           aria-live="polite"
         >
@@ -362,7 +363,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
             <strong>{publicState.drawPileCount}</strong>
             {drawRecommended && <small>No legal card</small>}
           </button>
-          <div className="pile ashtray">
+          <div className="pile ashtray" key={publicState.topDiscard.id}>
             <span>Ashtray</span>
             <ThcCard card={publicState.topDiscard} zone="discard" />
           </div>
