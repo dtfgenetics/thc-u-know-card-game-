@@ -150,6 +150,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
     playGameSound('turn', nextValue);
   }
 
+  const latestAction = publicState.actionLog.at(-1);
   const latestLog = publicState.actionLog.slice(-5).reverse();
   const targetOptions = publicState.players.filter(player => player.id !== playerId && player.connected);
   const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
@@ -174,6 +175,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
   useEffect(() => {
     const justBecameMyTurn = isMyTurn && !wasMyTurnRef.current;
     const newlyHasPlayableCard = isMyTurn && previousPlayableCountRef.current === 0 && playableCount > 0;
+    if (justBecameMyTurn && !publicState.winnerId) playGameSound('turn', soundEnabled);
     wasMyTurnRef.current = isMyTurn;
     previousPlayableCountRef.current = playableCount;
 
@@ -235,6 +237,11 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
         roundComplete={Boolean(winner)}
       />
       <section className="table-center">
+        {latestAction && !winner && (
+          <p className="latest-action-banner" key={latestAction.id} role="status" aria-live="polite">
+            {latestAction.message}
+          </p>
+        )}
         {winner && (
           <section className="winner-panel">
             <p className="eyebrow">{matchWinner ? 'Match Complete' : `Round ${publicState.roundNumber} Complete`}</p>
@@ -392,6 +399,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
           <div className="action-picker" role="dialog" aria-modal="true" aria-labelledby="wild-picker-title">
             <div className="action-picker-card">
               <strong id="wild-picker-title">Choose strain color for {pendingWild.label}</strong>
+              <p>{pendingWild.kind === 'number' ? 'Choose the next active strain color.' : manifestEntry(pendingWild.kind).effect}</p>
               <p>Your card will play immediately after you choose.</p>
               <div className="action-picker-options">
                 {wildColors.map(color => (
@@ -408,6 +416,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
           <div className="action-picker" role="dialog" aria-modal="true" aria-labelledby="target-picker-title">
             <div className="action-picker-card">
               <strong id="target-picker-title">Choose target for {pendingTarget.label}</strong>
+              <p>{pendingTarget.kind === 'number' ? 'Choose another player.' : manifestEntry(pendingTarget.kind).effect}</p>
               <p>Select the player this action should affect.</p>
               <div className="action-picker-options">
                 {targetOptions.map(target => (
