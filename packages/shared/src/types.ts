@@ -70,6 +70,11 @@ export type LastRoundScore = {
   remainingCardPoints: Record<string, number>;
 };
 
+export type RoundHistoryEntry = LastRoundScore & {
+  roundNumber: number;
+  scoresAfterRound: ScoreLedger;
+};
+
 export type GameState = {
   sessionCode: string;
   settings: GameSettings;
@@ -84,6 +89,7 @@ export type GameState = {
   actionLog: GameActionLog[];
   scores: ScoreLedger;
   roundNumber: number;
+  roundHistory?: RoundHistoryEntry[];
   lastRoundScore?: LastRoundScore;
   winnerId?: string;
   matchWinnerId?: string;

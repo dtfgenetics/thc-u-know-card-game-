@@ -8,6 +8,7 @@ export function createNextRoundState(previousState: GameState, random?: () => nu
     players: resetPlayers,
     settings: previousState.settings,
     scores: previousState.scores,
+    roundHistory: previousState.roundHistory ?? [],
     roundNumber: previousState.roundNumber + 1,
     random
   });

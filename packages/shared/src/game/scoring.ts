@@ -35,10 +35,19 @@ export function applyRoundScore(state: GameState, winnerId: string): GameState {
   const winnerScore = (scores[winnerId] ?? 0) + lastRoundScore.pointsAwarded;
   const nextScores = { ...scores, [winnerId]: winnerScore };
   const matchWinnerId = winnerScore >= state.settings.targetScore ? winnerId : undefined;
+  const roundHistory = [
+    ...(state.roundHistory ?? []),
+    {
+      roundNumber: state.roundNumber,
+      ...lastRoundScore,
+      scoresAfterRound: nextScores
+    }
+  ];
 
   return {
     ...state,
     scores: nextScores,
+    roundHistory,
     lastRoundScore,
     winnerId,
     matchWinnerId,
