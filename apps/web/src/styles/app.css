@@ -73,8 +73,23 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   font-weight: 850;
   text-align: center;
 }
-.player-rail { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem; }
-.player-pill { min-width: 150px; padding: 0.75rem; border-radius: 18px; background: rgba(255,255,255,0.08); display: grid; gap: 0.35rem; }
+.player-rail {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.5rem;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+.player-pill {
+  min-width: 150px;
+  padding: 0.75rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.08);
+  display: grid;
+  gap: 0.35rem;
+  scroll-snap-align: start;
+}
 .player-pill.active { outline: 3px solid #9fea4d; }
 .player-pill.is-local {
   background: linear-gradient(145deg, rgba(159,234,77,0.16), rgba(255,255,255,0.07));
@@ -292,7 +307,11 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   z-index: 60;
   display: grid;
   place-items: center;
-  padding: 1rem;
+  padding:
+    max(1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
   background: rgba(3, 8, 4, 0.78);
   backdrop-filter: blur(8px);
 }
@@ -380,7 +399,7 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   }
   .table-center { align-content: start; gap: 0.7rem; }
   .player-pill { min-width: 120px; padding: 0.6rem; }
-  .player-pill strong { font-size: 1.45rem; }
+  .player-pill strong { font-size: 0.95rem; }
   .round-score-summary { grid-template-columns: 1fr; gap: 0.45rem; }
   .round-score-summary > span { grid-template-columns: 1fr auto; align-items: center; }
   .status-row { display: none; }
@@ -392,9 +411,15 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   .piles { gap: 0.65rem; }
   .pile { min-width: min(44vw, 174px); min-height: 138px; }
   .hand-zone { border-radius: 20px; padding: 0.75rem; }
-  .hand-header { align-items: flex-start; }
+  .hand-header { align-items: flex-start; flex-wrap: wrap; }
   .hand-header > button { padding-inline: 0.8rem; }
   .card { width: 142px; height: 132px; }
+}
+
+@media (max-width: 420px) {
+  .hand-header > button {
+    width: 100%;
+  }
 }
 
 @media (min-width: 900px) {
