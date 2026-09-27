@@ -76,13 +76,30 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .player-rail { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem; }
 .player-pill { min-width: 150px; padding: 0.75rem; border-radius: 18px; background: rgba(255,255,255,0.08); display: grid; gap: 0.35rem; }
 .player-pill.active { outline: 3px solid #9fea4d; }
+.player-pill.is-local {
+  background: linear-gradient(145deg, rgba(159,234,77,0.16), rgba(255,255,255,0.07));
+  border: 1px solid rgba(159,234,77,0.28);
+}
+.player-badges { display: flex; flex-wrap: wrap; gap: 0.3rem; min-height: 20px; }
+.player-badges span {
+  padding: 0.18rem 0.42rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  color: #dfffc4;
+  font-size: 0.62rem;
+  font-weight: 950;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.player-pill.active .player-badges span { border-color: rgba(159,234,77,0.35); }
+.player-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 850; }
 .player-pill.is-disconnected {
   opacity: 0.58;
   filter: saturate(0.45);
   outline-color: rgba(255,255,255,0.24);
 }
 .player-pill.is-disconnected small { color: #d2c9c0; }
-.player-pill strong { font-size: 1.8rem; }
+.player-pill strong { font-size: 1.05rem; line-height: 1.1; }
 .player-pill small { color: #ffdf75; font-weight: 900; }
 .player-pill em { color: #9fea4d; font-style: normal; font-weight: 900; }
 .table-center { display: grid; align-content: center; gap: 1rem; min-width: 0; }

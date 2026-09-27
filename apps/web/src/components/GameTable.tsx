@@ -228,7 +228,12 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
           Connection lost. Reconnecting to your Smoke Circle… Actions are paused until the multiplayer server returns.
         </p>
       )}
-      <PlayerRail players={publicState.players} currentPlayerId={publicState.currentPlayerId} />
+      <PlayerRail
+        players={publicState.players}
+        currentPlayerId={publicState.currentPlayerId}
+        localPlayerId={playerId}
+        roundComplete={Boolean(winner)}
+      />
       <section className="table-center">
         {winner && (
           <section className="winner-panel">
