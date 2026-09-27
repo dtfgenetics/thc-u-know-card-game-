@@ -445,8 +445,36 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 }
 
 @media (min-width: 900px) {
-  .game-table { grid-template-columns: 260px 1fr; grid-template-rows: 1fr auto; }
-  .player-rail { grid-row: 1 / span 2; flex-direction: column; overflow: visible; }
+  .game-table {
+    grid-template-columns: clamp(220px, 24vw, 280px) 1fr;
+    grid-template-rows: 1fr auto;
+  }
+  .player-rail {
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100svh - 2rem);
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+    padding-right: 0.65rem;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1180px) {
+  .game-table {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  .player-rail {
+    max-height: calc(100svh - 1.5rem);
+    top: 0.75rem;
+  }
+  .player-pill {
+    padding: 0.65rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
