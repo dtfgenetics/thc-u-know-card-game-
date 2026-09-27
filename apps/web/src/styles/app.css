@@ -94,6 +94,26 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .round-score-summary small { color: #c9d8c3; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; }
 .round-score-summary strong { color: #ffdf75; font-size: clamp(1.15rem, 4vw, 1.6rem); }
 .round-result-copy { width: min(600px, 100%); margin: 0 auto 1rem; color: #d8e8d0; line-height: 1.45; }
+.round-score-breakdown {
+  width: min(620px, 100%);
+  margin: 0 auto 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.round-standing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.22);
+  text-align: left;
+}
+.round-standing > span { display: grid; gap: 0.15rem; min-width: 0; }
+.round-standing > span > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.round-standing small { color: #c9d8c3; font-size: 0.72rem; }
+.round-standing > strong { color: #ffdf75; white-space: nowrap; }
 .winner-actions { justify-content: center; }
 .turn-banner {
   width: min(780px, 100%);
