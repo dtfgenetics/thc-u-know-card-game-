@@ -65,12 +65,35 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .player-rail { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem; }
 .player-pill { min-width: 150px; padding: 0.75rem; border-radius: 18px; background: rgba(255,255,255,0.08); display: grid; gap: 0.35rem; }
 .player-pill.active { outline: 3px solid #9fea4d; }
+.player-pill.is-disconnected {
+  opacity: 0.58;
+  filter: saturate(0.45);
+  outline-color: rgba(255,255,255,0.24);
+}
+.player-pill.is-disconnected small { color: #d2c9c0; }
 .player-pill strong { font-size: 1.8rem; }
 .player-pill small { color: #ffdf75; font-weight: 900; }
 .player-pill em { color: #9fea4d; font-style: normal; font-weight: 900; }
 .table-center { display: grid; align-content: center; gap: 1rem; min-width: 0; }
 .winner-panel { width: min(720px, 100%); margin: 0 auto; padding: 1.25rem; text-align: center; border-radius: 28px; background: linear-gradient(145deg, rgba(159,234,77,0.25), rgba(0,0,0,0.34)); border: 1px solid rgba(159,234,77,0.4); }
 .winner-panel h2 { margin: 0.25rem 0 1rem; font-size: clamp(2rem, 6vw, 4rem); }
+.round-score-summary {
+  width: min(560px, 100%);
+  margin: 0 auto 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.round-score-summary > span {
+  padding: 0.75rem 0.55rem;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.24);
+  display: grid;
+  gap: 0.2rem;
+}
+.round-score-summary small { color: #c9d8c3; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; }
+.round-score-summary strong { color: #ffdf75; font-size: clamp(1.15rem, 4vw, 1.6rem); }
+.round-result-copy { width: min(600px, 100%); margin: 0 auto 1rem; color: #d8e8d0; line-height: 1.45; }
 .winner-actions { justify-content: center; }
 .turn-banner {
   width: min(780px, 100%);
@@ -260,6 +283,8 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   .table-center { align-content: start; gap: 0.7rem; }
   .player-pill { min-width: 120px; padding: 0.6rem; }
   .player-pill strong { font-size: 1.45rem; }
+  .round-score-summary { grid-template-columns: 1fr; gap: 0.45rem; }
+  .round-score-summary > span { grid-template-columns: 1fr auto; align-items: center; }
   .status-row { display: none; }
   .table-secondary > summary { min-height: 44px; padding: 0.65rem 0.8rem; }
   .table-secondary > summary small { display: none; }
