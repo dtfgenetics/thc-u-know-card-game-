@@ -399,7 +399,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
           <div className="action-picker" role="dialog" aria-modal="true" aria-labelledby="wild-picker-title">
             <div className="action-picker-card">
               <strong id="wild-picker-title">Choose strain color for {pendingWild.label}</strong>
-              <p>{manifestEntry(pendingWild.kind).effect}</p>
+              <p>{pendingWild.kind === 'number' ? 'Choose the next active strain color.' : manifestEntry(pendingWild.kind).effect}</p>
               <p>Your card will play immediately after you choose.</p>
               <div className="action-picker-options">
                 {wildColors.map(color => (
@@ -416,7 +416,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
           <div className="action-picker" role="dialog" aria-modal="true" aria-labelledby="target-picker-title">
             <div className="action-picker-card">
               <strong id="target-picker-title">Choose target for {pendingTarget.label}</strong>
-              <p>{manifestEntry(pendingTarget.kind).effect}</p>
+              <p>{pendingTarget.kind === 'number' ? 'Choose another player.' : manifestEntry(pendingTarget.kind).effect}</p>
               <p>Select the player this action should affect.</p>
               <div className="action-picker-options">
                 {targetOptions.map(target => (
