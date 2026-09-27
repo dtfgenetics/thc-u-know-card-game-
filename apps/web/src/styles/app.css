@@ -62,6 +62,17 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   background-size: cover;
   background-position: center;
 }
+.reconnect-banner {
+  width: min(780px, calc(100% - 1rem));
+  margin: 0 auto;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 189, 89, 0.55);
+  border-radius: 16px;
+  background: rgba(73, 43, 4, 0.92);
+  color: #ffe5a8;
+  font-weight: 850;
+  text-align: center;
+}
 .player-rail { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0.5rem; }
 .player-pill { min-width: 150px; padding: 0.75rem; border-radius: 18px; background: rgba(255,255,255,0.08); display: grid; gap: 0.35rem; }
 .player-pill.active { outline: 3px solid #9fea4d; }
