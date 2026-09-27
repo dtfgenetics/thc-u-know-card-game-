@@ -54,7 +54,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
       void controller.release();
       controller.detach();
     };
-  }, [soundEnabled]);
+  }, []);
 
   useEffect(() => {
     function onActionError(payload: { message?: string }) {
@@ -67,7 +67,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
     return () => {
       socket.off(Events.ERROR, onActionError);
     };
-  }, []);
+  }, [soundEnabled]);
 
   useEffect(() => {
     const latestAction = publicState.actionLog.at(-1);
