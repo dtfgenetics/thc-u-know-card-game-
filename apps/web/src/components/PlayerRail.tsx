@@ -31,7 +31,7 @@ export function PlayerRail({ players, currentPlayerId, localPlayerId, roundCompl
               {!player.connected && <span>Offline</span>}
             </div>
             <span className="player-name">{player.name}</span>
-            <small>{player.score} pts</small>
+            <small>{player.connected ? `${player.score} pts` : `Disconnected · ${player.score} pts`}</small>
             <strong>{player.cardCount} card{player.cardCount === 1 ? '' : 's'}</strong>
             {player.calledThcUKnow && <em>THC U Know!</em>}
           </div>
