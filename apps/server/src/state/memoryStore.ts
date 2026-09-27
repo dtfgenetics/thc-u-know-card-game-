@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { advancePastDisconnectedCurrentPlayer, defaultSettings } from '@thc-u-know/shared';
+import { advancePastDisconnectedCurrentPlayer, defaultSettings, ensureConnectedHost } from '@thc-u-know/shared';
 import type { GameSettings, GameState, Player } from '@thc-u-know/shared';
 import { createSessionCode, normalizeSessionCode } from './sessionCode.js';
 import type { Session } from './types.js';
@@ -137,10 +137,14 @@ export function kickPlayer(code: string, hostId: string, targetPlayerId: string)
 export function markDisconnected(playerId: string): Session | undefined {
   for (const session of sessions.values()) {
     if (!session.players.some(player => player.id === playerId)) continue;
-    const players = session.players.map(player =>
+    const disconnectedPlayers = session.players.map(player =>
       player.id === playerId ? { ...player, connected: false } : player
     );
-    const synced = syncGamePlayers(session, players);
+    const succession = ensureConnectedHost(disconnectedPlayers, session.hostId);
+    const synced = syncGamePlayers(
+      { ...session, hostId: succession.hostId },
+      succession.players
+    );
     const recovered = synced.game
       ? { ...synced, game: advancePastDisconnectedCurrentPlayer(synced.game) }
       : synced;
