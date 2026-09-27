@@ -364,6 +364,17 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
   background: linear-gradient(180deg, rgba(0,0,0,0.08), rgba(0,0,0,0.42));
 }
 .card-label, .card-footer { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; text-shadow: 0 2px 5px rgba(0,0,0,0.55); }
+.card-effect {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 0.64rem;
+  line-height: 1.18;
+  font-weight: 800;
+  color: #f2f7ea;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+}
 .card-value { font-size: 1.7rem; line-height: 1; text-shadow: 0 3px 8px rgba(0,0,0,0.7); }
 .card-back-title { align-self: center; justify-self: center; font-size: 1.4rem; font-weight: 1000; text-transform: uppercase; text-shadow: 0 4px 14px rgba(0,0,0,0.8); }
 .hand-scroll .card.is-playable:not(:disabled) {
@@ -425,4 +436,10 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 @media (min-width: 900px) {
   .game-table { grid-template-columns: 260px 1fr; grid-template-rows: 1fr auto; }
   .player-rail { grid-row: 1 / span 2; flex-direction: column; overflow: visible; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .latest-action-banner { animation: none; }
+  .card { transition: none; }
+  .hand-scroll { scroll-behavior: auto; }
 }

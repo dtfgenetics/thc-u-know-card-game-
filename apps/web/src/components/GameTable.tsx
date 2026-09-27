@@ -53,11 +53,12 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
       void controller.release();
       controller.detach();
     };
-  }, []);
+  }, [soundEnabled]);
 
   useEffect(() => {
     function onActionError() {
       setActionPending(false);
+      playGameSound('error', soundEnabled);
     }
 
     socket.on(Events.ERROR, onActionError);

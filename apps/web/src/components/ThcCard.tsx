@@ -1,4 +1,5 @@
 import type { Card } from '@thc-u-know/shared';
+import { manifestEntry } from '@thc-u-know/shared';
 import { cardBackArt, visualAssetForCard } from '../assets/cardVisualAssets';
 
 type Props = {
@@ -30,7 +31,8 @@ export function ThcCard({
   }
 
   const playabilityClass = playable === undefined ? '' : playable ? ' is-playable' : ' is-blocked';
-  const accessibleLabel = disabledReason ? `${card.label}. ${disabledReason}` : card.label;
+  const effectText = card.kind === 'number' ? undefined : manifestEntry(card.kind).effect;
+  const accessibleLabel = [card.label, effectText, disabledReason].filter(Boolean).join('. ');
 
   return (
     <button
@@ -50,6 +52,7 @@ export function ThcCard({
       <img className="card-art" src={visualAssetForCard(card)} alt="" aria-hidden="true" />
       <span className="card-label">{card.label}</span>
       <strong className="card-value">{card.kind === 'number' ? card.value : card.label}</strong>
+      {effectText && zone === 'hand' && <span className="card-effect">{effectText}</span>}
       <span className="card-footer">{card.points} pts</span>
     </button>
   );
