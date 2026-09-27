@@ -18,6 +18,10 @@ function emitSocketError(socket: Socket, message = 'Server error while handling 
   socket.emit(Events.ERROR, { message });
 }
 
+function boundPlayerId(socket: Socket): string {
+  return String(socket.data.playerId ?? '');
+}
+
 function safeOn(
   socket: Socket,
   event: string,
@@ -97,7 +101,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
 
     safeOn(socket, Events.SESSION_KICK_PLAYER, async payload => {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
-      const hostId = payloadString(payload, 'hostId', socket.data.playerId);
+      const hostId = boundPlayerId(socket);
+      if (!hostId) return emitSocketError(socket, 'Join a Smoke Circle before managing players');
       const targetPlayerId = payloadString(payload, 'targetPlayerId');
       const result = await store.kickPlayer(code, hostId, targetPlayerId);
       if (result.error || !result.session) {
@@ -111,7 +116,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
 
     safeOn(socket, Events.GAME_START, async payload => {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
-      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
+      const playerId = boundPlayerId(socket);
+      if (!playerId) return emitSocketError(socket, 'Join a Smoke Circle before using game actions');
       const session = await store.getSession(code);
       if (!session) return emitSocketError(socket, 'Smoke Circle not found');
       const start = canStartRound(session.players, session.hostId, playerId);
@@ -127,7 +133,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
 
     safeOn(socket, Events.GAME_REMATCH, async payload => {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
-      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
+      const playerId = boundPlayerId(socket);
+      if (!playerId) return emitSocketError(socket, 'Join a Smoke Circle before using game actions');
       const session = await store.getSession(code);
       if (!session?.game) return emitSocketError(socket, 'Game not found');
       if (!session.game.winnerId && !session.game.drawRound) return emitSocketError(socket, 'Round is not over yet');
@@ -145,7 +152,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
 
     safeOn(socket, Events.GAME_PLAY_CARD, async payload => {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
-      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
+      const playerId = boundPlayerId(socket);
+      if (!playerId) return emitSocketError(socket, 'Join a Smoke Circle before using game actions');
       const session = await store.getSession(code);
       if (!session?.game) return emitSocketError(socket, 'Game not found');
 
@@ -172,7 +180,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
 
     safeOn(socket, Events.GAME_DRAW_CARD, async payload => {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
-      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
+      const playerId = boundPlayerId(socket);
+      if (!playerId) return emitSocketError(socket, 'Join a Smoke Circle before using game actions');
       const session = await store.getSession(code);
       if (!session?.game) return emitSocketError(socket, 'Game not found');
 
@@ -186,7 +195,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
 
     safeOn(socket, Events.GAME_CALL_THC_U_KNOW, async payload => {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
-      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
+      const playerId = boundPlayerId(socket);
+      if (!playerId) return emitSocketError(socket, 'Join a Smoke Circle before using game actions');
       const session = await store.getSession(code);
       if (!session?.game) return emitSocketError(socket, 'Game not found');
       const call = canCallThcUKnow(session.game, playerId);
@@ -205,7 +215,8 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
 
     safeOn(socket, Events.CHAT_SEND, async payload => {
       const code = payloadString(payload, 'code', socket.data.sessionCode).trim().toUpperCase();
-      const playerId = payloadString(payload, 'playerId', socket.data.playerId);
+      const playerId = boundPlayerId(socket);
+      if (!playerId) return emitSocketError(socket, 'Join a Smoke Circle before using game actions');
       const session = await store.getSession(code);
       const player = session?.players.find(item => item.id === playerId);
       if (!session || !player) return;
