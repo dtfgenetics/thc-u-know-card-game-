@@ -33,6 +33,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const isMyTurn = publicState.currentPlayerId === playerId && !publicState.winnerId;
   const [pendingWild, setPendingWild] = useState<Card | null>(null);
   const [pendingTarget, setPendingTarget] = useState<Card | null>(null);
+  const [actionPending, setActionPending] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(() => window.localStorage.getItem('thc-u-know-sound') !== 'off');
   const previousActionId = useRef<string | undefined>(undefined);
   const handScrollRef = useRef<HTMLDivElement | null>(null);
@@ -50,6 +51,8 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }, [publicState.actionLog, publicState.winnerId, soundEnabled]);
 
   function emitPlay(card: Card, options?: { chosenColor?: CardColor; targetPlayerId?: string }) {
+    if (actionPending) return;
+    setActionPending(true);
     socket.emit(Events.GAME_PLAY_CARD, {
       code: publicState.sessionCode,
       playerId,
@@ -60,6 +63,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   function play(card: Card) {
+    if (actionPending) return;
     if (cardNeedsChosenColor(card)) {
       setPendingWild(card);
       return;
@@ -84,15 +88,21 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   function draw() {
+    if (actionPending) return;
+    setActionPending(true);
     playGameSound('draw', soundEnabled);
     socket.emit(Events.GAME_DRAW_CARD, { code: publicState.sessionCode, playerId });
   }
 
   function callThcUKnow() {
+    if (actionPending) return;
+    setActionPending(true);
     socket.emit(Events.GAME_CALL_THC_U_KNOW, { code: publicState.sessionCode, playerId });
   }
 
   function rematch() {
+    if (actionPending) return;
+    setActionPending(true);
     playGameSound('turn', soundEnabled);
     socket.emit(Events.GAME_REMATCH, { code: publicState.sessionCode, playerId });
   }
@@ -113,12 +123,18 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const targetOptions = publicState.players.filter(player => player.id !== playerId);
   const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
   const currentPlayer = publicState.players.find(player => player.id === publicState.currentPlayerId);
+  const localPlayer = publicState.players.find(player => player.id === playerId);
   const handPlayability = privateState.hand.map(card => ({
     card,
     result: canPlayCardFromPublicState(publicState, playerId, card)
   }));
   const playableCount = handPlayability.filter(entry => entry.result.ok).length;
   const drawRecommended = isMyTurn && playableCount === 0;
+  const canCallThcUKnow = !winner && privateState.hand.length === 1 && !localPlayer?.calledThcUKnow;
+
+  useEffect(() => {
+    setActionPending(false);
+  }, [publicState.updatedAt, privateState.hand.length]);
 
   useEffect(() => {
     const justBecameMyTurn = isMyTurn && !wasMyTurnRef.current;
@@ -170,6 +186,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
       data-round-number={publicState.roundNumber}
       data-winner-id={publicState.winnerId}
       data-updated-at={publicState.updatedAt}
+      aria-busy={actionPending}
     >
       <PlayerRail players={publicState.players} currentPlayerId={publicState.currentPlayerId} />
       <section className="table-center">
@@ -178,7 +195,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
             <p className="eyebrow">Round Over</p>
             <h2>{winner.name} wins!</h2>
             <div className="button-row winner-actions">
-              <button type="button" onClick={rematch}>Start Rematch</button>
+              <button type="button" disabled={actionPending} onClick={rematch}>Start Rematch</button>
               <button className="ghost-button" type="button" onClick={leaveGame}>Back to Home</button>
             </div>
           </section>
@@ -211,7 +228,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
           <button
             className={`pile stash-pile ${drawRecommended ? 'draw-recommended' : ''}`}
             type="button"
-            disabled={!isMyTurn}
+            disabled={!isMyTurn || actionPending}
             onClick={draw}
           >
             <span>{drawRecommended ? 'Draw here' : 'Stash'}</span>
@@ -238,6 +255,11 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
         </details>
       </section>
       <section className="hand-zone">
+        {actionPending && (
+          <p className="game-action-status" role="status" aria-live="polite">
+            Updating the table…
+          </p>
+        )}
         <div className="hand-header">
           <div>
             <h2>Your Hand</h2>
@@ -251,30 +273,38 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
                   : 'Cards are dimmed until your turn.'}
             </p>
           </div>
-          <button type="button" disabled={Boolean(publicState.winnerId)} onClick={callThcUKnow}>THC U Know!</button>
+          <button type="button" disabled={!canCallThcUKnow || actionPending} onClick={callThcUKnow}>
+            {localPlayer?.calledThcUKnow ? 'THC U Know called' : 'THC U Know!'}
+          </button>
         </div>
         {pendingWild && (
-          <div className="wild-picker">
-            <strong>Choose strain color for {pendingWild.label}</strong>
-            <div>
-              {wildColors.map(color => (
-                <button key={color} className={`color-choice card-${color}`} type="button" onClick={() => chooseWildColor(color)}>
-                  {color}
-                </button>
-              ))}
+          <div className="action-picker" role="dialog" aria-modal="true" aria-labelledby="wild-picker-title">
+            <div className="action-picker-card">
+              <strong id="wild-picker-title">Choose strain color for {pendingWild.label}</strong>
+              <p>Your card will play immediately after you choose.</p>
+              <div className="action-picker-options">
+                {wildColors.map(color => (
+                  <button key={color} className={`color-choice card-${color}`} type="button" onClick={() => chooseWildColor(color)}>
+                    {color}
+                  </button>
+                ))}
+              </div>
               <button className="ghost-button" type="button" onClick={() => setPendingWild(null)}>Cancel</button>
             </div>
           </div>
         )}
         {pendingTarget && (
-          <div className="wild-picker">
-            <strong>Choose target for {pendingTarget.label}</strong>
-            <div>
-              {targetOptions.map(target => (
-                <button key={target.id} className="ghost-button" type="button" onClick={() => chooseTarget(target.id)}>
-                  {target.name}
-                </button>
-              ))}
+          <div className="action-picker" role="dialog" aria-modal="true" aria-labelledby="target-picker-title">
+            <div className="action-picker-card">
+              <strong id="target-picker-title">Choose target for {pendingTarget.label}</strong>
+              <p>Select the player this action should affect.</p>
+              <div className="action-picker-options">
+                {targetOptions.map(target => (
+                  <button key={target.id} className="ghost-button" type="button" onClick={() => chooseTarget(target.id)}>
+                    {target.name}
+                  </button>
+                ))}
+              </div>
               <button className="ghost-button" type="button" onClick={() => setPendingTarget(null)}>Cancel</button>
             </div>
           </div>
@@ -286,7 +316,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
               card={card}
               zone="hand"
               playable={result.ok}
-              disabled={!result.ok}
+              disabled={!result.ok || actionPending}
               disabledReason={result.ok ? undefined : result.reason}
               onClick={play}
             />
