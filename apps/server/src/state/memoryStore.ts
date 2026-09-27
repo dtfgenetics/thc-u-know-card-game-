@@ -82,7 +82,7 @@ export function joinSession(
   if (!normalizedName) return { error: 'Player name is required' };
 
   const existingById = playerId ? session.players.find(player => player.id === playerId) : undefined;
-  if (existingById) {
+  if (existingById && playerId) {
     if (resumeToken !== session.resumeTokens?.[playerId]) {
       return { error: 'Unable to resume this player session' };
     }
