@@ -49,6 +49,7 @@ export function createSession(playerName: string, settings?: Partial<GameSetting
     code,
     hostId: host.id,
     players: [host],
+    resumeTokens: { [host.id]: randomUUID() },
     settings: { ...defaultSettings, ...settings, mode, startingHandSize },
     createdAt: now,
     updatedAt: now
@@ -68,7 +69,12 @@ export function saveSession(session: Session): Session {
   return updated;
 }
 
-export function joinSession(code: string, playerName: string, playerId?: string): { session?: Session; player?: Player; error?: string } {
+export function joinSession(
+  code: string,
+  playerName: string,
+  playerId?: string,
+  resumeToken?: string
+): { session?: Session; player?: Player; resumeToken?: string; error?: string } {
   const session = getSession(code);
   if (!session) return { error: 'Smoke Circle not found' };
 
@@ -77,11 +83,18 @@ export function joinSession(code: string, playerName: string, playerId?: string)
 
   const existingById = playerId ? session.players.find(player => player.id === playerId) : undefined;
   if (existingById) {
+    if (resumeToken !== session.resumeTokens?.[playerId]) {
+      return { error: 'Unable to resume this player session' };
+    }
     const players = session.players.map(player =>
       player.id === playerId ? { ...player, connected: true, name: normalizedName || player.name } : player
     );
     const updated = saveSession(syncGamePlayers(session, players));
-    return { session: updated, player: players.find(player => player.id === playerId) };
+    return {
+      session: updated,
+      player: players.find(player => player.id === playerId),
+      resumeToken
+    };
   }
 
   if (session.game?.started) return { error: 'This game has already started' };
@@ -92,18 +105,34 @@ export function joinSession(code: string, playerName: string, playerId?: string)
   }
 
   const player = createPlayer(normalizedName, false, playerId);
-  const updated = saveSession({ ...session, players: [...session.players, player] });
-  return { session: updated, player };
+  const nextResumeToken = randomUUID();
+  const updated = saveSession({
+    ...session,
+    players: [...session.players, player],
+    resumeTokens: { ...(session.resumeTokens ?? {}), [player.id]: nextResumeToken }
+  });
+  return { session: updated, player, resumeToken: nextResumeToken };
 }
 
-export function rejoinSession(code: string, playerId: string): { session?: Session; player?: Player; error?: string } {
+export function rejoinSession(
+  code: string,
+  playerId: string,
+  resumeToken: string
+): { session?: Session; player?: Player; resumeToken?: string; error?: string } {
   const session = getSession(code);
   if (!session) return { error: 'Smoke Circle not found' };
   const player = session.players.find(item => item.id === playerId);
   if (!player) return { error: 'Player is not part of this Smoke Circle' };
+  if (resumeToken !== session.resumeTokens?.[playerId]) {
+    return { error: 'Unable to resume this player session' };
+  }
   const players = session.players.map(item => (item.id === playerId ? { ...item, connected: true } : item));
   const updated = saveSession(syncGamePlayers(session, players));
-  return { session: updated, player: players.find(item => item.id === playerId) };
+  return {
+    session: updated,
+    player: players.find(item => item.id === playerId),
+    resumeToken
+  };
 }
 
 export function setGame(code: string, game: GameState): Session | undefined {
@@ -121,6 +150,8 @@ export function kickPlayer(code: string, hostId: string, targetPlayerId: string)
   if (!session.players.some(player => player.id === targetPlayerId)) return { error: 'Player not found' };
 
   const players = session.players.filter(player => player.id !== targetPlayerId);
+  const resumeTokens = { ...(session.resumeTokens ?? {}) };
+  delete resumeTokens[targetPlayerId];
   let game = session.game;
   if (game) {
     game = {
@@ -132,7 +163,7 @@ export function kickPlayer(code: string, hostId: string, targetPlayerId: string)
     };
   }
 
-  return { session: saveSession(transferHostIfNeeded({ ...session, players, game })) };
+  return { session: saveSession(transferHostIfNeeded({ ...session, players, resumeTokens, game })) };
 }
 
 export function markDisconnected(playerId: string): Session | undefined {
