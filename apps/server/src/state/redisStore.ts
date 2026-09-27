@@ -66,6 +66,7 @@ export class RedisSessionStore implements SessionStore {
       code,
       hostId: host.id,
       players: [host],
+      resumeTokens: { [host.id]: randomUUID() },
       settings: { ...defaultSettings, ...settings, mode, startingHandSize },
       createdAt: now,
       updatedAt: now
@@ -89,7 +90,7 @@ export class RedisSessionStore implements SessionStore {
     return updated;
   }
 
-  async joinSession(code: string, playerName: string, playerId?: string): Promise<JoinResult> {
+  async joinSession(code: string, playerName: string, playerId?: string, resumeToken?: string): Promise<JoinResult> {
     const session = await this.getSession(code);
     if (!session) return { error: 'Smoke Circle not found' };
 
@@ -97,12 +98,19 @@ export class RedisSessionStore implements SessionStore {
     if (!normalizedName) return { error: 'Player name is required' };
 
     const existingById = playerId ? session.players.find(player => player.id === playerId) : undefined;
-    if (existingById) {
+    if (existingById && playerId) {
+      if (resumeToken !== session.resumeTokens?.[playerId]) {
+        return { error: 'Unable to resume this player session' };
+      }
       const players = session.players.map(player =>
         player.id === playerId ? { ...player, connected: true, name: normalizedName || player.name } : player
       );
       const updated = await this.saveSession(syncGamePlayers(session, players));
-      return { session: updated, player: players.find(player => player.id === playerId) };
+      return {
+        session: updated,
+        player: players.find(player => player.id === playerId),
+        resumeToken
+      };
     }
 
     if (session.game?.started) return { error: 'This game has already started' };
@@ -112,18 +120,30 @@ export class RedisSessionStore implements SessionStore {
     }
 
     const player = createPlayer(normalizedName, false, playerId);
-    const updated = await this.saveSession({ ...session, players: [...session.players, player] });
-    return { session: updated, player };
+    const nextResumeToken = randomUUID();
+    const updated = await this.saveSession({
+      ...session,
+      players: [...session.players, player],
+      resumeTokens: { ...(session.resumeTokens ?? {}), [player.id]: nextResumeToken }
+    });
+    return { session: updated, player, resumeToken: nextResumeToken };
   }
 
-  async rejoinSession(code: string, playerId: string): Promise<JoinResult> {
+  async rejoinSession(code: string, playerId: string, resumeToken: string): Promise<JoinResult> {
     const session = await this.getSession(code);
     if (!session) return { error: 'Smoke Circle not found' };
     const player = session.players.find(item => item.id === playerId);
     if (!player) return { error: 'Player is not part of this Smoke Circle' };
+    if (resumeToken !== session.resumeTokens?.[playerId]) {
+      return { error: 'Unable to resume this player session' };
+    }
     const players = session.players.map(item => (item.id === playerId ? { ...item, connected: true } : item));
     const updated = await this.saveSession(syncGamePlayers(session, players));
-    return { session: updated, player: players.find(item => item.id === playerId) };
+    return {
+      session: updated,
+      player: players.find(item => item.id === playerId),
+      resumeToken
+    };
   }
 
   async setGame(code: string, game: GameState): Promise<Session | undefined> {
@@ -141,6 +161,8 @@ export class RedisSessionStore implements SessionStore {
     if (!session.players.some(player => player.id === targetPlayerId)) return { error: 'Player not found' };
 
     const players = session.players.filter(player => player.id !== targetPlayerId);
+    const resumeTokens = { ...(session.resumeTokens ?? {}) };
+    delete resumeTokens[targetPlayerId];
     let game = session.game;
     if (game) {
       game = {
@@ -152,7 +174,7 @@ export class RedisSessionStore implements SessionStore {
       };
     }
 
-    return { session: await this.saveSession(transferHostIfNeeded({ ...session, players, game })) };
+    return { session: await this.saveSession(transferHostIfNeeded({ ...session, players, resumeTokens, game })) };
   }
 
   async markDisconnected(playerId: string): Promise<Session | undefined> {

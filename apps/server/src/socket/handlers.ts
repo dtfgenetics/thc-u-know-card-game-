@@ -65,7 +65,11 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const player = session.players[0];
       if (!player) return;
       joinSocketRooms(socket, session.code, player.id);
-      socket.emit(Events.SESSION_CREATED, { session: publicSession(session), player });
+      socket.emit(Events.SESSION_CREATED, {
+        session: publicSession(session),
+        player,
+        resumeToken: session.resumeTokens[player.id]
+      });
       broadcastSession(io, session);
     });
 
@@ -73,14 +77,19 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
       const code = payloadString(payload, 'code').trim().toUpperCase();
       const name = payloadString(payload, 'playerName').trim();
       const playerId = payloadString(payload, 'playerId') || undefined;
-      const result = await store.joinSession(code, name, playerId);
+      const resumeToken = payloadString(payload, 'resumeToken') || undefined;
+      const result = await store.joinSession(code, name, playerId, resumeToken);
       if (result.error || !result.session || !result.player) {
         socket.emit(Events.ERROR, { message: result.error ?? 'Unable to join Smoke Circle' });
         return;
       }
 
       joinSocketRooms(socket, result.session.code, result.player.id);
-      socket.emit(Events.SESSION_JOINED, { session: publicSession(result.session), player: result.player });
+      socket.emit(Events.SESSION_JOINED, {
+        session: publicSession(result.session),
+        player: result.player,
+        resumeToken: result.resumeToken
+      });
       broadcastSession(io, result.session);
       if (result.session.game) broadcastGame(io, result.session);
     });
@@ -88,14 +97,19 @@ export function registerSocketHandlers(io: Server, store: SessionStore): void {
     safeOn(socket, Events.SESSION_REJOIN, async payload => {
       const code = payloadString(payload, 'code').trim().toUpperCase();
       const playerId = payloadString(payload, 'playerId');
-      const result = await store.rejoinSession(code, playerId);
+      const resumeToken = payloadString(payload, 'resumeToken');
+      const result = await store.rejoinSession(code, playerId, resumeToken);
       if (result.error || !result.session || !result.player) {
         socket.emit(Events.ERROR, { message: result.error ?? 'Unable to reconnect' });
         return;
       }
 
       joinSocketRooms(socket, result.session.code, result.player.id);
-      socket.emit(Events.SESSION_JOINED, { session: publicSession(result.session), player: result.player });
+      socket.emit(Events.SESSION_JOINED, {
+        session: publicSession(result.session),
+        player: result.player,
+        resumeToken: result.resumeToken
+      });
       await emitFullState(io, store, result.session.code);
     });
 
