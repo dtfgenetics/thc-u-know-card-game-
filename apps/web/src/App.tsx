@@ -61,10 +61,17 @@ export function App() {
   const [socketConnected, setSocketConnected] = useState(socket.connected);
   const [connectionFailed, setConnectionFailed] = useState(false);
 
+  function requestSavedRejoin() {
+    const saved = readSavedSession();
+    if (!saved?.code || !saved.playerId || joinCode) return;
+    socket.emit(Events.SESSION_REJOIN, { code: saved.code, playerId: saved.playerId });
+  }
+
   useEffect(() => {
     function onConnect() {
       setSocketConnected(true);
       setConnectionFailed(false);
+      requestSavedRejoin();
     }
 
     function onDisconnect() {
@@ -94,6 +101,8 @@ export function App() {
     socket.on('disconnect', onDisconnect);
     socket.on('connect_error', onConnectError);
 
+    if (socket.connected) requestSavedRejoin();
+
     return () => {
       socket.off(Events.SESSION_CREATED, onJoined);
       socket.off(Events.SESSION_JOINED, onJoined);
@@ -107,13 +116,6 @@ export function App() {
       socket.off('connect_error', onConnectError);
     };
   }, []);
-
-  useEffect(() => {
-    const saved = readSavedSession();
-    if (saved?.code && saved.playerId && !joinCode) {
-      socket.emit(Events.SESSION_REJOIN, { code: saved.code, playerId: saved.playerId });
-    }
-  }, [joinCode]);
 
   function hostGame() {
     const playerName = name.trim();
@@ -172,7 +174,14 @@ export function App() {
   }
 
   if (player && session && publicState && privateState) {
-    return <GameTable playerId={player.id} publicState={publicState} privateState={privateState} />;
+    return (
+      <GameTable
+        playerId={player.id}
+        publicState={publicState}
+        privateState={privateState}
+        socketConnected={socketConnected}
+      />
+    );
   }
 
   const isHost = Boolean(player && session?.hostId === player.id);
