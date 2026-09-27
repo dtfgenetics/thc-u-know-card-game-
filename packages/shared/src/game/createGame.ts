@@ -1,4 +1,4 @@
-import type { Card, GameMode, GameSettings, GameState, Player, PlayerHand, ScoreLedger } from '../types.js';
+import type { Card, GameMode, GameSettings, GameState, Player, PlayerHand, RoundHistoryEntry, ScoreLedger } from '../types.js';
 import { classicColors } from './cardNames.js';
 import { createDeck } from './createDeck.js';
 import { normalizeScores } from './scoring.js';
@@ -28,6 +28,7 @@ export function createGameState(input: {
   players: Player[];
   settings?: Partial<GameSettings>;
   scores?: ScoreLedger;
+  roundHistory?: RoundHistoryEntry[];
   roundNumber?: number;
   random?: () => number;
 }): GameState {
@@ -70,6 +71,7 @@ export function createGameState(input: {
     ],
     scores: normalizeScores(input.players, input.scores),
     roundNumber: input.roundNumber ?? 1,
+    roundHistory: input.roundHistory ?? [],
     started: true,
     createdAt: now,
     updatedAt: now
