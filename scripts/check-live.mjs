@@ -8,16 +8,22 @@ const REQUEST_TIMEOUT_MS = 12_000;
 const REQUIRED_HEADER_TOKENS = [
   'data-dtf-shell="header-v6"',
   'data-dtf-sitewide-header="canonical-eight-v1"',
-  'dtf-sitewide-header-v6-script',
-  '>Home</a>',
-  '>Seeds</a>',
-  '>Learn</a>',
-  '>Courses</a>',
-  '>Diagnostic</a>',
-  '<a href="/games/"',
-  '>Community</a>',
-  '>Shop</a>'
+  'dtf-sitewide-header-v6-script'
 ];
+const REQUIRED_NAV_ROUTES = [
+  '/',
+  '/seeds/',
+  '/learn/',
+  '/courses/',
+  '/tools/',
+  '/games/',
+  '/community/',
+  '/shop/'
+];
+
+function hasNavRoute(body, route) {
+  return body.includes('href="' + route + '"') || body.includes("href='" + route + "'");
+}
 
 function normalizeOrigin(value, fallback = DEFAULT_WEB_ORIGIN) {
   const url = new URL(value || fallback);
@@ -72,7 +78,10 @@ async function checkGame(origin) {
   for (const token of REQUIRED_HEADER_TOKENS) {
     if (!result.body.includes(token)) fail(`game route: approved DTFSeeds V6 header token is missing: ${token}`);
   }
-  console.log(`PASS game route + approved V6 header ${new URL(GAME_PATH, origin)}`);
+  for (const route of REQUIRED_NAV_ROUTES) {
+    if (!hasNavRoute(result.body, route)) fail(`game route: canonical navigation route is missing: ${route}`);
+  }
+  console.log(`PASS game route + approved V6 header/navigation ${new URL(GAME_PATH, origin)}`);
 }
 
 async function checkHealth(origin, pathname, label) {
