@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { advancePastDisconnectedCurrentPlayer, defaultSettings } from '@thc-u-know/shared';
+import { advancePastDisconnectedCurrentPlayer, defaultSettings, ensureConnectedHost } from '@thc-u-know/shared';
 import type { GameSettings, GameState, Player } from '@thc-u-know/shared';
 import { Redis } from 'ioredis';
 import { env } from '../config/env.js';
@@ -159,10 +159,14 @@ export class RedisSessionStore implements SessionStore {
     for (const code of codes) {
       const session = await this.getSession(code);
       if (!session || !session.players.some(player => player.id === playerId)) continue;
-      const players = session.players.map(player =>
+      const disconnectedPlayers = session.players.map(player =>
         player.id === playerId ? { ...player, connected: false } : player
       );
-      const synced = syncGamePlayers(session, players);
+      const succession = ensureConnectedHost(disconnectedPlayers, session.hostId);
+      const synced = syncGamePlayers(
+        { ...session, hostId: succession.hostId },
+        succession.players
+      );
       const recovered = synced.game
         ? { ...synced, game: advancePastDisconnectedCurrentPlayer(synced.game) }
         : synced;
