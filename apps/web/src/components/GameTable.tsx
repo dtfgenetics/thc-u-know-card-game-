@@ -242,6 +242,20 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
                 ? `${winner.name} reached the match target. Start a new match to reset the scores.`
                 : `${winner.name} earned ${roundPoints} point${roundPoints === 1 ? '' : 's'}. Scores carry into round ${publicState.roundNumber + 1}.`}
             </p>
+            <div className="round-score-breakdown" aria-label="Round point breakdown">
+              {publicState.players.map(player => {
+                const remainingPoints = publicState.lastRoundScore?.remainingCardPoints[player.id] ?? 0;
+                return (
+                  <div className="round-standing" key={player.id}>
+                    <span>
+                      <strong>{player.name}</strong>
+                      <small>{player.id === winner.id ? 'Round winner' : `${remainingPoints} pts left in hand`}</small>
+                    </span>
+                    <strong>{player.score} total</strong>
+                  </div>
+                );
+              })}
+            </div>
             <div className="button-row winner-actions">
               {localPlayer?.host ? (
                 <button type="button" disabled={actionPending || !canStartNextRound} onClick={rematch}>
