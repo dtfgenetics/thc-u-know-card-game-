@@ -6,6 +6,7 @@ import { playGameSound } from '../audio/gameSounds';
 import { ChatBox } from './ChatBox';
 import { PlayerRail } from './PlayerRail';
 import { ThcCard } from './ThcCard';
+import { createScreenWakeLockController } from '../browserExperience';
 
 type Props = {
   playerId: string;
@@ -39,6 +40,19 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const handScrollRef = useRef<HTMLDivElement | null>(null);
   const wasMyTurnRef = useRef(false);
   const previousPlayableCountRef = useRef(0);
+  const wakeLockRef = useRef<ReturnType<typeof createScreenWakeLockController> | null>(null);
+
+
+  useEffect(() => {
+    if (!wakeLockRef.current) wakeLockRef.current = createScreenWakeLockController();
+    const controller = wakeLockRef.current;
+    controller.attach();
+    void controller.acquire();
+    return () => {
+      void controller.release();
+      controller.detach();
+    };
+  }, []);
 
   useEffect(() => {
     const latestAction = publicState.actionLog.at(-1);
