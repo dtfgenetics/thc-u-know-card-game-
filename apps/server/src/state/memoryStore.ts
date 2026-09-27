@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { defaultSettings } from '@thc-u-know/shared';
+import { advancePastDisconnectedCurrentPlayer, defaultSettings } from '@thc-u-know/shared';
 import type { GameSettings, GameState, Player } from '@thc-u-know/shared';
 import { createSessionCode, normalizeSessionCode } from './sessionCode.js';
 import type { Session } from './types.js';
@@ -140,7 +140,11 @@ export function markDisconnected(playerId: string): Session | undefined {
     const players = session.players.map(player =>
       player.id === playerId ? { ...player, connected: false } : player
     );
-    return saveSession(syncGamePlayers(session, players));
+    const synced = syncGamePlayers(session, players);
+    const recovered = synced.game
+      ? { ...synced, game: advancePastDisconnectedCurrentPlayer(synced.game) }
+      : synced;
+    return saveSession(recovered);
   }
   return undefined;
 }

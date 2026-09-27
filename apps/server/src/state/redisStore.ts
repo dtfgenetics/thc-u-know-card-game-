@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { defaultSettings } from '@thc-u-know/shared';
+import { advancePastDisconnectedCurrentPlayer, defaultSettings } from '@thc-u-know/shared';
 import type { GameSettings, GameState, Player } from '@thc-u-know/shared';
 import { Redis } from 'ioredis';
 import { env } from '../config/env.js';
@@ -162,7 +162,11 @@ export class RedisSessionStore implements SessionStore {
       const players = session.players.map(player =>
         player.id === playerId ? { ...player, connected: false } : player
       );
-      return this.saveSession(syncGamePlayers(session, players));
+      const synced = syncGamePlayers(session, players);
+      const recovered = synced.game
+        ? { ...synced, game: advancePastDisconnectedCurrentPlayer(synced.game) }
+        : synced;
+      return this.saveSession(recovered);
     }
     return undefined;
   }
