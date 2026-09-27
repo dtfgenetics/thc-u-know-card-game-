@@ -29,3 +29,26 @@ export function reverseDirection(state: GameState): GameState {
     updatedAt: Date.now()
   };
 }
+
+
+export function advancePastDisconnectedCurrentPlayer(state: GameState): GameState {
+  const currentIndex = currentPlayerIndex(state);
+  if (currentIndex < 0) return state;
+
+  const currentPlayer = state.players[currentIndex];
+  if (!currentPlayer || currentPlayer.connected) return state;
+
+  for (let step = 1; step < state.players.length; step += 1) {
+    const index = (currentIndex + step * state.direction + state.players.length * 10) % state.players.length;
+    const candidate = state.players[index];
+    if (candidate?.connected) {
+      return {
+        ...state,
+        currentPlayerId: candidate.id,
+        updatedAt: Date.now()
+      };
+    }
+  }
+
+  return state;
+}
