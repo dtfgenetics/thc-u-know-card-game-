@@ -256,6 +256,28 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
                 );
               })}
             </div>
+            {(publicState.roundHistory?.length ?? 0) > 0 && (
+              <details className="round-history">
+                <summary>Round History</summary>
+                <div className="round-history-list">
+                  {publicState.roundHistory?.slice().reverse().map(entry => {
+                    const historyWinner = publicState.players.find(player => player.id === entry.winnerId);
+                    return (
+                      <div className="round-history-row" key={entry.roundNumber}>
+                        <span>
+                          <strong>Round {entry.roundNumber}</strong>
+                          <small>{historyWinner?.name ?? 'Player'} won</small>
+                        </span>
+                        <span>
+                          <strong>+{entry.pointsAwarded}</strong>
+                          <small>{entry.scoresAfterRound[entry.winnerId] ?? 0} total</small>
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </details>
+            )}
             <div className="button-row winner-actions">
               {localPlayer?.host ? (
                 <button type="button" disabled={actionPending || !canStartNextRound} onClick={rematch}>
