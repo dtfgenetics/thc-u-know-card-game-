@@ -230,6 +230,14 @@ function applyFinalCardEffects(state: GameState, card: Card, input: PlayCardInpu
         if (player.id !== input.playerId) nextState = drawForPlayer(nextState, player.id, 1);
       }
       return nextState;
+    case 'greener-side': {
+      const targetId = input.targetPlayerId && nextState.players.some(player => player.id === input.targetPlayerId && player.connected)
+        ? input.targetPlayerId
+        : nextPlayerId(nextState);
+      return swapHands(nextState, input.playerId, targetId);
+    }
+    case 'pass-the-tray':
+      return passTheTray(nextState);
     case 'mystery-nug':
       return revealMysteryNug(nextState, input, true);
     default:
@@ -265,12 +273,31 @@ export function playCard(state: GameState, input: PlayCardInput): MoveResult {
   };
 
   if (cards.length === 0) {
-    const scoredState = applyRoundScore(applyFinalCardEffects(nextState, card, input), input.playerId);
+    const terminalState = applyFinalCardEffects(nextState, card, input);
+    const emptyHand = terminalState.hands.find(hand => hand.cards.length === 0);
+
+    if (!emptyHand) {
+      return {
+        ok: true,
+        state: logAction(
+          advanceTurn(terminalState),
+          input.playerId,
+          `${playerName(terminalState, input.playerId)} played ${card.label}. Its hand-moving effect kept the round going.`
+        )
+      };
+    }
+
+    const scoredState = applyRoundScore(terminalState, emptyHand.playerId);
     const points = scoredState.lastRoundScore?.pointsAwarded ?? 0;
-    const matchText = scoredState.matchWinnerId ? ` Match target reached at ${scoredState.scores[input.playerId]} points.` : '';
+    const winnerScore = scoredState.scores[emptyHand.playerId] ?? 0;
+    const matchText = scoredState.matchWinnerId ? ` Match target reached at ${winnerScore} points.` : '';
     return {
       ok: true,
-      state: logAction(scoredState, input.playerId, `${playerName(scoredState, input.playerId)} went out, scored ${points} points, and won the round.${matchText}`)
+      state: logAction(
+        scoredState,
+        input.playerId,
+        `${playerName(scoredState, emptyHand.playerId)} went out, scored ${points} points, and won the round.${matchText}`
+      )
     };
   }
 
