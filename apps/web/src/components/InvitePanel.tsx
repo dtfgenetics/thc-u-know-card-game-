@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { copyText, shareInvite as shareInviteWithFallback } from '../browserExperience';
 
 type Props = {
   code: string;
@@ -11,49 +12,27 @@ export function InvitePanel({ code }: Props) {
   const [status, setStatus] = useState('');
 
   async function copy(value: string, label: string) {
-    let copied = false;
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(value);
-        copied = true;
-      }
-    } catch {}
-
-    if (!copied) {
-      try {
-        const field = document.createElement('textarea');
-        field.value = value;
-        field.setAttribute('readonly', '');
-        field.style.position = 'fixed';
-        field.style.opacity = '0';
-        field.style.pointerEvents = 'none';
-        document.body.append(field);
-        field.select();
-        field.setSelectionRange(0, value.length);
-        copied = document.execCommand?.('copy') === true;
-        field.remove();
-      } catch {}
-    }
-
+    const copied = await copyText(value);
     setStatus(copied ? `${label} copied.` : 'Copy failed. Share the QR code or select the session code manually.');
   }
 
   async function shareInvite() {
-    if (!navigator.share) {
-      await copy(inviteUrl, 'Invite link');
+    const result = await shareInviteWithFallback({
+      title: 'THC U Know',
+      text: `Join my THC U Know Smoke Circle. Code: ${code}`,
+      url: inviteUrl
+    });
+
+    if (result === 'shared') {
+      setStatus('Invite shared.');
       return;
     }
-
-    try {
-      await navigator.share({
-        title: 'THC U Know',
-        text: `Join my THC U Know Smoke Circle. Code: ${code}`,
-        url: inviteUrl
-      });
-      setStatus('Invite shared.');
-    } catch (error) {
-      if (error instanceof DOMException && error.name === 'AbortError') return;
-      setStatus('Sharing was unavailable. Use Copy Invite Link instead.');
+    if (result === 'copied') {
+      setStatus('Sharing was unavailable, so the invite link was copied instead.');
+      return;
+    }
+    if (result === 'manual') {
+      setStatus('Sharing and copy are unavailable. Use the QR code or select the session code manually.');
     }
   }
 
