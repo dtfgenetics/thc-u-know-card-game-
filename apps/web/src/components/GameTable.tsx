@@ -122,6 +122,8 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   const latestLog = publicState.actionLog.slice(-5).reverse();
   const targetOptions = publicState.players.filter(player => player.id !== playerId);
   const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
+  const matchWinner = publicState.matchWinnerId ? publicState.players.find(player => player.id === publicState.matchWinnerId) : undefined;
+  const roundPoints = publicState.lastRoundScore?.pointsAwarded ?? 0;
   const currentPlayer = publicState.players.find(player => player.id === publicState.currentPlayerId);
   const localPlayer = publicState.players.find(player => player.id === playerId);
   const handPlayability = privateState.hand.map(card => ({
@@ -192,10 +194,31 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
       <section className="table-center">
         {winner && (
           <section className="winner-panel">
-            <p className="eyebrow">Round Over</p>
-            <h2>{winner.name} wins!</h2>
+            <p className="eyebrow">{matchWinner ? 'Match Complete' : `Round ${publicState.roundNumber} Complete`}</p>
+            <h2>{winner.name} {matchWinner ? 'wins the match!' : 'wins the round!'}</h2>
+            <div className="round-score-summary" aria-label="Round scoring summary">
+              <span>
+                <small>Round points</small>
+                <strong>+{roundPoints}</strong>
+              </span>
+              <span>
+                <small>{winner.name} total</small>
+                <strong>{winner.score}</strong>
+              </span>
+              <span>
+                <small>Match target</small>
+                <strong>{publicState.settings.targetScore}</strong>
+              </span>
+            </div>
+            <p className="round-result-copy">
+              {matchWinner
+                ? `${winner.name} reached the match target. Start a new match to reset the scores.`
+                : `${winner.name} earned ${roundPoints} point${roundPoints === 1 ? '' : 's'}. Scores carry into round ${publicState.roundNumber + 1}.`}
+            </p>
             <div className="button-row winner-actions">
-              <button type="button" disabled={actionPending} onClick={rematch}>Start Rematch</button>
+              <button type="button" disabled={actionPending} onClick={rematch}>
+                {matchWinner ? 'New Match' : 'Start Next Round'}
+              </button>
               <button className="ghost-button" type="button" onClick={leaveGame}>Back to Home</button>
             </div>
           </section>
