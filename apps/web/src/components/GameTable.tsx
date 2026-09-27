@@ -134,7 +134,7 @@ export function GameTable({ playerId, publicState, privateState }: Props) {
   }
 
   const latestLog = publicState.actionLog.slice(-5).reverse();
-  const targetOptions = publicState.players.filter(player => player.id !== playerId);
+  const targetOptions = publicState.players.filter(player => player.id !== playerId && player.connected);
   const winner = publicState.winnerId ? publicState.players.find(player => player.id === publicState.winnerId) : undefined;
   const matchWinner = publicState.matchWinnerId ? publicState.players.find(player => player.id === publicState.matchWinnerId) : undefined;
   const roundPoints = publicState.lastRoundScore?.pointsAwarded ?? 0;

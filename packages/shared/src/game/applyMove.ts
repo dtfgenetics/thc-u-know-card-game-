@@ -37,7 +37,9 @@ function requiresTarget(card: Card): boolean {
 function validateTarget(state: GameState, input: PlayCardInput, card: Card): string | null {
   if (!requiresTarget(card) || !input.targetPlayerId) return null;
   if (input.targetPlayerId === input.playerId) return 'Target must be another player';
-  if (!state.players.some(player => player.id === input.targetPlayerId)) return 'Target player was not found';
+  const target = state.players.find(player => player.id === input.targetPlayerId);
+  if (!target) return 'Target player was not found';
+  if (!target.connected) return 'Target player must be connected';
   return null;
 }
 
