@@ -14,3 +14,5 @@ export * from './game/applyMove.js';
 export * from './game/publicState.js';
 
 export * from './game/callThcUKnow.js';
+
+export * from './game/roundStart.js';
