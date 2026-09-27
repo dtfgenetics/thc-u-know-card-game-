@@ -51,15 +51,38 @@ describe('round scoring', () => {
     expect(result.state.winnerId).toBe('p1');
     expect(result.state.scores.p1).toBe(25);
     expect(result.state.lastRoundScore?.pointsAwarded).toBe(25);
+    expect(result.state.roundHistory).toEqual([
+      {
+        roundNumber: 1,
+        winnerId: 'p1',
+        pointsAwarded: 25,
+        remainingCardPoints: { p1: 0, p2: 25 },
+        scoresAfterRound: { p1: 25, p2: 0 }
+      }
+    ]);
   });
 
   it('preserves scores into the next round', () => {
     const state = createGameState({ sessionCode: 'SCORE3', players, random: () => 0.5 });
-    const scoredState = { ...state, scores: { p1: 25, p2: 0 }, roundNumber: 1 };
+    const scoredState = {
+      ...state,
+      scores: { p1: 25, p2: 0 },
+      roundNumber: 1,
+      roundHistory: [
+        {
+          roundNumber: 1,
+          winnerId: 'p1',
+          pointsAwarded: 25,
+          remainingCardPoints: { p1: 0, p2: 25 },
+          scoresAfterRound: { p1: 25, p2: 0 }
+        }
+      ]
+    };
     const nextRound = createNextRoundState(scoredState, () => 0.5);
 
     expect(nextRound.roundNumber).toBe(2);
     expect(nextRound.scores.p1).toBe(25);
+    expect(nextRound.roundHistory).toEqual(scoredState.roundHistory);
     expect(nextRound.winnerId).toBeUndefined();
     expect(nextRound.matchWinnerId).toBeUndefined();
   });
