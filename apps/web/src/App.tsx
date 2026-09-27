@@ -32,6 +32,7 @@ type SavedSession = {
   code: string;
   playerId: string;
   name: string;
+  resumeToken: string;
 };
 
 function readSavedSession(): SavedSession | null {
@@ -43,8 +44,11 @@ function readSavedSession(): SavedSession | null {
   }
 }
 
-function savePlayerSession(code: string, player: Player) {
-  window.localStorage.setItem(savedSessionKey, JSON.stringify({ code, playerId: player.id, name: player.name }));
+function savePlayerSession(code: string, player: Player, resumeToken: string) {
+  window.localStorage.setItem(
+    savedSessionKey,
+    JSON.stringify({ code, playerId: player.id, name: player.name, resumeToken })
+  );
 }
 
 export function App() {
@@ -63,8 +67,12 @@ export function App() {
 
   function requestSavedRejoin() {
     const saved = readSavedSession();
-    if (!saved?.code || !saved.playerId || joinCode) return;
-    socket.emit(Events.SESSION_REJOIN, { code: saved.code, playerId: saved.playerId });
+    if (!saved?.code || !saved.playerId || !saved.resumeToken || joinCode) return;
+    socket.emit(Events.SESSION_REJOIN, {
+      code: saved.code,
+      playerId: saved.playerId,
+      resumeToken: saved.resumeToken
+    });
   }
 
   useEffect(() => {
@@ -83,10 +91,10 @@ export function App() {
       setConnectionFailed(true);
     }
 
-    function onJoined(payload: { session: PublicSession; player: Player }) {
+    function onJoined(payload: { session: PublicSession; player: Player; resumeToken?: string }) {
       setPlayer(payload.player);
       setSession(payload.session);
-      savePlayerSession(payload.session.code, payload.player);
+      if (payload.resumeToken) savePlayerSession(payload.session.code, payload.player, payload.resumeToken);
       setError(null);
     }
 
@@ -141,7 +149,12 @@ export function App() {
     const saved = readSavedSession();
     setError(null);
     setCode(sessionCode);
-    socket.emit(Events.SESSION_JOIN, { code: sessionCode, playerName, playerId: saved?.code === sessionCode ? saved.playerId : undefined });
+    socket.emit(Events.SESSION_JOIN, {
+      code: sessionCode,
+      playerName,
+      playerId: saved?.code === sessionCode ? saved.playerId : undefined,
+      resumeToken: saved?.code === sessionCode ? saved.resumeToken : undefined
+    });
   }
 
   function startGame() {
