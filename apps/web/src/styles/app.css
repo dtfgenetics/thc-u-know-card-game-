@@ -103,6 +103,24 @@ label { display: grid; gap: 0.5rem; color: #d5ffc2; font-weight: 700; }
 .player-pill small { color: #ffdf75; font-weight: 900; }
 .player-pill em { color: #9fea4d; font-style: normal; font-weight: 900; }
 .table-center { display: grid; align-content: center; gap: 1rem; min-width: 0; }
+.latest-action-banner {
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(159,234,77,0.28);
+  border-radius: 16px;
+  background: rgba(12, 30, 13, 0.82);
+  color: #e8ffd8;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  animation: table-action-pop 220ms ease-out;
+}
+@keyframes table-action-pop {
+  from { opacity: 0; transform: translateY(-4px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 .winner-panel { width: min(720px, 100%); margin: 0 auto; padding: 1.25rem; text-align: center; border-radius: 28px; background: linear-gradient(145deg, rgba(159,234,77,0.25), rgba(0,0,0,0.34)); border: 1px solid rgba(159,234,77,0.4); }
 .winner-panel h2 { margin: 0.25rem 0 1rem; font-size: clamp(2rem, 6vw, 4rem); }
 .round-score-summary {
