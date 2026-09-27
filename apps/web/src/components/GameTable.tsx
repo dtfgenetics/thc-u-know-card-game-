@@ -77,7 +77,8 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
   }, [publicState.actionLog, publicState.winnerId, soundEnabled]);
 
   function emitPlay(card: Card, options?: { chosenColor?: CardColor; targetPlayerId?: string }) {
-    if (actionPending || !socketConnected) return;
+    if (actionPending) return;
+    if (!socketConnected) return;
     setActionPending(true);
     socket.emit(Events.GAME_PLAY_CARD, {
       code: publicState.sessionCode,
@@ -89,7 +90,8 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
   }
 
   function play(card: Card) {
-    if (actionPending || !socketConnected) return;
+    if (actionPending) return;
+    if (!socketConnected) return;
     if (cardNeedsChosenColor(card)) {
       setPendingWild(card);
       return;
@@ -114,20 +116,23 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
   }
 
   function draw() {
-    if (actionPending || !socketConnected) return;
+    if (actionPending) return;
+    if (!socketConnected) return;
     setActionPending(true);
     playGameSound('draw', soundEnabled);
     socket.emit(Events.GAME_DRAW_CARD, { code: publicState.sessionCode, playerId });
   }
 
   function callThcUKnow() {
-    if (actionPending || !socketConnected) return;
+    if (actionPending) return;
+    if (!socketConnected) return;
     setActionPending(true);
     socket.emit(Events.GAME_CALL_THC_U_KNOW, { code: publicState.sessionCode, playerId });
   }
 
   function rematch() {
-    if (actionPending || !socketConnected) return;
+    if (actionPending) return;
+    if (!socketConnected) return;
     setActionPending(true);
     playGameSound('turn', soundEnabled);
     socket.emit(Events.GAME_REMATCH, { code: publicState.sessionCode, playerId });
