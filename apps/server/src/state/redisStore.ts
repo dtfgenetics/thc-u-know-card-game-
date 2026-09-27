@@ -136,6 +136,7 @@ export class RedisSessionStore implements SessionStore {
     const session = await this.getSession(code);
     if (!session) return { error: 'Smoke Circle not found' };
     if (session.hostId !== hostId) return { error: 'Only the host can kick players' };
+    if (session.game?.started) return { error: 'Players cannot be kicked after the game starts' };
     if (targetPlayerId === hostId) return { error: 'Host cannot kick themselves' };
     if (!session.players.some(player => player.id === targetPlayerId)) return { error: 'Player not found' };
 
