@@ -57,6 +57,21 @@ Hostinger options:
 - If using VPS, run the server with PM2 or systemd and configure the reverse proxy to preserve WebSocket upgrades.
 - If the host can only upload static files, deploy the frontend only and keep the unavailable-server warning visible. Do not label that state as production-ready multiplayer.
 
+## Automated Node deployment lane
+
+The repository includes `.github/workflows/deploy-node-runtime.yml`. It deploys only an exact green `main` revision and refuses to report success when production hosting is unconfigured.
+
+Required production configuration:
+
+- secret `THC_U_KNOW_SSH_HOST`
+- secret `THC_U_KNOW_SSH_USER`
+- secret `THC_U_KNOW_SSH_KEY`
+- optional secret `THC_U_KNOW_SSH_PORT`
+- Actions variable `THC_U_KNOW_SERVER_ORIGIN` — the public origin whose health/socket paths reach the deployed Node process
+- optional Actions variable `THC_U_KNOW_PORT` — defaults to `5174`
+
+The remote host must provide Node, Corepack, Git, curl, and either PM2 or a usable user-level systemd service manager. The workflow re-runs repository verification and the production-runtime contract on the host before restarting the persistent process, then checks the public health and Socket.IO endpoints. A green source CI without this deployment gate is not multiplayer production.
+
 ## Post-deploy checks
 
 ### Same-origin Node routing
