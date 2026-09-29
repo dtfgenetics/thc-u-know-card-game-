@@ -81,7 +81,7 @@ Set the repository Actions variable `THC_U_KNOW_SERVER_ORIGIN` to the deployed N
 
 Then verify:
 
-1. The public game route contains the THC U Know app and `data-dtf-shell="header-v5"`.
+1. The public game route contains the THC U Know app and `data-dtf-shell="header-v6"`.
 2. `${LIVE_SERVER_URL:-$LIVE_BASE_URL}/games/thc-u-know/healthz` returns JSON `{ "ok": true, "service": "thc-u-know-server" }`.
 3. `${LIVE_SERVER_URL:-$LIVE_BASE_URL}/games/thc-u-know/socket.io/?EIO=4&transport=polling` returns an Engine.IO open packet, not HTML.
 4. Create a room with player one.
