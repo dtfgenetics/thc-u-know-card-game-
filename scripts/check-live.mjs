@@ -7,17 +7,15 @@ const SOCKET_PATH = '/games/thc-u-know/socket.io/?EIO=4&transport=polling';
 const REQUEST_TIMEOUT_MS = 12_000;
 const REQUIRED_HEADER_TOKENS = [
   'data-dtf-shell="header-v6"',
-  'data-dtf-sitewide-header="canonical-eight-v1"',
+  'data-dtf-sitewide-header="canonical-five-v1"',
   'dtf-sitewide-header-v6-script'
 ];
 const REQUIRED_NAV_ROUTES = [
   '/',
   '/seeds/',
   '/learn/',
-  '/courses/',
   '/tools/',
   '/games/',
-  '/community/',
   '/shop/'
 ];
 
@@ -38,7 +36,7 @@ async function request(origin, pathname, options = {}) {
   const url = new URL(pathname, origin);
   if (options.cacheBust) url.searchParams.set('dtf_v6_smoke', `${Date.now()}-${Math.random().toString(36).slice(2)}`);
   const response = await fetch(url, {
-    redirect: 'follow',
+    redirect: 'manual',
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     headers: {
       'user-agent': 'thc-u-know-live-smoke/1.4',
@@ -48,6 +46,9 @@ async function request(origin, pathname, options = {}) {
     }
   });
 
+  if (response.status >= 300 && response.status < 400) {
+    fail(`${pathname}: unexpected redirect to ${response.headers.get('location') || '<unknown>'}`);
+  }
   const body = await response.text();
   return {
     status: response.status,
@@ -149,7 +150,7 @@ async function main() {
   await checkSocket(serverOrigin);
   await checkOptionalRootHealth(serverOrigin);
 
-  console.log('THC U Know production smoke passed: frontend, approved V6 header, game health, and Socket.IO routing are live.');
+  console.log('THC U Know production smoke passed: frontend, approved Header V6 canonical-five navigation, game health, and Socket.IO routing are live.');
 }
 
 main().catch((error) => {
