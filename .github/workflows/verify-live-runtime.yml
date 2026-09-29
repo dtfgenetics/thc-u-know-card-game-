@@ -45,8 +45,8 @@ jobs:
             echo '## THC U Know live runtime verification'
             echo
             echo '- Web: https://dtfseeds.com/games/thc-u-know/'
-            echo '- Health: https://api.dtfseeds.com/games/thc-u-know/healthz'
-            echo '- Socket.IO: https://api.dtfseeds.com/games/thc-u-know/socket.io/'
-            echo '- Requires the canonical V6 DTFSeeds header and server identity.'
+            echo '- Default topology: same-origin Node health and Socket.IO under https://dtfseeds.com/games/thc-u-know/.'
+            echo '- Optional split-origin: set LIVE_SERVER_URL / THC_U_KNOW_SERVER_ORIGIN to the deployed Node origin.'
+            echo '- Requires the canonical Header V6 DTFSeeds navigation and thc-u-know-server identity.'
             echo '- A green run is still followed by the manual two-browser multiplayer gate before public promotion.'
           } >> "$GITHUB_STEP_SUMMARY"
