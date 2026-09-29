@@ -1,5 +1,4 @@
 const DEFAULT_WEB_ORIGIN = 'https://dtfseeds.com';
-const DEFAULT_SERVER_ORIGIN = 'https://api.dtfseeds.com';
 const GAME_PATH = '/games/thc-u-know/';
 const GAME_HEALTH_PATH = '/games/thc-u-know/healthz';
 const ROOT_HEALTH_PATH = '/healthz';
@@ -142,7 +141,7 @@ async function checkSocket(origin) {
 
 async function main() {
   const webOrigin = normalizeOrigin(process.env.LIVE_BASE_URL || process.argv[2] || DEFAULT_WEB_ORIGIN);
-  const serverOrigin = normalizeOrigin(process.env.LIVE_SERVER_URL, DEFAULT_SERVER_ORIGIN);
+  const serverOrigin = normalizeOrigin(process.env.LIVE_SERVER_URL || webOrigin, webOrigin);
   console.log(`THC U Know production smoke: web=${webOrigin} server=${serverOrigin}`);
 
   await checkGame(webOrigin);
