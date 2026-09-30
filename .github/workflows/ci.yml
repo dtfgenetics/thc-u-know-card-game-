@@ -28,6 +28,12 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -39,6 +45,19 @@ jobs:
 
       - name: Verify production runtime, subpath, socket and V6 header contract
         run: pnpm test:production-runtime
+
+      - name: Build shared-hosting fallback candidate
+        run: pnpm build:shared-hosting-fallback
+
+      - name: Validate shared-hosting fallback candidate
+        run: |
+          php -l deploy/shared-hosting-fallback/api/index.php
+          php -l dist/shared-hosting-fallback/api/index.php
+          node --check deploy/shared-hosting-fallback/assets/thc-u-know.js
+          node --check dist/shared-hosting-fallback/assets/thc-u-know.js
+          test -s dist/shared-hosting-fallback/index.html
+          test -s dist/shared-hosting-fallback/assets/cards/card-back.svg
+          test -s dist/shared-hosting-fallback/assets/logos/thc-u-know-logo.svg
 
       - name: Validate runtime manifest
         run: |
