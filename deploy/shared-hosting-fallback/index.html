@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Play THC U Know online with private room codes, ready controls, server-authoritative turns, and reconnect support."
+    />
+    <title>THC U Know</title>
+    <link rel="icon" href="assets/logos/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="assets/thc-u-know.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="table-hero" aria-label="THC U Know multiplayer table">
+        <div class="hero-copy">
+          <img class="game-logo" src="assets/logos/thc-u-know-logo.svg" alt="THC U Know" />
+          <p class="eyebrow">Live Multiplayer Card Table</p>
+          <h1>THC U Know</h1>
+          <p>
+            Host a private smoke circle, share a six-character room code, ready up, and play a server-controlled
+            cannabis parody card game with refresh/reconnect support.
+          </p>
+        </div>
+        <aside class="status-panel" aria-live="polite">
+          <span id="connection-chip" class="connection-chip idle">Not connected</span>
+          <strong id="room-title">Create or join a room</strong>
+          <p id="room-subtitle">No install, no account, just a private browser table.</p>
+        </aside>
+      </section>
+
+      <section id="setup-view" class="setup-grid">
+        <form id="create-form" class="panel setup-card">
+          <span class="panel-kicker">Host</span>
+          <h2>Create game</h2>
+          <label>
+            Player name
+            <input id="create-name" name="create-name" autocomplete="nickname" maxlength="24" placeholder="Your name" />
+          </label>
+          <button class="primary" type="submit">Create Multiplayer Game</button>
+        </form>
+
+        <form id="join-form" class="panel setup-card">
+          <span class="panel-kicker">Guest</span>
+          <h2>Join game</h2>
+          <label>
+            Player name
+            <input id="join-name" name="join-name" autocomplete="nickname" maxlength="24" placeholder="Your name" />
+          </label>
+          <label>
+            Room code
+            <input id="join-code" name="join-code" maxlength="6" placeholder="ABC123" />
+          </label>
+          <button class="secondary" type="submit">Join Multiplayer Game</button>
+        </form>
+      </section>
+
+      <section id="lobby-view" class="panel lobby-view hidden">
+        <div class="section-title">
+          <div>
+            <span class="panel-kicker">Lobby</span>
+            <h2>Smoke circle</h2>
+          </div>
+          <button id="leave-lobby" class="ghost" type="button">Leave</button>
+        </div>
+        <div class="invite-row">
+          <label>
+            Invite link
+            <input id="invite-link" readonly />
+          </label>
+          <button id="copy-invite" type="button">Copy Invite</button>
+        </div>
+        <div id="lobby-players" class="player-list"></div>
+        <div class="button-row">
+          <button id="ready-button" class="secondary" type="button">Mark Ready</button>
+          <button id="start-button" class="primary" type="button">Start Game</button>
+        </div>
+      </section>
+
+      <section id="game-view" class="game-view hidden">
+        <aside class="panel rail">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Players</span>
+              <h2>Turn order</h2>
+            </div>
+            <button id="leave-game" class="ghost" type="button">Exit</button>
+          </div>
+          <div id="game-players" class="player-list compact"></div>
+          <div class="mini-actions">
+            <button id="copy-invite-game" type="button">Copy Invite</button>
+            <button id="refresh-state" type="button">Refresh</button>
+          </div>
+        </aside>
+
+        <section class="table-panel">
+          <div class="table-status">
+            <span id="active-turn">Waiting for turn</span>
+            <span id="direction-status">Clockwise</span>
+          </div>
+          <div class="discard-stage">
+            <div id="discard-card" class="game-card-display card-back">THC</div>
+            <div class="table-copy">
+              <span id="current-color" class="color-badge">Color</span>
+              <strong id="game-message">Waiting for the table.</strong>
+              <p id="pending-draw">No pending draw.</p>
+            </div>
+          </div>
+          <div id="winner-panel" class="winner-panel hidden">
+            <span class="panel-kicker">Round over</span>
+            <h2 id="winner-text"></h2>
+            <button id="new-room" class="primary" type="button">Create New Room</button>
+          </div>
+        </section>
+
+        <section class="panel hand-panel">
+          <div class="section-title">
+            <div>
+              <span class="panel-kicker">Your hand</span>
+              <h2 id="hand-title">Cards</h2>
+            </div>
+            <button id="draw-button" class="primary" type="button">Draw</button>
+          </div>
+          <div id="color-picker" class="color-picker hidden" aria-label="Choose wild card color"></div>
+          <div id="hand" class="hand"></div>
+        </section>
+      </section>
+
+      <section class="panel log-panel">
+        <div class="section-title">
+          <div>
+            <span class="panel-kicker">Table talk</span>
+            <h2>Activity</h2>
+          </div>
+          <span id="room-code-pill" class="room-code-pill">No room</span>
+        </div>
+        <div id="error-box" class="error-box hidden"></div>
+        <ol id="activity-log" class="activity-log"></ol>
+      </section>
+    </main>
+    <script src="assets/thc-u-know.js" type="module"></script>
+  </body>
+</html>
