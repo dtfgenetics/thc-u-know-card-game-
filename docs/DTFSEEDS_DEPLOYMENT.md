@@ -63,6 +63,8 @@ The repository includes `.github/workflows/deploy-node-runtime.yml`. It deploys 
 
 Required production configuration:
 
+- Actions variable `THC_U_KNOW_AUTODEPLOY_ENABLED=true` to allow green-main CI to trigger automatic production deployment
+- Actions variable `THC_U_KNOW_RUNTIME_MONITOR_ENABLED=true` after the public Node runtime is actually deployed, enabling scheduled live smoke checks
 - secret `THC_U_KNOW_SSH_HOST`
 - secret `THC_U_KNOW_SSH_USER`
 - secret `THC_U_KNOW_SSH_KEY`
@@ -103,6 +105,6 @@ Then verify:
 5. Join through the invite link in a second browser.
 6. Start game, draw, play a number card, play action cards, play a wild, refresh/rejoin, and rematch.
 
-The scheduled `Live Production Smoke` workflow runs every six hours to detect routing/runtime regressions between deployments. If a health or Socket.IO request returns HTML, the request is reaching the WordPress/static frontend instead of the Node multiplayer process and the route/proxy or dedicated backend origin still needs deployment work.
+After `THC_U_KNOW_RUNTIME_MONITOR_ENABLED=true` is configured, the scheduled `Live Production Smoke` workflow runs every six hours to detect routing/runtime regressions between deployments. Manual dispatch remains available and strict before monitoring is enabled. If a health or Socket.IO request returns HTML, the request is reaching the WordPress/static frontend instead of the Node multiplayer process and the route/proxy or dedicated backend origin still needs deployment work.
 
 Rollback branch: `backup-main-before-direct-push`.
