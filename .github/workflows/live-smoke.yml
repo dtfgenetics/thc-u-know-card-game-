@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   live-smoke:
+    if: github.event_name == 'workflow_dispatch' || vars.THC_U_KNOW_RUNTIME_MONITOR_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
