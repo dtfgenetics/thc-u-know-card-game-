@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "repository": "dtfgenetics/thc-u-know-card-game-",
+  "controlRepository": "dtfgenetics/Thc",
+  "defaultBranch": "main",
+  "canonicalDomains": [
+    "THC U Know game",
+    "THC U Know multiplayer rules",
+    "THC U Know browser/server runtime"
+  ],
+  "sourceRoots": [
+    "apps/",
+    "packages/",
+    "scripts/",
+    "docs/",
+    "assets/",
+    "package.json",
+    "pnpm-lock.yaml",
+    "AGENTS.md"
+  ],
+  "protectedPaths": [
+    ".github/workflows/**",
+    ".env*"
+  ],
+  "verificationProfiles": {
+    "default": {
+      "commands": [
+        "pnpm verify"
+      ],
+      "ciAuthoritative": true
+    },
+    "runtime": {
+      "commands": [
+        "pnpm verify",
+        "pnpm test:production-runtime"
+      ],
+      "ciAuthoritative": true
+    },
+    "live": {
+      "commands": [
+        "pnpm verify",
+        "pnpm test:production-runtime"
+      ],
+      "conditionalLiveCommand": "pnpm live:check",
+      "ciAuthoritative": true
+    }
+  },
+  "production": {
+    "directMutation": false,
+    "integrationOwner": "dtfgenetics/Thc",
+    "route": "/games/thc-u-know/",
+    "notes": "Persistent multiplayer server is required; static build success is not live proof. Central DTFSeeds integration and exact live verification remain required."
+  }
+}
