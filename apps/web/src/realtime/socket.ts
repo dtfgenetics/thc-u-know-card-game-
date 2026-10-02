@@ -1,5 +1,7 @@
 import { io } from 'socket.io-client';
 
+export const THC_U_KNOW_PROTOCOL_VERSION = 1;
+
 function defaultSocketPath(): string {
   const baseUrl = import.meta.env.BASE_URL || '/';
   const normalizedBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
@@ -11,6 +13,7 @@ const socketPath = import.meta.env.VITE_SOCKET_PATH ?? defaultSocketPath();
 
 export const socket = io(serverUrl, {
   path: socketPath,
+  auth: { protocolVersion: THC_U_KNOW_PROTOCOL_VERSION },
   transports: ['websocket', 'polling'],
   tryAllTransports: true,
   autoConnect: true,
