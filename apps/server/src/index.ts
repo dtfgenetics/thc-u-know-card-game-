@@ -12,6 +12,14 @@ import { registerSocketHandlers } from './socket/handlers.js';
 
 const serverDistDir = path.dirname(fileURLToPath(import.meta.url));
 export const THC_U_KNOW_PROTOCOL_VERSION = 1;
+const maintenanceMode = process.env.THC_U_KNOW_MAINTENANCE_MODE === 'true';
+const multiplayerEnabled = process.env.THC_U_KNOW_MULTIPLAYER_ENABLED !== 'false';
+const operationalMetrics = {
+  socketConnections: 0,
+  socketDisconnects: 0,
+  socketRejected: 0,
+  connectedSockets: 0
+};
 
 function basePath(value: string): string {
   const trimmed = value.trim();
@@ -33,7 +41,15 @@ function findWebDistDir(): string | undefined {
 }
 
 function sendHealth(response: express.Response): void {
-  response.status(200).json({ ok: true, service: 'thc-u-know-server' });
+  response.status(200).json({
+    ok: true,
+    service: 'thc-u-know-server',
+    protocolVersion: THC_U_KNOW_PROTOCOL_VERSION,
+    maintenance: maintenanceMode,
+    multiplayerEnabled,
+    uptimeSeconds: Math.round(process.uptime()),
+    operationalMetrics: { ...operationalMetrics }
+  });
 }
 
 function addWebBuild(app: express.Express): void {
@@ -80,6 +96,18 @@ async function main() {
     }
   });
 
+  io.use((_socket, next) => {
+    if (maintenanceMode) {
+      operationalMetrics.socketRejected += 1;
+      return next(new Error('THC U Know is temporarily under maintenance'));
+    }
+    if (!multiplayerEnabled) {
+      operationalMetrics.socketRejected += 1;
+      return next(new Error('THC U Know multiplayer is temporarily disabled'));
+    }
+    next();
+  });
+
   io.use((socket, next) => {
     const rawVersion = socket.handshake.auth?.protocolVersion;
     if (rawVersion == null || rawVersion === '') return next();
@@ -87,6 +115,15 @@ async function main() {
       return next(new Error('THC U Know client protocol is incompatible with this server'));
     }
     next();
+  });
+
+  io.on('connection', socket => {
+    operationalMetrics.socketConnections += 1;
+    operationalMetrics.connectedSockets += 1;
+    socket.on('disconnect', () => {
+      operationalMetrics.socketDisconnects += 1;
+      operationalMetrics.connectedSockets = Math.max(0, operationalMetrics.connectedSockets - 1);
+    });
   });
 
   const sessionStore = createSessionStore();
