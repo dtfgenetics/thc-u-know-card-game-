@@ -11,6 +11,7 @@ import { createSessionStore } from './state/createSessionStore.js';
 import { registerSocketHandlers } from './socket/handlers.js';
 
 const serverDistDir = path.dirname(fileURLToPath(import.meta.url));
+export const THC_U_KNOW_PROTOCOL_VERSION = 1;
 
 function basePath(value: string): string {
   const trimmed = value.trim();
@@ -77,6 +78,15 @@ async function main() {
       origin: corsOrigin,
       credentials: true
     }
+  });
+
+  io.use((socket, next) => {
+    const rawVersion = socket.handshake.auth?.protocolVersion;
+    if (rawVersion == null || rawVersion === '') return next();
+    if (Number(rawVersion) !== THC_U_KNOW_PROTOCOL_VERSION) {
+      return next(new Error('THC U Know client protocol is incompatible with this server'));
+    }
+    next();
   });
 
   const sessionStore = createSessionStore();

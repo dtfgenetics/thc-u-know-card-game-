@@ -35,5 +35,7 @@
     "pnpm live:check",
     "manual-two-browser-multiplayer-check"
   ],
-  "productionBlocker": "A Node/Socket.IO origin must be deployed and either reverse-proxied to the game-scoped health/socket routes or configured as THC_U_KNOW_SERVER_ORIGIN."
+  "productionBlocker": "A Node/Socket.IO origin must be deployed and either reverse-proxied to the game-scoped health/socket routes or configured as THC_U_KNOW_SERVER_ORIGIN.",
+  "protocolVersion": 1,
+  "protocolMigration": "Missing handshake protocolVersion remains accepted during v1 migration; explicit incompatible versions are rejected before room handlers run."
 }
