@@ -6,15 +6,15 @@ const workflow = fs.readFileSync('.github/workflows/live-smoke.yml', 'utf8');
 const verifyWorkflow = fs.readFileSync('.github/workflows/verify-live-runtime.yml', 'utf8');
 const deployWorkflow = fs.readFileSync('.github/workflows/deploy-node-runtime.yml', 'utf8');
 
-assert.doesNotMatch(
+assert.match(
   checker,
-  /DEFAULT_SERVER_ORIGIN\s*=\s*['"]https:\/\/api\.dtfseeds\.com/,
-  'live smoke must not hard-code a separate API origin when the production contract defaults to same-origin'
+  /DEFAULT_SERVER_ORIGIN\s*=\s*['\"]https:\/\/api\.dtfseeds\.com/,
+  'live smoke default backend should use the documented split API origin'
 );
 assert.match(
   checker,
-  /process\.env\.LIVE_SERVER_URL\s*\|\|\s*webOrigin/,
-  'blank LIVE_SERVER_URL must use the frontend origin for same-origin Node/Socket.IO routing'
+  /process\.env\.LIVE_SERVER_URL\s*,\s*DEFAULT_SERVER_ORIGIN/,
+  'explicit LIVE_SERVER_URL must override the split-origin default'
 );
 assert.match(
   workflow,
@@ -30,7 +30,7 @@ assert.match(
 assert.match(checker, /REQUIRED_NAV_ROUTES/, 'live checker must validate canonical nav routes semantically');
 assert.match(checker, /'\/tools\/'/, 'live checker must require the current Tools route');
 assert.doesNotMatch(checker, />Diagnostic<|\/diagnostic\//, 'live checker must not require the retired Diagnostic nav label');
-assert.match(verifyWorkflow, /same-origin/i, 'live verification summary must explain the default same-origin topology');
+assert.match(verifyWorkflow, /split-origin/i, 'live verification summary must describe the default split-origin topology');
 assert.match(verifyWorkflow, /LIVE_SERVER_URL|THC_U_KNOW_SERVER_ORIGIN/, 'live verification summary must mention the optional separate backend override');
 
 assert.match(deployWorkflow, /THC_U_KNOW_SERVER_ORIGIN/, 'production deployment must require an explicit public Node origin');
