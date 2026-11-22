@@ -382,7 +382,7 @@ export function GameTable({ playerId, publicState, privateState, socketConnected
           </div>
         </details>
       </section>
-      <section className="hand-zone">
+      <section className={`hand-zone${privateState.hand.length >= 12 ? ' is-large-hand' : ''}`} data-hand-size={privateState.hand.length}>
         {actionPending && (
           <p className="game-action-status" role="status" aria-live="polite">
             Updating the table…
