@@ -9,7 +9,7 @@ type Props = {
 
 export function PlayerRail({ players, currentPlayerId, localPlayerId, roundComplete }: Props) {
   return (
-    <aside className="player-rail" aria-label="Players">
+    <aside className={`player-rail${players.length >= 6 ? ' is-crowded' : ''}`} aria-label="Players">
       {players.map(player => {
         const isLocal = player.id === localPlayerId;
         const isCurrent = !roundComplete && player.id === currentPlayerId;
